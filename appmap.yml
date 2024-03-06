@@ -1,0 +1,11 @@
+name: bitcoinwifes
+packages:
+  - path: common
+  - path: components\Modal
+  - path: locate
+  - path: service
+  - path: style\iconfont
+  - path: types
+  - path: utils
+language: javascript
+appmap_dir: tmp/appmap

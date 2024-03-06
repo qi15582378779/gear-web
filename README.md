@@ -1,1 +1,2 @@
-# gear-web
+# ai-cell-web
+AICell web project
