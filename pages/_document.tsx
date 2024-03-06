@@ -33,7 +33,7 @@ class AppDocument extends Document {
       <Html>
         <Head>
           <link rel="icon" href="/logo.ico" />
-          <title>AICell</title>
+          <title>Gear</title>
           <meta name="description" content="" />
           <link rel="stylesheet" href="/font/font.css" />
           <script
