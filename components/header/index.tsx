@@ -208,6 +208,10 @@ const Nav = styled.div`
   display: flex;
   align-items: center;
   gap: 0 0.72rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   @media screen and (max-width: 768px) {
     display: none;
   }

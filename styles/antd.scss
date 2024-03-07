@@ -125,6 +125,14 @@
       border-radius: 0;
     }
   }
+
+  &.text-tip-popover {
+    --antd-arrow-background-color: #211f22;
+
+    .ant-popover-inner {
+      background-color: #211f22;
+    }
+  }
 }
 
 // ant-btn

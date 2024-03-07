@@ -41,7 +41,7 @@ function AiApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <link rel="icon" href="/logo.ico" />
-        <title>AICell</title>
+        <title>GEAR</title>
         <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
         <meta name="msapplication-tap-highlight" content="no" />
       </Head>

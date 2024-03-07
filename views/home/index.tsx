@@ -1,13 +1,13 @@
-import { IconDown, IconHistory, IconHistory2 } from '@/components/Icon';
+import { IconSearch } from '@/components/Icon';
 import cn from 'classnames';
-import { FC, ReactElement, useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { Button, Input, Skeleton, Tooltip, message, notification } from 'antd';
+import { FC, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+
+import { Button, Input, notification } from 'antd';
 import CellModal from './components/cellModal';
 import HistoryModal from './components/history-modal';
 import { useApproveByToken, useTransactionMined, useWallet } from '@/hooks';
 import { useConnectWallet } from '@/state/chain/hooks';
-import { $BigNumber, $shiftedBy, $shiftedByFixed, $sleep } from '@/utils/met';
+import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed, $sleep } from '@/utils/met';
 import { getCell, ERC20 } from '@/sdk';
 
 import Server from '@/service';
@@ -17,10 +17,16 @@ import ResultModal from './ResultModal';
 import ApproveModal from './ApproveModal';
 import { useUserBalance } from '@/state/base/hooks';
 
+import ps from './styles/index.module.scss';
+import TooltipLine from '@/components/TooltipLine';
+import { Copy } from '@/components';
+
+const { TextArea } = Input;
+
 const Home: FC = (): ReactElement => {
   const [, connectWallet] = useConnectWallet();
   const [history, { fetchHistory, reset }] = useHistory();
-  const { account, wallet, walletReady, switchNetwork } = useWallet();
+  const { account, wallet, walletReady, switchNetwork, openGreenfieldScan } = useWallet();
   const [balance, getUserBalance] = useUserBalance();
 
   const [{ approvalState, transactionState }, { approve, getAllowance }, approveLoading] = useApproveByToken();
@@ -34,6 +40,36 @@ const Home: FC = (): ReactElement => {
   const [detailData, setDetailData] = useState<any>(null);
   const [cellModalFlag, setCellModalFlag] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [search, setSearch] = useState<string>('');
+
+  const [cellList, setCellList] = useState<any[]>([]);
+  const [cellLoad, setCellLoad] = useState<boolean>(false);
+  const params = useRef({
+    text: ''
+  });
+
+  const hangSearch = (value: string) => {
+    setSearch(value);
+  };
+
+  const getCellList = () => {
+    setCellLoad(true);
+    Server.fetchCells({ ...params.current })
+      .then((res) => {
+        console.log('res---->', res);
+        if (res.code === 0) {
+          setCellList(res.data);
+        }
+      })
+      .catch((e) => {
+        console.log('error--->', e);
+        notification.error({ message: e.error || e.message });
+      })
+      .finally(() => {
+        setCellLoad(false);
+      });
+  };
 
   const btn_disabled = useMemo(() => {
     if (detailData?.requestParams) {
@@ -218,125 +254,146 @@ const Home: FC = (): ReactElement => {
     else reset();
   }, [account]);
 
+  useEffect(() => {
+    getCellList();
+  }, []);
+
   return (
     <>
-      <Content>
-        <Img src="/images/home/icon-1.svg" alt="" className={cn('icon', 'icon-1')} />
-        <Img src="/images/home/icon-2.svg" alt="" className={cn('icon', 'icon-2')} />
-        <Img src="/images/home/icon-3.svg" alt="" className={cn('icon', 'icon-3')} />
-        <Img src="/images/home/icon-4.svg" alt="" className={cn('icon', 'icon-4')} />
-        <Group>
-          <Tit>
-            <div>Call Cell</div>
-            <HistoryGroup
-              onClick={() => {
-                handShowHistoryModal(true);
-                handHasNewHistory(false);
-              }}
-            >
-              {hasNewHistory ? <IconHistory2 /> : <IconHistory />}
-            </HistoryGroup>
-          </Tit>
-          <SubTit>Please select an API cell and enter an instruction to call it.</SubTit>
-
-          <Lab>Select Interface</Lab>
-
-          <SelectView className={cn(!detailData ? 'empty' : '', detailData ? '_value' : '')} onClick={handleSelect}>
-            {detailData ? (
-              <SelectText>
-                <SelectLfImg>
-                  <Skeleton.Avatar active />
-                  <Img src={detailData.logoFile} alt="" />
-                </SelectLfImg>
-
-                {detailData.name}
-              </SelectText>
+      <div className={ps.full}>
+        <div className={ps.container}>
+          <div className={ps.tit}>Call Cell</div>
+          <Input className={ps.search} value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e) => hangSearch(e.target.value)} />
+          <div className={ps.group}>
+            {cellLoad ? (
+              <>loading....</>
             ) : (
-              'Please Select Interface first'
+              <>
+                {cellList.map((item, index) => (
+                  <div className={cn(ps.item, [ps['open-item']])} key={`${item._id}-${index}`}>
+                    <section className={ps['data-item']}>
+                      <div className={ps['item-top']}>
+                        <div>
+                          <img src={item.logoFile} alt="" />
+                          <div>
+                            <div className={ps['top-tit']}>{item.name}</div>
+                            <TooltipLine name={item.description} index={index} length={null} clamp="2" />
+                          </div>
+                        </div>
+                        <div className={ps['top-rt']}>
+                          <img src={`/images/tokens/${item.tokeninfo.symbol}.png`} alt="" />
+
+                          <div>
+                            <span>${$shiftedBy(item.price, -item.tokeninfo.decimals)}</span>/Call
+                          </div>
+
+                          <div>
+                            <img src="/images/other/3.svg" alt="" />
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className={ps['more-item']}>
+                      <div>
+                        <div className={ps['more-top']}>
+                          <div>
+                            <div>URL</div>
+                            <div>{$hash(item.encryptURL, 15, 15)}</div>
+                          </div>
+                          <div>
+                            <div>Storage</div>
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openGreenfieldScan(item.metadataObjectId, 'object');
+                              }}
+                            >
+                              Txn Hash: {$hash(item.metadataObjectId)}{' '}
+                              <Copy
+                                className="copy"
+                                copy={() => {
+                                  $copy(item.metadataObjectId);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <>
+                          {Object.keys(item.requestParams).length > 0 && (
+                            <>
+                              {Object.entries(item.requestParams).map(([key, value]) => (
+                                <div className={ps['more-list']} key={key}>
+                                  <div className={ps['list-lab']}>{key}</div>
+                                  <TextArea className={ps['list-input']} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(key, e.target.value)} />
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </>
+
+                        {!btn_disabled ? (
+                          <div className={ps['list-fee']}>
+                            <div>
+                              <div>fee</div>
+                              <div>
+                                <img src={`/images/tokens/${item.tokeninfo.symbol}.png`} alt="" /> ${$shiftedBy(item.price, -item.tokeninfo.decimals)}
+                              </div>
+                            </div>
+
+                            <div>
+                              <div>Network Cost</div>
+                              <div>
+                                <img src="/images/tokens/USDC.png" alt="" /> $1.14
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
+
+                        {!account ? (
+                          <Button className={ps['btn']}>Connect Wallet</Button>
+                        ) : (
+                          <>
+                            {!walletReady ? (
+                              <Button
+                                className={ps['btn']}
+                                onClick={() => {
+                                  switchNetwork();
+                                }}
+                              >
+                                Connect to BNB Chain
+                              </Button>
+                            ) : !balanceHealth ? (
+                              <Button className={ps['btn']} disabled>
+                                Insufficient balance
+                              </Button>
+                            ) : (
+                              <>
+                                {approvalState !== ApprovalState.APPROVED ? (
+                                  <Button className={ps['btn']} loading={approveLoading || loading} disabled={btn_disabled} onClick={() => handApprove()}>
+                                    Approve and Call
+                                  </Button>
+                                ) : (
+                                  <Button className={ps['btn']} loading={loading} disabled={btn_disabled} onClick={() => handleCall()}>
+                                    Call
+                                  </Button>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </section>
+                  </div>
+                ))}
+              </>
             )}
-            <IconDown />
-          </SelectView>
+          </div>
+        </div>
+      </div>
 
-          {/* <Lab>Instructions</Lab> */}
-
-          {!detailData ? (
-            <GridGroup>
-              <div>
-                <Lab>Instructions</Lab>
-                <TextArea disabled={!detailData} />
-              </div>
-            </GridGroup>
-          ) : (
-            <>
-              {Object.keys(detailData.requestParams).length > 0 && (
-                <GridGroup>
-                  {Object.entries(detailData.requestParams).map(([key, value]) => (
-                    <div key={key}>
-                      <Lab>{key}</Lab>
-                      <TextArea value={value as string} className={cn({ focusVal: value })} onChange={(e) => handleInputChange(key, e.target.value)} />
-                    </div>
-                  ))}
-                </GridGroup>
-              )}
-            </>
-          )}
-
-          {detailData && !btn_disabled ? (
-            <Free>
-              <div>
-                Fee
-                <div>
-                  <Img src={`/images/tokens/${detailData.tokeninfo.symbol}.png`} />
-                  <span>{$shiftedBy(detailData.price, -detailData.tokeninfo.decimals)}</span>
-                </div>
-              </div>
-              {/* <div>
-                Network Cost
-                <div>
-                  <Img src="/images/tokens/USDT.png" alt="" />
-                  <span>$1.14</span>
-                </div>
-              </div> */}
-            </Free>
-          ) : null}
-
-          {!account ? (
-            <ContentWallet className={cn('connect-wallet-btn')} onClick={() => connectWallet('m')}>
-              Connect Wallet
-            </ContentWallet>
-          ) : (
-            <>
-              {!walletReady ? (
-                <CallBtn
-                  onClick={() => {
-                    switchNetwork();
-                  }}
-                >
-                  Connect to BNB Chain
-                </CallBtn>
-              ) : !detailData ? (
-                <NotSelect>Select Interface</NotSelect>
-              ) : !balanceHealth ? (
-                <NotSelect>Insufficient balance</NotSelect>
-              ) : (
-                <>
-                  {approvalState !== ApprovalState.APPROVED ? (
-                    <CallBtn loading={approveLoading || loading} disabled={btn_disabled} onClick={() => handApprove()}>
-                      Approve and Call
-                    </CallBtn>
-                  ) : (
-                    <CallBtn loading={loading} disabled={btn_disabled} onClick={() => handleCall()}>
-                      Call
-                    </CallBtn>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </Group>
-      </Content>
-
-      <CellModal
+      {/* <CellModal
         showCellModal={cellModalFlag}
         handleSelect={(item) => {
           handleSelectCell(item);
@@ -344,7 +401,7 @@ const Home: FC = (): ReactElement => {
         handleCloseModal={(update) => {
           setCellModalFlag(false);
         }}
-      />
+      /> */}
 
       <HistoryModal
         isOpen={showHistoryModal}
@@ -357,350 +414,5 @@ const Home: FC = (): ReactElement => {
     </>
   );
 };
-
-const Content = styled.div`
-  overflow-x: hidden;
-  /* overflow-y: auto; */
-  padding: 0.68rem 0.12rem;
-  height: 100%;
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    z-index: 1;
-    left: 50%;
-    top: calc(50% + 0.72rem);
-    width: 7.9rem;
-    max-width: 100%;
-    height: 7.9rem;
-    max-height: calc(100% - 1.92rem);
-    transform: translate(-50%, -50%);
-    border-radius: 7.9rem;
-    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 245, 0.1) 0%, rgba(255, 76, 237, 0) 100%);
-    filter: blur(44px);
-  }
-
-  @media screen and (max-width: 768px) {
-    padding-top: 0.2rem;
-    &::before {
-      height: calc(100% - 1.92rem);
-    }
-  }
-`;
-
-const Group = styled.div`
-  width: 4.62rem;
-  border-radius: 0.24rem;
-  border: 1px solid #f1eaf0;
-  background: #fff;
-  padding: 0.16rem;
-  margin: 0 auto;
-  max-width: 100%;
-  position: relative;
-  z-index: 2;
-`;
-
-const Tit = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  line-height: 1;
-  & > div {
-    display: flex;
-    align-items: center;
-    &:nth-of-type(1) {
-      font-size: 0.16rem;
-      font-weight: 500;
-      color: #222;
-    }
-    &:nth-of-type(2) {
-      position: relative;
-      color: #7d7d7d;
-      cursor: pointer;
-    }
-  }
-`;
-
-const SubTit = styled.div`
-  font-size: 0.12rem;
-  font-weight: 400;
-  line-height: 166.667%;
-  color: #6f6c90;
-  margin-bottom: 0.12rem;
-`;
-
-const Lab = styled.div`
-  font-size: 0.14rem;
-  font-weight: 500;
-  line-height: 171.429%;
-  margin-bottom: 0.04rem;
-  color: #7d7d7d;
-  height: 0.24rem;
-  display: flex;
-  align-items: center;
-`;
-
-const SelectView = styled.div`
-  width: 100%;
-  height: 0.48rem;
-  border-radius: 0.12rem;
-  border: 1px solid #e6e6e6;
-  background: #fff;
-  box-shadow: 0px 1px 4px 1px rgba(0, 0, 0, 0.03);
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.16rem;
-  padding: 0 0.16rem;
-  font-size: 0.16rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  & > svg {
-    width: 0.16rem;
-    height: 0.16rem;
-    position: absolute;
-    right: 0.16rem;
-    top: 50%;
-    color: #a4aebc;
-    transform: translateY(-50%);
-  }
-
-  &.empty {
-    background: #fc72ff;
-    box-shadow: none;
-    color: #fff;
-    border-color: #fc72ff;
-    transition: all 0.2s;
-    &:hover {
-      background: #fa59ff;
-    }
-    & > svg {
-      color: #fff;
-    }
-  }
-  &._value {
-    transition: all 0.2s;
-    &:hover {
-      background: linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%), #fff;
-    }
-  }
-`;
-
-const SelectText = styled.div`
-  display: flex;
-  align-items: center;
-  font-size: 0.14rem;
-  font-weight: 500;
-  line-height: 1;
-  color: #170f49;
-
-  img {
-    display: block;
-    width: 0.18rem;
-    height: 0.18rem;
-    border-radius: 50%;
-    margin-right: 0.1rem;
-  }
-`;
-
-const TextArea = styled(Input.TextArea)`
-  max-height: 1.2rem !important;
-  min-height: 0.56rem !important;
-  border-radius: 0.12rem;
-  background: #f9f9f9;
-  /* padding: 0.16rem; */
-  border: 1px solid #f9f9f9;
-  resize: none !important;
-  font-size: 0.14rem;
-  font-weight: 400;
-  line-height: 171.429% !important;
-  color: #170f49;
-  /* margin-bottom: 0.16rem; */
-
-  &:disabled,
-  &[disabled] {
-    border-color: #f9f9f9;
-    background-color: #f9f9f9;
-    padding: 0;
-    &:hover {
-      border-color: #f9f9f9;
-      background-color: #f9f9f9;
-    }
-  }
-
-  &:hover {
-    border-color: #f1eaf0;
-  }
-
-  &:focus,
-  &.focusVal {
-    padding: 0.16rem;
-    min-height: 1.2rem !important;
-  }
-`;
-
-const Free = styled.div`
-  border-radius: 0.12rem;
-  border: 1px solid #efefef;
-  background: #fff;
-  margin-bottom: 0.16rem;
-  padding: 0.12rem 0.16rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.08rem 0;
-
-  & > div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.14rem;
-    font-weight: 400;
-    color: #7d7d7d;
-    & > div {
-      display: flex;
-      align-items: center;
-      font-size: 0.14rem;
-      font-weight: 500;
-      color: #170f49;
-
-      img {
-        display: block;
-        width: 0.14rem;
-        height: 0.14rem;
-        border-radius: 50%;
-        margin-right: 0.08rem;
-      }
-
-      span {
-        display: flex;
-        align-items: center;
-        justify-content: right;
-        /* min-width: 0.4rem; */
-      }
-    }
-  }
-`;
-
-const ContentWallet = styled(Button)`
-  width: 100%;
-  height: 0.56rem;
-  font-size: 0.2rem;
-  font-weight: 500;
-  border-radius: 0.16rem;
-`;
-
-const NotSelect = styled.div`
-  width: 100%;
-  height: 0.56rem;
-  border-radius: 0.16rem;
-  cursor: not-allowed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f9f9f9;
-  color: #7d7d7d;
-  font-size: 0.2rem;
-  font-weight: 500;
-`;
-
-const CallBtn = styled(Button)`
-  width: 100%;
-  height: 0.56rem;
-  border: none;
-  box-shadow: none;
-  border-radius: 0.16rem;
-  background-color: #fc72ff;
-  font-size: 0.2rem;
-  font-weight: 500;
-  color: #fff;
-  &:hover {
-    color: #fff !important;
-    background-color: #fa59ff;
-  }
-`;
-
-const Img = styled.img`
-  &.icon {
-    width: 0.44rem;
-    height: 0.44rem;
-    border-radius: 50%;
-    position: absolute;
-  }
-
-  &.icon-1 {
-    bottom: 1.7rem;
-    left: 50%;
-    transform: translateX(calc(-50% - 5.76rem));
-  }
-
-  &.icon-2 {
-    top: 1.46rem;
-    left: 50%;
-    transform: translateX(calc(-50% - 4.78rem));
-  }
-
-  &.icon-3 {
-    top: 1.46rem;
-    left: 50%;
-    transform: translateX(calc(-50% + 4.78rem));
-  }
-
-  &.icon-4 {
-    bottom: 1.7rem;
-    left: 50%;
-    transform: translateX(calc(-50% + 5.76rem));
-  }
-`;
-
-const GridGroup = styled.div`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 0.12rem 0.1rem;
-  margin-bottom: 0.2rem;
-`;
-
-const KeyLabel = styled.div`
-  font-size: 0.12rem;
-  font-weight: 400;
-  line-height: 66.667%;
-  color: #7d7d7d;
-  margin-bottom: 0.04rem;
-  height: 0.2rem;
-  display: flex;
-  align-items: center;
-`;
-
-const InputFull = styled(Input)`
-  width: 100%;
-  height: 0.56rem;
-  border-radius: 0.12rem;
-  background: #f9f9f9;
-  border: 1px solid #f9f9f9;
-`;
-
-const HistoryGroup = styled.div`
-  display: flex;
-  align-items: center;
-  position: relative;
-`;
-
-const SelectLfImg = styled.div`
-  position: relative;
-  margin-right: 0.1rem;
-  & > div {
-    width: 0.18rem !important;
-    height: 0.18rem !important;
-  }
-  & > img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 0.18rem;
-    height: 0.18rem;
-  }
-`;
 
 export default Home;
