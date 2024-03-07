@@ -45,6 +45,8 @@ const Home: FC = (): ReactElement => {
 
   const [cellList, setCellList] = useState<any[]>([]);
   const [cellLoad, setCellLoad] = useState<boolean>(false);
+  const [loadingStates, setLoadingStates] = useState(Array(cellList.length).fill(false));
+
   const params = useRef({
     text: ''
   });
@@ -105,14 +107,15 @@ const Home: FC = (): ReactElement => {
     getAllowance(token, item.cellAddress, $shiftedByFixed(item.price, -1 * item.tokeninfo.decimals, 8));
   };
 
-  const handleInputChange = (key: string, value: string) => {
-    setDetailData((prevData: any) => ({
-      ...prevData,
-      requestParams: {
-        ...prevData.requestParams,
-        [key]: value
-      }
-    }));
+  const handleInputChange = (itemIndex: number, key: string, value: string) => {
+    const updatedData = [...cellList];
+
+    updatedData[itemIndex].requestParams = {
+      ...updatedData[itemIndex].requestParams,
+      [key]: value
+    };
+
+    setCellList(updatedData);
   };
 
   const handleCall = async (isApproveAction: boolean = false) => {
@@ -326,7 +329,7 @@ const Home: FC = (): ReactElement => {
                               {Object.entries(item.requestParams).map(([key, value]) => (
                                 <div className={ps['more-list']} key={key}>
                                   <div className={ps['list-lab']}>{key}</div>
-                                  <TextArea className={ps['list-input']} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(key, e.target.value)} />
+                                  <TextArea className={ps['list-input']} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(index, key, e.target.value)} />
                                 </div>
                               ))}
                             </>
@@ -371,11 +374,11 @@ const Home: FC = (): ReactElement => {
                             ) : (
                               <>
                                 {approvalState !== ApprovalState.APPROVED ? (
-                                  <Button className={ps['btn']} loading={approveLoading || loading} disabled={btn_disabled} onClick={() => handApprove()}>
+                                  <Button className={ps['btn']} loading={approveLoading || loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handApprove()}>
                                     Approve and Call
                                   </Button>
                                 ) : (
-                                  <Button className={ps['btn']} loading={loading} disabled={btn_disabled} onClick={() => handleCall()}>
+                                  <Button className={ps['btn']} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall()}>
                                     Call
                                   </Button>
                                 )}
@@ -389,6 +392,7 @@ const Home: FC = (): ReactElement => {
                 ))}
               </>
             )}
+            <></>
           </div>
         </div>
       </div>
