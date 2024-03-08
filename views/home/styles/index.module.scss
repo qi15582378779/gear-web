@@ -25,7 +25,7 @@
 
 .search {
   height: 0.4rem;
-  background-color: transparent;
+  background: transparent !important;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.32);
   color: #fff;
@@ -118,11 +118,33 @@
   align-items: center;
   justify-content: center;
   background-color: #0f152e;
+  position: relative;
   & > img {
     display: block;
     width: 0.24rem;
     height: 0.24rem;
     border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    background: #0f152e;
+  }
+
+  & > div {
+    width: 0.24rem !important;
+    height: 0.24rem;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    & > div {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 50% !important;
+      svg {
+        max-width: 50% !important;
+      }
+    }
   }
 }
 
@@ -392,6 +414,70 @@
       &:nth-of-type(2) {
         img {
           transform: rotate(180deg);
+        }
+      }
+    }
+  }
+}
+
+.load-item {
+  .data-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & > div {
+      &:nth-of-type(1) {
+        display: flex;
+        align-items: center;
+        & > div {
+          &:nth-of-type(1) {
+            width: 0.64rem;
+            height: 0.64rem;
+            border-radius: 50%;
+            margin-right: 0.16rem;
+            & > div {
+              width: 100% !important;
+              height: 100% !important;
+              border-radius: 50%;
+
+              svg {
+                max-width: 50%;
+              }
+            }
+          }
+
+          &:nth-of-type(2) {
+            display: flex;
+            flex-direction: column;
+            gap: 0.04rem 0;
+
+            & > div {
+              height: 0.24rem;
+              span {
+                height: 100%;
+                border-radius: 0.06rem;
+                min-width: auto;
+              }
+
+              &:nth-of-type(1) {
+                width: 1.54rem;
+              }
+              &:nth-of-type(2) {
+                width: 6rem;
+              }
+            }
+          }
+        }
+      }
+
+      &:nth-of-type(2) {
+        width: 1.2rem;
+        height: 0.24rem;
+        span {
+          height: 100%;
+          border-radius: 0.06rem;
+          min-width: auto;
         }
       }
     }

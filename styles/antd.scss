@@ -23,8 +23,8 @@
   &.ant-input-outlined:hover,
   &.ant-input-outlined:focus,
   &.ant-input-outlined:focus-within {
-    border-color: #f1eaf0;
-    background-color: #f9f9f9;
+    // border-color: #f1eaf0;
+    // background-color: #f9f9f9;
   }
   &:focus-visible {
     outline: none !important;
@@ -36,6 +36,10 @@
 }
 .ant-select.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer):hover .ant-select-selector {
   border-color: #f1eaf0;
+}
+
+.ant-input-affix-wrapper > input.ant-input {
+  background: transparent;
 }
 
 // ant-tooltip

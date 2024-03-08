@@ -2,8 +2,7 @@ import { IconSearch } from '@/components/Icon';
 import cn from 'classnames';
 import { FC, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Button, Input, notification } from 'antd';
-import CellModal from './components/cellModal';
+import { Button, ConfigProvider, Input, Skeleton, notification, theme } from 'antd';
 import HistoryModal from './components/history-modal';
 import { useApproveByToken, useTransactionMined, useWallet } from '@/hooks';
 import { useConnectWallet } from '@/state/chain/hooks';
@@ -271,7 +270,41 @@ const Home: FC = (): ReactElement => {
           <Input className={ps.search} value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e) => hangSearch(e.target.value)} />
           <div className={ps.group}>
             {cellLoad ? (
-              <>loading....</>
+              <>
+                {Array.from({ length: 5 }, (_, index) => (
+                  <section className={cn(ps.item, ps['load-item'])} key={index}>
+                    <div className={ps['data-item']}>
+                      <div>
+                        <ConfigProvider
+                          theme={{
+                            algorithm: theme.darkAlgorithm
+                          }}
+                        >
+                          <Skeleton.Image active />
+                        </ConfigProvider>
+                        <div>
+                          <ConfigProvider
+                            theme={{
+                              algorithm: theme.darkAlgorithm
+                            }}
+                          >
+                            <Skeleton.Input active block />
+                            <Skeleton.Input active block />
+                          </ConfigProvider>
+                        </div>
+                      </div>
+
+                      <ConfigProvider
+                        theme={{
+                          algorithm: theme.darkAlgorithm
+                        }}
+                      >
+                        <Skeleton.Input active block />
+                      </ConfigProvider>
+                    </div>
+                  </section>
+                ))}
+              </>
             ) : (
               <>
                 {cellList.map((item, index) => (
@@ -280,6 +313,13 @@ const Home: FC = (): ReactElement => {
                       <div className={ps['item-top']}>
                         <div>
                           <div className={ps['top-img']}>
+                            <ConfigProvider
+                              theme={{
+                                algorithm: theme.darkAlgorithm
+                              }}
+                            >
+                              <Skeleton.Image active />
+                            </ConfigProvider>
                             <img src={item.logoFile} alt="" />
                           </div>
 
@@ -406,16 +446,6 @@ const Home: FC = (): ReactElement => {
           </div>
         </div>
       </div>
-
-      {/* <CellModal
-        showCellModal={cellModalFlag}
-        handleSelect={(item) => {
-          handleSelectCell(item);
-        }}
-        handleCloseModal={(update) => {
-          setCellModalFlag(false);
-        }}
-      /> */}
 
       <HistoryModal
         isOpen={showHistoryModal}
