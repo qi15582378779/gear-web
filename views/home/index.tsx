@@ -42,6 +42,8 @@ const Home: FC = (): ReactElement => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [search, setSearch] = useState<string>('');
+  const [open, setOpen] = useState<boolean>(false);
+  const [openIndex, setOpenIndex] = useState<number>(-1);
 
   const [cellList, setCellList] = useState<any[]>([]);
   const [cellLoad, setCellLoad] = useState<boolean>(false);
@@ -273,11 +275,14 @@ const Home: FC = (): ReactElement => {
             ) : (
               <>
                 {cellList.map((item, index) => (
-                  <div className={cn(ps.item, [ps['open-item']])} key={`${item._id}-${index}`}>
+                  <div className={cn(ps.item, { [ps['open-item']]: open && openIndex === index })} key={`${item._id}-${index}`}>
                     <section className={ps['data-item']}>
                       <div className={ps['item-top']}>
                         <div>
-                          <img src={item.logoFile} alt="" />
+                          <div className={ps['top-img']}>
+                            <img src={item.logoFile} alt="" />
+                          </div>
+
                           <div>
                             <div className={ps['top-tit']}>{item.name}</div>
                             <TooltipLine name={item.description} index={index} length={null} clamp="2" />
@@ -290,7 +295,12 @@ const Home: FC = (): ReactElement => {
                             <span>${$shiftedBy(item.price, -item.tokeninfo.decimals)}</span>/Call
                           </div>
 
-                          <div>
+                          <div
+                            onClick={() => {
+                              setOpen(!open);
+                              setOpenIndex(index);
+                            }}
+                          >
                             <img src="/images/other/3.svg" alt="" />
                           </div>
                         </div>
