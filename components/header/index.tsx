@@ -90,7 +90,12 @@ const Header: FC<any> = (): ReactElement => {
         </Nav>
 
         <AccountConter>
-          <History>
+          <History
+            onClick={() => {
+              router.push('/history');
+            }}
+            className={'/history' === router.pathname ? 'active' : ''}
+          >
             <IconHistory1 />
             History
           </History>
@@ -569,6 +574,11 @@ const History = styled.div`
   &:hover {
     border-color: #fff;
     color: #fff;
+  }
+
+  &.active {
+    color: #fff;
+    font-weight: 700;
   }
 `;
 
