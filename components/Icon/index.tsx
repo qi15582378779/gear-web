@@ -363,3 +363,12 @@ export const IconOut: React.FC<SvgProps> = (props) => {
     </Svg>
   );
 };
+
+export const IconAdd: React.FC<SvgProps> = (props) => {
+  return (
+    <Svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <path d="M2.94141 21.7344H44.8498V26.2172H2.94141V21.7344Z" fill="currentColor" />
+      <path d="M21.6543 3.02148H26.1372V44.9299H21.6543V3.02148Z" fill="currentColor" />
+    </Svg>
+  );
+};
