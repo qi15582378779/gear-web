@@ -286,6 +286,83 @@
   }
 }
 
+.load-item {
+  & > div {
+    & > div {
+      &:nth-of-type(1) {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.18rem;
+        & > div {
+          flex-shrink: 0;
+          &:nth-of-type(1) {
+            width: 0.64rem;
+            height: 0.64rem;
+            border-radius: 50%;
+            margin-right: 0.16rem;
+            & > div {
+              width: 100% !important;
+              height: 100% !important;
+              border-radius: 50%;
+              svg {
+                max-width: 50% !important;
+              }
+            }
+          }
+
+          &:nth-of-type(2) {
+            display: flex;
+            flex-direction: column;
+            gap: 0.04rem 0;
+
+            & > div {
+              height: 0.24rem;
+              span {
+                height: 100%;
+                border-radius: 0.06rem;
+                min-width: auto;
+              }
+
+              &:nth-of-type(1) {
+                width: 1.54rem;
+              }
+              &:nth-of-type(2) {
+                width: 1rem;
+              }
+            }
+          }
+        }
+      }
+      &:nth-of-type(2) {
+        height: 0.48rem !important;
+        span {
+          border-radius: 0.06rem !important;
+          height: 0.24rem !important;
+        }
+      }
+
+      &:nth-of-type(3) {
+        height: 0.32rem !important;
+        margin-bottom: 0.24rem;
+        display: flex;
+        align-items: center;
+        span {
+          border-radius: 0.06rem !important;
+          height: 0.24rem !important;
+        }
+      }
+
+      &:nth-of-type(4) {
+        height: 0.4rem !important;
+        span {
+          border-radius: 0.06rem !important;
+          height: 100% !important;
+        }
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 768px) {
   .full {
     padding: 1.28rem 0.16rem 0.48rem;

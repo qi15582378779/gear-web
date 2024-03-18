@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { IconAdd } from '@/components/Icon';
 import cn from 'classnames';
 import TooltipLine from '@/components/TooltipLine';
-import { Button } from 'antd';
+import { Button, ConfigProvider, Skeleton, theme } from 'antd';
 import { Copy } from '@/components';
 import { $copy } from '@/utils/met';
 
@@ -30,6 +30,54 @@ const Cells: React.FC = () => {
         </div>
 
         <div className={ps.group}>
+          <section className={cn(ps.item, ps['load-item'])}>
+            <div>
+              <div>
+                <ConfigProvider
+                  theme={{
+                    algorithm: theme.darkAlgorithm
+                  }}
+                >
+                  <Skeleton.Image active />
+                </ConfigProvider>
+                <div>
+                  <ConfigProvider
+                    theme={{
+                      algorithm: theme.darkAlgorithm
+                    }}
+                  >
+                    <Skeleton.Input active block />
+                    <Skeleton.Input active block />
+                  </ConfigProvider>
+                </div>
+              </div>
+
+              <ConfigProvider
+                theme={{
+                  algorithm: theme.darkAlgorithm
+                }}
+              >
+                <Skeleton.Input active block />
+              </ConfigProvider>
+
+              <ConfigProvider
+                theme={{
+                  algorithm: theme.darkAlgorithm
+                }}
+              >
+                <Skeleton.Input active block />
+              </ConfigProvider>
+
+              <ConfigProvider
+                theme={{
+                  algorithm: theme.darkAlgorithm
+                }}
+              >
+                <Skeleton.Input active block />
+              </ConfigProvider>
+            </div>
+          </section>
+
           <section className={ps.item}>
             <div>
               <div className={ps['item-name']}>
