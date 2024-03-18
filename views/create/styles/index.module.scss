@@ -431,3 +431,42 @@
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.06) 100%), linear-gradient(48deg, #9945ff 0.57%, #8a53f4 14.41%, #6377d6 42.09%, #24b0a7 78.67%, #00d18c 98.45%, #00d18c 99.43%);
   }
 }
+
+@media screen and (max-width: 768px) {
+  .full {
+    padding: 0.48rem 0.16rem;
+  }
+
+  .tit {
+    font-size: 0.24rem;
+    line-height: 1px;
+  }
+
+  .logo-des {
+    flex-direction: column;
+    row-gap: 0.24rem;
+    & > div {
+      width: 100%;
+    }
+  }
+
+  .type-url {
+    flex-direction: column;
+    row-gap: 0.32rem;
+    & > div {
+      width: 100%;
+    }
+  }
+
+  .token-price {
+    & > div {
+      &:nth-of-type(3) {
+        flex-direction: column;
+        row-gap: 0.16rem;
+        & > div {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

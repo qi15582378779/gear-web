@@ -351,6 +351,13 @@ const Home: FC = (): ReactElement => {
                       <div>
                         <div className={ps['more-top']}>
                           <div>
+                            <div>Price</div>
+                            <div>
+                              <img src={`/images/tokens/${item.tokeninfo.symbol}.png`} alt="" />
+                              <span>${$shiftedBy(item.price, -item.tokeninfo.decimals)}</span>/Call
+                            </div>
+                          </div>
+                          <div>
                             <div>URL</div>
                             <div>{$hash(item.encryptURL, 15, 15)}</div>
                           </div>
