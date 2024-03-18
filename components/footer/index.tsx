@@ -24,7 +24,7 @@ const Footer: React.FC = () => {
 const FooterFull = styled.div`
   display: none;
   @media screen and (max-width: 768px) {
-    display: block;
+    /* display: block; */
     width: 100%;
     position: fixed;
     bottom: 0;

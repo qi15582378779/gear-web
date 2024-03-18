@@ -3,7 +3,7 @@ import { useConnectWallet, useDisconnectWallet } from '@/state/chain/hooks';
 import { $hash } from '@/utils/met';
 import { useRouter } from 'next/router';
 import { FC, ReactElement, useEffect, useRef, useState } from 'react';
-import { IconMetaMask, IconHistory1, IconOut, IconCopy } from '@/components/Icon';
+import { IconMetaMask, IconHistory1, IconOut, IconCopy, IconAdd } from '@/components/Icon';
 import { motion, AnimatePresence } from 'framer-motion';
 import tokens from '@/utils/tokens.json';
 
@@ -12,6 +12,7 @@ import { useIsCreate } from '@/state/cells/hooks';
 import { Dropdown, Popover } from 'antd';
 import { useUserBalance } from '@/state/base/hooks';
 import type { MenuProps } from 'antd';
+import cn from 'classnames';
 
 const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
@@ -25,6 +26,9 @@ const Header: FC<any> = (): ReactElement => {
 
   const [initial, setInitial] = useState<any>({ opacity: 0, x: 20 });
   const [animate, setAnimate] = useState<any>({ opacity: 1, x: 0 });
+
+  const [infoFlag, setInfoFlag] = useState<boolean>(false);
+  const H5DropRef = useRef<HTMLDivElement | null>(null);
 
   const nav = [
     { name: 'Call', path: '/' },
@@ -75,9 +79,22 @@ const Header: FC<any> = (): ReactElement => {
     getUserBalance();
   }, [account, open]);
 
+  const handleDocumentClick = (event: MouseEvent) => {
+    if (open && H5DropRef.current && !H5DropRef.current.contains(event.target as Node)) {
+      setOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleDocumentClick);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [open]);
+
   return (
     <HeaderView>
-      <Section>
+      <Section className={cn({ 'menu-open': open })}>
         <Left>
           <Logo onClick={() => jump('/')} src="/images/logo/logo.svg" />
         </Left>
@@ -118,15 +135,90 @@ const Header: FC<any> = (): ReactElement => {
           </Chain>
 
           {account ? (
-            <Wallet onClick={() => handOpen()}>
+            <Wallet ref={H5DropRef} onClick={() => handOpen()}>
               <AvatarIcon src="/images/avatar.svg" />
-              {$hash(account, 6, 4)}
+              <WalletAddressTxt>{$hash(account, 6, 4)}</WalletAddressTxt>
               <WalletDownIcon src="/images/other/3.svg" />
             </Wallet>
           ) : (
             <ConnectWallet onClick={() => connectWallet('m')}>Connect Wallet</ConnectWallet>
           )}
+
+          <H5Menu
+            ref={H5DropRef}
+            onClick={() => {
+              setOpen(!open);
+            }}
+            className={cn({ active: open })}
+          >
+            <IconAdd />
+          </H5Menu>
         </AccountConter>
+
+        <H5MenuDrop className={cn({ open: open })}>
+          {nav.map((ele) => (
+            <H5MenuItem
+              key={ele.path}
+              onClick={() => {
+                jump(ele.path);
+                setOpen(!open);
+              }}
+              className={ele.path === router.pathname ? 'active' : ''}
+            >
+              {ele.name}
+            </H5MenuItem>
+          ))}
+
+          {account ? (
+            <H5WalletInfo
+              onClick={(e) => {
+                e.stopPropagation();
+                e.nativeEvent.stopImmediatePropagation();
+                setInfoFlag(!infoFlag);
+              }}
+              className={cn({ active: infoFlag })}
+            >
+              Profile <WalletDownIcon src="/images/other/3.svg" />
+            </H5WalletInfo>
+          ) : (
+            <H5ConnectFull>
+              <ConnectWallet onClick={() => connectWallet('m')}>Connect Wallet</ConnectWallet>
+            </H5ConnectFull>
+          )}
+
+          {account && (
+            <H5InfoDrop
+              onClick={(e) => {
+                e.stopPropagation();
+                e.nativeEvent.stopImmediatePropagation();
+              }}
+              className={cn({ 'info-active': infoFlag })}
+            >
+              <Account>
+                <Avatar src="/images/avatar-metamask.png" />
+                {$hash(account, 4, 4)}
+                <IconCopy />
+              </Account>
+
+              <AssetsContent>
+                <Balance>
+                  <Symbol>
+                    <SymbolIcon src="/images/tokens/USDC.png" />
+                    USDC
+                  </Symbol>
+                  <b>{balance.usdt}</b>
+                </Balance>
+                <Balance>
+                  <Symbol>
+                    <SymbolIcon src="/images/tokens/SOL.png" />
+                    SOL
+                  </Symbol>
+                  <b>{balance.bnb}</b>
+                </Balance>
+              </AssetsContent>
+            </H5InfoDrop>
+          )}
+        </H5MenuDrop>
 
         <AnimatePresence>
           {open && (
@@ -192,7 +284,12 @@ const HeaderView = styled.header`
   justify-content: center;
   padding: 0 0.52rem;
   z-index: 4;
-  background: #161616;
+  background: #191e24;
+  @media screen and (max-width: 768px) {
+    padding: 0.16rem;
+    background: transparent;
+    height: auto;
+  }
 `;
 const Section = styled.div`
   height: 100%;
@@ -200,6 +297,17 @@ const Section = styled.div`
   display: flex;
   justify-content: space-between;
   position: relative;
+
+  @media screen and (max-width: 768px) {
+    border-radius: 0.24rem;
+    height: 0.64rem;
+    background: #191e24;
+    padding: 0 0.2rem;
+  }
+
+  &.menu-open {
+    border-radius: 0.24rem 0.24rem 0 0;
+  }
 `;
 
 const Left = styled.div`
@@ -208,6 +316,9 @@ const Left = styled.div`
 `;
 const Logo = styled.img`
   width: 0.95rem;
+  @media screen and (max-width: 768px) {
+    width: 0.657rem;
+  }
 `;
 const Nav = styled.div`
   display: flex;
@@ -261,6 +372,10 @@ const ConnectWallet = styled.div`
   &:hover {
     background: #c4cbd4;
   }
+
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const AccountConter = styled.div`
@@ -282,6 +397,10 @@ const Chain = styled.div`
 const ChainImg = styled.img`
   height: 0.4rem;
   width: 0.4rem;
+  @media screen and (max-width: 768px) {
+    width: 0.32rem;
+    height: 0.32rem;
+  }
 `;
 
 const Wallet = styled.div`
@@ -301,6 +420,14 @@ const Wallet = styled.div`
   &:hover {
     border-color: #fff;
   }
+
+  @media screen and (max-width: 768px) {
+    padding: 0;
+    margin-right: 0.3rem;
+    &:hover {
+      border-color: transparent;
+    }
+  }
 `;
 
 const AvatarIcon = styled.img`
@@ -309,7 +436,17 @@ const AvatarIcon = styled.img`
   width: 0.24rem;
 `;
 
-const WalletDownIcon = styled(AvatarIcon)``;
+const WalletDownIcon = styled(AvatarIcon)`
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const WalletAddressTxt = styled.span`
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+`;
 
 const Modal = styled(motion.div)`
   width: 2.48rem;
@@ -330,19 +467,9 @@ const Modal = styled(motion.div)`
     z-index: 999;
     width: 100%;
   }
-`;
 
-const Mask = styled.div`
-  width: 100vw;
-  height: 100vh;
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.18);
-  display: none;
   @media screen and (max-width: 768px) {
-    display: block;
+    display: none;
   }
 `;
 
@@ -459,6 +586,12 @@ const Account = styled.div`
       color: #17fb9b;
     }
   }
+
+  @media screen and (max-width: 768px) {
+    background: linear-gradient(0deg, #191e24 0%, #191e24 100%), radial-gradient(230.54% 165.04% at 50% 100.41%, rgba(146, 73, 250, 0.15) 0%, rgba(34, 233, 174, 0.15) 100%);
+    box-shadow: 0px 0px 18.201px 0px #fff inset;
+    margin-bottom: 0;
+  }
 `;
 
 const Avatar = styled.img`
@@ -486,6 +619,9 @@ const Balance = styled.div`
     font-size: 0.16rem;
     font-style: normal;
     font-weight: 700;
+  }
+  @media screen and (max-width: 768px) {
+    background-color: transparent;
   }
 `;
 
@@ -579,6 +715,124 @@ const History = styled.div`
   &.active {
     color: #fff;
     font-weight: 700;
+  }
+
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const H5Menu = styled.div`
+  width: 0.64rem;
+  height: 0.42rem;
+  border-radius: 0.12rem;
+  background-color: #292f36;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+
+  & > svg {
+    width: 0.2rem;
+    height: 0.2rem;
+    transition: all 0.2s;
+  }
+
+  &.active {
+    svg {
+      transform: rotate(45deg);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const H5MenuDrop = styled.div`
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  background-color: #191e24;
+  border-radius: 0 0 0.24rem 0.24rem;
+  padding: 0 0.2rem 0.24rem;
+  overflow: hidden;
+
+  transition: opacity 267ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 178ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transform-origin: 0 0;
+  transform: scaleY(0);
+  opacity: 0;
+
+  &.open {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  @media screen and (max-width: 768px) {
+    display: block;
+  }
+`;
+
+const H5MenuItem = styled.div`
+  padding: 0.15rem 0.14rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.14rem;
+  font-weight: 400;
+  line-height: 171.429%;
+  border-bottom: 1px solid #292f36;
+  text-align: center;
+
+  &.active {
+    color: #fff;
+    font-weight: 700;
+  }
+`;
+
+const H5ConnectFull = styled.div`
+  width: 100%;
+  padding-top: 0.24rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & > div {
+    display: flex;
+  }
+`;
+
+const H5WalletInfo = styled.div`
+  height: 0.54rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.14rem;
+  font-weight: 400;
+  border-bottom: 1px solid #292f36;
+  & > img {
+    display: block;
+    margin-left: 0.02rem;
+    transition: all 0.2s;
+  }
+
+  &.active {
+    img {
+      transform: rotate(180deg);
+    }
+  }
+`;
+
+const H5InfoDrop = styled.div`
+  display: none;
+  flex-direction: column;
+  row-gap: 0.08rem;
+  padding-top: 0.15rem;
+  transition: all 0.2s;
+  &.info-active {
+    display: flex;
   }
 `;
 

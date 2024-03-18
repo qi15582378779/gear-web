@@ -19,9 +19,9 @@ const Main = styled.section`
   z-index: 2;
   overflow-y: auto;
   overflow-x: hidden;
-  /* @media (max-width: 768px) {
-    padding-top: 0.4rem;
-  } */
+  @media screen and (max-width: 768px) {
+    padding-top: 0;
+  }
 `;
 
 export async function getServerSideProps(context: any) {
