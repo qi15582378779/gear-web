@@ -1,13 +1,16 @@
 import 'styles/index.scss';
+import dynamic from 'next/dynamic';
 import { createGlobalStyle } from 'styled-components';
 import type { AppProps } from 'next/app';
+import '@solana/wallet-adapter-react-ui/styles.css';
 import Header from 'components/header';
 import Footer from 'components/footer';
 import Head from 'next/head';
 import { Provider } from 'react-redux';
 import store from '../state';
 import styled from 'styled-components';
-import { WalletProvider } from '../contexts/Wallet';
+import { ReactNode } from 'react';
+// import { WalletProvider } from '../contexts/Wallet';
 // import ResultModal from '@/components/ResultModal';
 
 const GlobalStyle = createGlobalStyle``;
@@ -23,6 +26,19 @@ const Main = styled.section`
     padding-top: 0.4rem;
   } */
 `;
+
+const SolanaProvider = dynamic(() => import('../contexts/Solana/Provider').then(({ SolanaProvider }) => SolanaProvider), { ssr: false });
+
+function AppContext({ children }: { children: ReactNode }) {
+  return (
+    <SolanaProvider>{children}</SolanaProvider>
+    // <Provider store={store}>
+    //   <WalletProvider>
+    //   {children}
+    //   </WalletProvider>
+    // </Provider>
+  );
+}
 
 export async function getServerSideProps(context: any) {
   const { params, query } = context;
@@ -46,16 +62,14 @@ function AiApp({ Component, pageProps }: AppProps) {
         <meta name="msapplication-tap-highlight" content="no" />
       </Head>
       <GlobalStyle />
-      <Provider store={store}>
-        <WalletProvider>
-          <Header headers={pageProps.headers} />
-          <Main id="_main_app">
-            <Component {...pageProps} />
-          </Main>
-          <Footer />
-          {/* <ResultModal /> */}
-        </WalletProvider>
-      </Provider>
+      <AppContext>
+        {/* <Header headers={pageProps.headers} />
+        <Main id="_main_app">
+          <Component {...pageProps} />
+        </Main>
+        <Footer /> */}
+        <Component {...pageProps} />
+      </AppContext>
     </>
   );
 }
