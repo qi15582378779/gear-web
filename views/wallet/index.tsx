@@ -1,13 +1,15 @@
 import styled from 'styled-components';
+import * as BufferLayout from 'buffer-layout';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import { LAMPORTS_PER_SOL, PublicKey, TransactionInstruction, Transaction } from '@solana/web3.js';
 
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
+declare var Uint8Array: any;
 const Wallet = () => {
-  const { connected, wallet, publicKey, disconnect } = useWallet();
+  const { connected, wallet, publicKey, disconnect, signMessage, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const [balance, setBalance] = useState(0);
   const [devTokenBalance, setDevTokenBalance] = useState(0);
@@ -40,6 +42,69 @@ const Wallet = () => {
       }
     } catch (e: any) {
       console.error('getBalance error', e.message);
+    }
+  };
+
+  const sign = async () => {
+    try {
+      const encodedMessage = new TextEncoder().encode('12121');
+      // const msg = await signMessage(encodedMessage);
+    } catch (e) {}
+  };
+
+  const action = async () => {
+    try {
+      let programId = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
+      const transaction = new Transaction();
+
+      // 创建一个新的交易指令
+      // const transferInstruction = new solanaWeb3.TransactionInstruction({
+      //   keys: [
+      //     {pubkey: wallet.publicKey, isSigner: true, isWritable: true},
+      //     {pubkey: '接收者的公钥', isSigner: false, isWritable: true}, // 替换为接收者的公钥
+      //   ],
+      //   programId: TOKEN_PROGRAM_ID,
+      //   data: Buffer.from([3, ...new Uint8Array(8)]), // 3是transfer方法的指令编号
+      // });
+
+      // 创建一个 buffer layout 来描述转账指令的数据
+      const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), BufferLayout.nu64('amount')]);
+
+      // 创建一个包含转账指令和转账金额的 buffer
+      const data = Buffer.alloc(dataLayout.span);
+      dataLayout.encode(
+        {
+          instruction: 3, // 转账指令的编号
+          amount: 100 * LAMPORTS_PER_SOL // 转账金额，转换为 lamports
+        },
+        data
+      );
+
+      const instruction = new TransactionInstruction({
+        keys: [
+          { pubkey: publicKey as PublicKey, isSigner: true, isWritable: true },
+          { pubkey: new PublicKey('EqYfeHEE2o4tF8m3dY26CRW74wscdh1nzyZ21VQfajfb'), isSigner: false, isWritable: true } // 替换为接收者的公钥
+        ],
+        programId,
+        // data: Buffer.from([3, ...new Uint8Array(100)])
+        data
+      });
+
+      console.log('instruction', instruction);
+      transaction.add(instruction);
+
+      transaction.recentBlockhash = (await connection.getRecentBlockhash('max')).blockhash;
+      console.log('transaction.recentBlockhash', transaction.recentBlockhash);
+
+      // console.log('transaction.feePayer', transaction.feePayer);
+      // transaction.feePayer = payerPublicKey;
+
+      const transactionSignature: any = await sendTransaction(transaction, connection);
+      console.log('transactionSignature:::', transactionSignature);
+      const tx = await connection.sendRawTransaction(transactionSignature.serialize());
+      console.log('tx:::', tx);
+    } catch (e: any) {
+      console.error('error', e.reason || e.message || 'error');
     }
   };
 
@@ -80,6 +145,8 @@ const Wallet = () => {
       <h2>sol 余额：{balance}</h2>
       <h2>dev Token 余额：{devTokenBalance}</h2>
       {connected && <Button onClick={getBalance}>获取余额</Button>}
+      {connected && <Button onClick={sign}>签名</Button>}
+      {connected && <Button onClick={action}>发送交易</Button>}
       {connected && <Button onClick={disconnect}>断开连接</Button>}
       <WalletMultiButton />
     </Main>
