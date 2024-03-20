@@ -1,15 +1,17 @@
 import styled from 'styled-components';
 import * as BufferLayout from 'buffer-layout';
+
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { LAMPORTS_PER_SOL, PublicKey, TransactionInstruction, Transaction, Keypair, SystemProgram } from '@solana/web3.js';
-import { createInitializeMintInstruction, TOKEN_PROGRAM_ID, MINT_SIZE, getMinimumBalanceForRentExemptMint, createMint, createAssociatedTokenAccountInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
-import * as bs58 from 'bs58';
-import React, { useEffect, useState } from 'react';
+import { LAMPORTS_PER_SOL, PublicKey, TransactionInstruction, Transaction, SystemProgram, sendAndConfirmTransaction } from '@solana/web3.js';
+import { AccountLayout, TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, createTransferInstruction, createAssociatedTokenAccountInstruction, createMint } from '@solana/spl-token';
+
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { message } from 'antd';
 
 declare var Uint8Array: any;
 const Wallet = () => {
-  const { connected, wallet, publicKey, disconnect, sendTransaction } = useWallet();
+  const { connected, wallet, publicKey, disconnect, signTransaction, signMessage, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const [balance, setBalance] = useState(0);
   const [devTokenBalance, setDevTokenBalance] = useState(0);
@@ -52,91 +54,9 @@ const Wallet = () => {
     } catch (e) {}
   };
 
-  const createMintToken = async () => {
+  const action = async () => {
     try {
-      // const feePayer = Keypair.fromSecretKey(bs58.decode('AEULR9sgCeMJ42QbQk4KbVhHN8eWY9Yxu5JrduVobcSDQigSNZZY8RQkkwFtCQu84Jdy84BYUp6TPWqgHmaxxms'));
-      // let mintPubkey = await createMint(connection, feePayer, publicKey!, publicKey, 9);
-      // console.log(`mint: ${mintPubkey.toBase58()}`);
-      const mint = Keypair.generate();
-      console.log(`mint: ${mint.publicKey.toBase58()}`);
       const transaction = new Transaction();
-
-      transaction.add(
-        // create mint account
-        SystemProgram.createAccount({
-          fromPubkey: publicKey!,
-          newAccountPubkey: mint.publicKey,
-          space: MINT_SIZE,
-          lamports: await getMinimumBalanceForRentExemptMint(connection),
-          programId: TOKEN_PROGRAM_ID
-        }),
-        createInitializeMintInstruction(
-          mint.publicKey, // mint pubkey
-          9, // decimals
-          publicKey!, // mint authority
-          publicKey, // freeze authority (you can use `null` to disable it. when you disable it, you can't turn it on again)
-          TOKEN_PROGRAM_ID
-        )
-      );
-      const {
-        context: { slot: minContextSlot },
-        value: { blockhash, lastValidBlockHeight }
-      } = await connection.getLatestBlockhashAndContext();
-      const signature: any = await sendTransaction(transaction, connection, { signers: [mint] });
-      const res = await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
-      console.log('tx:::', res);
-    } catch (e: any) {
-      console.error('error', e.reason || e.message || 'error');
-    }
-  };
-
-  const createTokenAccount = async () => {
-    try {
-      const mintPubkey = new PublicKey('6a8VyQRxFEMUBp9mZTazGURKJZL8e6cMb315K3Bq5Xdh');
-      const ownerPubkey = new PublicKey('DBiFqs7oK5UkW73ShtinHxPxbrVoCEFgJrEkDN7Swxzn');
-      let transaction = new Transaction();
-      let ata = await getAssociatedTokenAddress(
-        mintPubkey, // mint
-        ownerPubkey // owner
-      );
-      console.log('============token account: ', ata.toBase58());
-      transaction.add(
-        // create token account
-        createAssociatedTokenAccountInstruction(
-          publicKey!, // payer
-          ata, // ata
-          ownerPubkey!, // owner
-          mintPubkey // mint
-        )
-      );
-
-      const {
-        context: { slot: minContextSlot },
-        value: { blockhash, lastValidBlockHeight }
-      } = await connection.getLatestBlockhashAndContext();
-
-      const signature: any = await sendTransaction(transaction, connection, { minContextSlot });
-      const res = await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
-      console.log('tx:::', res);
-    } catch (e: any) {
-      console.error('error', e.reason || e.message || 'error');
-    }
-  };
-
-  const mintToken = async () => {
-    try {
-      // Users
-      const PAYER_PUBKEY = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      const RECEIVER_PUBKEY = new PublicKey('DjWdezJvbqyw1K6RvvhmWUw8Wu2QavHxTajyzgXq7MbU');
-
-      // Mint and token accounts
-      const TOKEN_MINT_ACCOUNT = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      const SOURCE_TOKEN_ACCOUNT = new PublicKey('H9zPKof4XG2iwNrDh6A9ruuerNx6rLCqT6LEYD3VC1Hd');
-      const DESTINATION_TOKEN_ACCOUNT = new PublicKey('AYSoVVXUoVtsvDx1YK453GsoxjUZKn5PuRMseAL43mtV');
-
-      let programId = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      const transaction = new Transaction();
-
       // 创建一个 buffer layout 来描述转账指令的数据
       const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), BufferLayout.nu64('amount')]);
 
@@ -152,72 +72,20 @@ const Wallet = () => {
 
       const instruction = new TransactionInstruction({
         keys: [
-          { pubkey: SOURCE_TOKEN_ACCOUNT, isSigner: false, isWritable: true },
-          { pubkey: DESTINATION_TOKEN_ACCOUNT, isSigner: false, isWritable: true }
-        ],
-        programId: TOKEN_MINT_ACCOUNT,
-        data
-      });
-
-      // console.log('instruction', instruction);
-      transaction.add(instruction);
-
-      // transaction.recentBlockhash = (await connection.getRecentBlockhash('max')).blockhash;
-      // console.log('transaction.recentBlockhash', transaction.recentBlockhash);
-
-      // console.log('transaction.feePayer', transaction.feePayer);
-      // transaction.feePayer = payerPublicKey;
-
-      const transactionSignature: any = await sendTransaction(transaction, connection);
-      console.log('transactionSignature:::', transactionSignature);
-      const tx = await connection.sendRawTransaction(transactionSignature.serialize());
-      console.log('tx:::', tx);
-    } catch (e: any) {
-      console.error('error', e.reason || e.message || 'error');
-    }
-  };
-
-  const transferToken = async () => {
-    try {
-      // Users
-      const PAYER_PUBKEY = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      const RECEIVER_PUBKEY = new PublicKey('DjWdezJvbqyw1K6RvvhmWUw8Wu2QavHxTajyzgXq7MbU');
-
-      // Mint and token accounts
-      const TOKEN_MINT_ACCOUNT = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      const SOURCE_TOKEN_ACCOUNT = new PublicKey('H9zPKof4XG2iwNrDh6A9ruuerNx6rLCqT6LEYD3VC1Hd');
-      const DESTINATION_TOKEN_ACCOUNT = new PublicKey('AYSoVVXUoVtsvDx1YK453GsoxjUZKn5PuRMseAL43mtV');
-
-      let programId = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      const transaction = new Transaction();
-
-      // 创建一个 buffer layout 来描述转账指令的数据
-      const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), BufferLayout.nu64('amount')]);
-
-      // 创建一个包含转账指令和转账金额的 buffer
-      const data = Buffer.alloc(dataLayout.span);
-      dataLayout.encode(
-        {
-          instruction: 3, // 转账指令的编号
-          amount: 100 * LAMPORTS_PER_SOL // 转账金额，转换为 lamports
-        },
-        data
-      );
-
-      const instruction = new TransactionInstruction({
-        keys: [
-          { pubkey: SOURCE_TOKEN_ACCOUNT, isSigner: false, isWritable: true },
-          { pubkey: DESTINATION_TOKEN_ACCOUNT, isSigner: false, isWritable: true }
+          { pubkey: new PublicKey('AYSoVVXUoVtsvDx1YK453GsoxjUZKn5PuRMseAL43mtV'), isSigner: false, isWritable: true },
+          { pubkey: new PublicKey('H9zPKof4XG2iwNrDh6A9ruuerNx6rLCqT6LEYD3VC1Hd'), isSigner: false, isWritable: true }, // 替换为接收者的公钥
+          { pubkey: publicKey as PublicKey, isSigner: true, isWritable: false }
         ],
         programId: TOKEN_PROGRAM_ID,
+        // data: Buffer.from([3, ...new Uint8Array(100)])
         data
       });
 
-      // console.log('instruction', instruction);
+      console.log('instruction', instruction);
       transaction.add(instruction);
 
-      // transaction.recentBlockhash = (await connection.getRecentBlockhash('max')).blockhash;
-      // console.log('transaction.recentBlockhash', transaction.recentBlockhash);
+      transaction.recentBlockhash = (await connection.getRecentBlockhash('max')).blockhash;
+      console.log('transaction.recentBlockhash', transaction.recentBlockhash);
 
       // console.log('transaction.feePayer', transaction.feePayer);
       // transaction.feePayer = payerPublicKey;
@@ -476,18 +344,13 @@ const Wallet = () => {
       <h2>钱包地址：{account}</h2>
       <h2>sol 余额：{balance}</h2>
       <h2>dev Token 余额：{devTokenBalance}</h2>
-      <div className="content">
-        {connected && <Button onClick={getBalance}>获取余额</Button>}
-        {connected && <Button onClick={sign}>签名</Button>}
-        {connected && <Button onClick={disconnect}>断开连接</Button>}
-      </div>
-      <div className="content">
-        {connected && <Button onClick={createMintToken}>Create Mint account</Button>}
-        {connected && <Button onClick={createTokenAccount}>Create Token Account</Button>}
-        {connected && <Button onClick={mintToken}>Mint Token</Button>}
-        {connected && <Button onClick={transferToken}>Transfer Token</Button>}
-      </div>
-
+      {connected && <Button onClick={getBalance}>获取余额</Button>}
+      {connected && <Button onClick={sign}>签名</Button>}
+      {connected && <Button onClick={transferSOL}>发送SQL</Button>}
+      {connected && <Button onClick={createTokenAccount}>createTokenAccount</Button>}
+      {connected && <Button onClick={getTokenAccount}>getTokenAccount</Button>}
+      {connected && <Button onClick={action}>发送交易</Button>}
+      {connected && <Button onClick={disconnect}>断开连接</Button>}
       <WalletMultiButton />
     </Main>
   );
@@ -501,9 +364,6 @@ const Main = styled.div`
   h1,
   h2 {
     margin-bottom: 20px;
-  }
-  .content {
-    display: flex;
   }
 `;
 const Button = styled.button`
