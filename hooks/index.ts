@@ -7,3 +7,4 @@ export { useApproveByToken } from './useApprove';
 export { useAllowanceByToken } from './useAllowance';
 export { default as useBalance } from './useBalance';
 export { default as useTransactionMined } from './useTransactionMined';
+export { default as useWorkspace } from './useWorkspace';

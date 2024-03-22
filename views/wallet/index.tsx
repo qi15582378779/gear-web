@@ -4,8 +4,8 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { LAMPORTS_PER_SOL, PublicKey, TransactionInstruction, Transaction, Keypair, SystemProgram } from '@solana/web3.js';
 import { createInitializeMintInstruction, TOKEN_PROGRAM_ID, MINT_SIZE, getMinimumBalanceForRentExemptMint, createMint, createAssociatedTokenAccountInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
-import * as bs58 from 'bs58';
 import React, { useEffect, useState } from 'react';
+import { useWorkspace } from '@/hooks';
 
 declare var Uint8Array: any;
 const Wallet = () => {
@@ -14,6 +14,7 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [devTokenBalance, setDevTokenBalance] = useState(0);
   const [account, setAccount] = useState('');
+  const workspace = useWorkspace();
 
   const getBalance = async () => {
     try {

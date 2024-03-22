@@ -8,6 +8,8 @@ import { AccountLayout, TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, cre
 
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { message } from 'antd';
+import { useWorkspace } from '@/hooks';
+import { getPostPda } from '@/utils/utils';
 
 declare var Uint8Array: any;
 const Wallet = () => {
@@ -16,6 +18,7 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [devTokenBalance, setDevTokenBalance] = useState(0);
   const [account, setAccount] = useState('');
+  const workspace = useWorkspace();
 
   const getBalance = async () => {
     try {
@@ -44,6 +47,20 @@ const Wallet = () => {
       }
     } catch (e: any) {
       console.error('getBalance error', e.message);
+    }
+  };
+
+  const getAccountState = async () => {
+    try {
+      if (!workspace) return;
+      let res = await getPostPda();
+      console.log('getAccountState ---', res[0]);
+      console.log('getAccountState ---', res[0].toBase58());
+      // let accountState = await workspace.program.account.helloWorld.fetch(res[0]);
+      let accountState = await workspace.program.account.helloWorld.fetch('3kBm5FqATUGVZhMu11pfivQvkBEE9k1AZHmHbhbBwmSu');
+      console.log('accountState---', accountState);
+    } catch (e: any) {
+      console.error('getParams error', e.message);
     }
   };
 
@@ -346,6 +363,7 @@ const Wallet = () => {
       <h2>dev Token 余额：{devTokenBalance}</h2>
       {connected && <Button onClick={getBalance}>获取余额</Button>}
       {connected && <Button onClick={sign}>签名</Button>}
+      {connected && <Button onClick={getAccountState}>getAccountState</Button>}
       {connected && <Button onClick={transferSOL}>发送SQL</Button>}
       {connected && <Button onClick={createTokenAccount}>createTokenAccount</Button>}
       {connected && <Button onClick={getTokenAccount}>getTokenAccount</Button>}
