@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import * as anchor from '@project-serum/anchor';
 import * as BufferLayout from 'buffer-layout';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -50,14 +51,25 @@ const Wallet = () => {
     }
   };
 
+  const initHelloWorld = async () => {
+    if (!workspace) return;
+    let helloworldPda = await getPostPda();
+    const tx = await workspace.program.methods
+      .initialize('Hello My Friend!')
+      .accounts({
+        helloWorld: helloworldPda,
+        authority: account,
+        systemProgram: anchor.web3.SystemProgram.programId
+      })
+      .rpc();
+    console.log('Your transaction signature', tx);
+  };
+
   const getAccountState = async () => {
     try {
       if (!workspace) return;
-      let res = await getPostPda();
-      console.log('getAccountState ---', res[0]);
-      console.log('getAccountState ---', res[0].toBase58());
-      // let accountState = await workspace.program.account.helloWorld.fetch(res[0]);
-      let accountState = await workspace.program.account.helloWorld.fetch('3kBm5FqATUGVZhMu11pfivQvkBEE9k1AZHmHbhbBwmSu');
+      let padPubKey = await getPostPda();
+      let accountState = await workspace.program.account.helloWorld.fetch(padPubKey);
       console.log('accountState---', accountState);
     } catch (e: any) {
       console.error('getParams error', e.message);
@@ -363,6 +375,7 @@ const Wallet = () => {
       <h2>dev Token 余额：{devTokenBalance}</h2>
       {connected && <Button onClick={getBalance}>获取余额</Button>}
       {connected && <Button onClick={sign}>签名</Button>}
+      {connected && <Button onClick={initHelloWorld}>initHelloWorld</Button>}
       {connected && <Button onClick={getAccountState}>getAccountState</Button>}
       {connected && <Button onClick={transferSOL}>发送SQL</Button>}
       {connected && <Button onClick={createTokenAccount}>createTokenAccount</Button>}

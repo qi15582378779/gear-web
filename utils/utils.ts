@@ -21,6 +21,7 @@ export function createProgram(provider: anchor.AnchorProvider): anchor.Program<H
 }
 
 export const getPostPda = async () => {
-  const data = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from('hello_world')], PROGRAM_ID);
-  return data;
+  const [publicKey] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from('hello-world')], PROGRAM_ID);
+  console.log("========publicKey: ", publicKey.toBase58())
+  return publicKey;
 };

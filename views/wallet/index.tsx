@@ -6,6 +6,7 @@ import { LAMPORTS_PER_SOL, PublicKey, TransactionInstruction, Transaction, Keypa
 import { createInitializeMintInstruction, TOKEN_PROGRAM_ID, MINT_SIZE, getMinimumBalanceForRentExemptMint, createMint, createAssociatedTokenAccountInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
 import React, { useEffect, useState } from 'react';
 import { useWorkspace } from '@/hooks';
+import { message } from 'antd';
 
 declare var Uint8Array: any;
 const Wallet = () => {
@@ -242,155 +243,6 @@ const Wallet = () => {
     }
   };
 
-  const transferSOL1 = async () => {
-    try {
-      const transaction = new Transaction();
-
-      transaction.add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey!,
-          toPubkey: new PublicKey('EqYfeHEE2o4tF8m3dY26CRW74wscdh1nzyZ21VQfajfb'),
-          lamports: 1 * 10 ** 9
-        })
-      );
-
-      // console.log('transaction.feePayer', transaction.feePayer);
-      // transaction.feePayer = payerPublicKey;
-
-      const signature: any = await sendTransaction(transaction, connection);
-      const rawTransaction = transaction.serialize();
-      console.log('signature:::', rawTransaction);
-
-      const txid = await connection.sendRawTransaction(rawTransaction, {
-        skipPreflight: true,
-        maxRetries: 2
-      });
-      console.log('txid', txid);
-
-      const latestBlockHash = await connection.getLatestBlockhash();
-
-      const result = await connection.confirmTransaction({
-        blockhash: latestBlockHash.blockhash,
-        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-        signature: txid
-      });
-
-      console.log('result', result);
-
-      // const tx = await connection.sendRawTransaction(transaction.serialize());
-      // console.log('tx', tx);
-      // const { context, value } = await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
-      // console.log('context:::', context);
-      // console.log('result:::', !value.err ? 'success' : 'error');
-      // message.success(!value.err ? 'success' : 'fail');
-    } catch (e: any) {
-      console.error('error', e.reason || e.message || 'error');
-    }
-  };
-
-  const transferSOL = async () => {
-    try {
-      let programId = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      const transaction = new Transaction();
-
-      transaction.add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey!,
-          toPubkey: new PublicKey('EqYfeHEE2o4tF8m3dY26CRW74wscdh1nzyZ21VQfajfb'),
-          lamports: 1 * 10 ** 9
-        })
-      );
-
-      // console.log('transaction.feePayer', transaction.feePayer);
-      // transaction.feePayer = payerPublicKey;
-
-      const {
-        context: { slot: minContextSlot },
-        value: { blockhash, lastValidBlockHeight }
-      } = await connection.getLatestBlockhashAndContext();
-
-      const signature: any = await sendTransaction(transaction, connection, { minContextSlot });
-      console.log('signature:::', signature);
-      // const tx = await connection.sendRawTransaction(transaction.serialize());
-      // console.log('tx', tx);
-      const { context, value } = await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
-      console.log('context:::', context);
-      console.log('result:::', !value.err ? 'success' : 'error');
-      message.success(!value.err ? 'success' : 'fail');
-    } catch (e: any) {
-      console.error('error', e.reason || e.message || 'error');
-    }
-  };
-
-  const createTokenAccount = async () => {
-    try {
-      let transaction = new Transaction();
-      // transaction.add(
-      //   SystemProgram.createAccount({
-      //     fromPubkey: feePayer.publicKey,
-      //     newAccountPubkey: tokenAccount.publicKey,
-      //     space: ACCOUNT_SIZE,
-      //     lamports: await getMinimumBalanceForRentExemptAccount(connection),
-      //     programId: TOKEN_PROGRAM_ID
-      //   })
-      // );
-      // const transactionSignature: any = await sendTransaction(transaction, connection);
-      // console.log('transactionSignature:::', transactionSignature);
-      // const tx = await connection.sendRawTransaction(transactionSignature.serialize());
-      // console.log('tx:::', tx);
-    } catch (e: any) {
-      console.error('error', e.message);
-    }
-  };
-
-  const onSendSPLTransaction = useCallback(
-    async (toPubkey: string, amount: number) => {
-      if (!toPubkey || !amount) return;
-      try {
-        // if (!publicKey || !signTransaction) throw new WalletNotConnectedError()
-        // const toPublicKey = new PublicKey(toPubkey);
-        // const mint = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-        // const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, publicKey as any, mint, publicKey!, signTransaction!);
-        // const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, publicKey as any, mint, toPublicKey!, signTransaction!);
-        // const transaction = new Transaction().add(
-        //   createTransferInstruction(
-        //     fromTokenAccount.address, // source
-        //     toTokenAccount.address, // dest
-        //     publicKey,
-        //     amount * LAMPORTS_PER_SOL,
-        //     [],
-        //     TOKEN_PROGRAM_ID
-        //   )
-        // );
-        // const blockHash = await connection.getRecentBlockhash();
-        // transaction.feePayer = await publicKey;
-        // transaction.recentBlockhash = await blockHash.blockhash;
-        // const signed = await signTransaction(transaction);
-        // await connection.sendRawTransaction(signed.serialize());
-        // toast.success('Transaction sent', {
-        //   id: toastId
-        // });
-      } catch (error: any) {}
-    },
-    [publicKey, sendTransaction, connection]
-  );
-
-  const getTokenAccount = async () => {
-    try {
-      // const mint = await createMint(connection, fromWallet, fromWallet.publicKey, null, 9);
-      let programId = new PublicKey('9t7A8kkRRTPV391tvKWw5FfEhr6UwtcD2ijbAbJ2fs89');
-      // const accountAddress = 'EqYfeHEE2o4tF8m3dY26CRW74wscdh1nzyZ21VQfajfb';
-      const accountAddress = 'DBiFqs7oK5UkW73ShtinHxPxbrVoCEFgJrEkDN7Swxzn';
-
-      const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, publicKey as any, programId, new PublicKey(accountAddress));
-
-      console.log('toTokenAccount', toTokenAccount);
-      console.log(`pubkey: ${toTokenAccount.address.toBase58()}`);
-    } catch (e: any) {
-      console.error('error', e, e.message);
-    }
-  };
-
   const getBaseInfo = async () => {
     try {
       // 获取Solana账户信息
@@ -419,13 +271,13 @@ const Wallet = () => {
 
       console.log('filteredTokenAccounts', tokenAccounts.value.length > 0 ? tokenAccounts.value[0].pubkey.toBase58() : '');
 
-      tokenAccounts.value.forEach((e) => {
-        console.log(`pubkey: ${e.pubkey.toBase58()}`);
-        const accountInfo = AccountLayout.decode(e.account.data);
-        console.log('accountInfo', accountInfo, accountInfo.amount);
-        console.log(`mint: ${new PublicKey(accountInfo.mint)}`);
-        // console.log(`amount: ${BufferLayout.u64.fromBuffer(accountInfo.amount)}`);
-      });
+      // tokenAccounts.value.forEach((e) => {
+      //   console.log(`pubkey: ${e.pubkey.toBase58()}`);
+      //   const accountInfo = AccountLayout.decode(e.account.data);
+      //   console.log('accountInfo', accountInfo, accountInfo.amount);
+      //   console.log(`mint: ${new PublicKey(accountInfo.mint)}`);
+      //   // console.log(`amount: ${BufferLayout.u64.fromBuffer(accountInfo.amount)}`);
+      // });
 
       // // 筛选出与当前账户地址匹配的Token账户
       // const filteredTokenAccounts = tokenAccounts.value.filter((account: any) => {
