@@ -41,8 +41,7 @@ const Home: FC = (): ReactElement => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [search, setSearch] = useState<string>('');
-  const [open, setOpen] = useState<boolean>(false);
-  const [openIndex, setOpenIndex] = useState<number>(-1);
+  const [isExpanded, setIsExpanded] = useState<any[]>([]);
 
   const [cellList, setCellList] = useState<any[]>([]);
   const [cellLoad, setCellLoad] = useState<boolean>(false);
@@ -308,7 +307,7 @@ const Home: FC = (): ReactElement => {
             ) : (
               <>
                 {cellList.map((item, index) => (
-                  <div className={cn(ps.item, { [ps['open-item']]: open && openIndex === index })} key={`${item._id}-${index}`}>
+                  <div className={cn(ps.item, { [ps['open-item']]: isExpanded.includes(index) })} key={`${item._id}-${index}`}>
                     <section className={ps['data-item']}>
                       <div className={ps['item-top']}>
                         <div>
@@ -337,8 +336,13 @@ const Home: FC = (): ReactElement => {
 
                           <div
                             onClick={() => {
-                              setOpen(!open);
-                              setOpenIndex(index);
+                              setIsExpanded((prevState) => {
+                                if (prevState.includes(index)) {
+                                  return prevState.filter((i) => i !== index);
+                                } else {
+                                  return [...prevState, index];
+                                }
+                              });
                             }}
                           >
                             <img src="/images/other/3.svg" alt="" />

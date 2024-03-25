@@ -14,8 +14,7 @@ const Cells: React.FC = () => {
   const [list, fetchCells, , reset, loading] = useCells();
   const [isCreate, setIsCreate] = useIsCreate();
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [openIndex, setOpenIndex] = useState<number>(1);
+  const [isExpanded, setIsExpanded] = useState<any[]>([]);
 
   useEffect(() => {
     if (account) fetchCells();
@@ -26,7 +25,13 @@ const Cells: React.FC = () => {
     <div className={ps.full}>
       <div className={ps.container}>
         <div className={ps.tit}>
-          Interface cell <span>({list.length})</span>
+          <div>
+            Interface cell <span>({list.length})</span>
+          </div>
+
+          <div className={ps['rt-create']}>
+            <IconAdd /> Create
+          </div>
         </div>
 
         <div className={ps.group}>
@@ -78,8 +83,23 @@ const Cells: React.FC = () => {
             </div>
           </section>
 
-          <section className={ps.item}>
-            <div>
+          <section className={cn(ps.item, { [ps['item-flipped']]: isExpanded.includes(1) })}>
+            <div
+              className={ps['flipped-icon']}
+              onClick={() => {
+                setIsExpanded((prevState) => {
+                  if (prevState.includes(1)) {
+                    return prevState.filter((i) => i !== 1);
+                  } else {
+                    return [...prevState, 1];
+                  }
+                });
+              }}
+            >
+              <img src="/images/other/5.svg" alt="" />
+            </div>
+
+            <div className={ps['item-front']}>
               <div className={ps['item-name']}>
                 <div>
                   <img src="/images/other/google.svg" alt="" />
@@ -96,15 +116,6 @@ const Cells: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
-                <div
-                  onClick={() => {
-                    setIsOpen(!isOpen);
-                    // setOpenIndex(index)
-                  }}
-                >
-                  <img src="/images/other/3.svg" alt="" />
-                </div>
               </div>
 
               <div className={ps.des}>
@@ -119,60 +130,60 @@ const Cells: React.FC = () => {
                 </div>
               </div>
 
-              <div className={cn(ps['info-group'], { [ps['open-info']]: isOpen && openIndex === 1 })}>
-                <div className={ps.info}>
-                  <div>
-                    Fee
-                    <div>
-                      <img src="/images/tokens/SOL.png" alt="" />
-                      $0.129104
-                    </div>
-                  </div>
-
-                  <div>
-                    Network Cost
-                    <div>
-                      <img src="/images/tokens/SOL.png" alt="" />
-                      $0.14
-                    </div>
-                  </div>
-
-                  <div>
-                    Call Txn
-                    <div>
-                      0x81...353b
-                      <Copy
-                        className="copy"
-                        copy={() => {
-                          $copy('');
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    Purchase Txn
-                    <div>
-                      0x81...353b
-                      <Copy
-                        className="copy"
-                        copy={() => {
-                          $copy('');
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    Time
-                    <div>2024-01-26</div>
-                  </div>
-                </div>
-              </div>
-
               <Button block className={ps['claim-btn']}>
                 Claim
               </Button>
+            </div>
+
+            <div className={ps['item-back']}>
+              <div className={ps.info}>
+                <div>
+                  Fee
+                  <div>
+                    <img src="/images/tokens/SOL.png" alt="" />
+                    $0.129104
+                  </div>
+                </div>
+
+                <div>
+                  Network Cost
+                  <div>
+                    <img src="/images/tokens/SOL.png" alt="" />
+                    $0.14
+                  </div>
+                </div>
+
+                <div>
+                  Call Txn
+                  <div>
+                    0x81...353b
+                    <Copy
+                      className="copy"
+                      copy={() => {
+                        $copy('');
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  Purchase Txn
+                  <div>
+                    0x81...353b
+                    <Copy
+                      className="copy"
+                      copy={() => {
+                        $copy('');
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  Time
+                  <div>2024-01-26</div>
+                </div>
+              </div>
             </div>
           </section>
 
