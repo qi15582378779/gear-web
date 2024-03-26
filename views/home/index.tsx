@@ -4,7 +4,7 @@ import { FC, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button, ConfigProvider, Input, Skeleton, notification, theme } from 'antd';
 import HistoryModal from './components/history-modal';
-import { useApproveByToken, useTransactionMined, useWallet } from '@/hooks';
+// import { useApproveByToken, useTransactionMined, useWallet } from '@/hooks';
 import { useConnectWallet } from '@/state/chain/hooks';
 import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed, $sleep } from '@/utils/met';
 import { getCell, ERC20 } from '@/sdk';
@@ -15,21 +15,25 @@ import { useApproveDialog, useHasNewHistory, useHistory, useHistoryDialog, useRe
 import ResultModal from './ResultModal';
 import ApproveModal from './ApproveModal';
 import { useUserBalance } from '@/state/base/hooks';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 import ps from './styles/index.module.scss';
 import TooltipLine from '@/components/TooltipLine';
 import { Copy } from '@/components';
+import { useScan } from '@/hooks';
 
 const { TextArea } = Input;
 
 const Home: FC = (): ReactElement => {
   const [, connectWallet] = useConnectWallet();
   const [history, { fetchHistory, reset }] = useHistory();
-  const { account, wallet, walletReady, switchNetwork, openGreenfieldScan } = useWallet();
+  const { wallet, publicKey, connected } = useWallet();
+  const { openGreenfieldScan } = useScan();
+  // const { account, wallet, walletReady, switchNetwork, openGreenfieldScan } = useWallet();
   const [balance, getUserBalance] = useUserBalance();
 
-  const [{ approvalState, transactionState }, { approve, getAllowance }, approveLoading] = useApproveByToken();
-  const [, { awaitTransactionMined }] = useTransactionMined();
+  // const [{ approvalState, transactionState }, { approve, getAllowance }, approveLoading] = useApproveByToken();
+  // const [, { awaitTransactionMined }] = useTransactionMined();
   const [showHistoryModal, handShowHistoryModal] = useHistoryDialog();
   const [approveResultDialog, handApproveResultModal] = useApproveDialog();
 
@@ -89,10 +93,6 @@ const Home: FC = (): ReactElement => {
   }, [detailData, balance]);
 
   const handleSelect = () => {
-    if (!walletReady) {
-      switchNetwork();
-      return;
-    }
     setCellModalFlag(true);
   };
 
@@ -104,7 +104,7 @@ const Home: FC = (): ReactElement => {
     // };
     setDetailData(item);
     const token = new ERC20(wallet, item.denom);
-    getAllowance(token, item.cellAddress, $shiftedByFixed(item.price, -1 * item.tokeninfo.decimals, 8));
+    // getAllowance(token, item.cellAddress, $shiftedByFixed(item.price, -1 * item.tokeninfo.decimals, 8));
   };
 
   const handleInputChange = (itemIndex: number, key: string, value: string) => {
@@ -147,44 +147,43 @@ const Home: FC = (): ReactElement => {
         }
       };
 
-      const { transactionState, hash } = await awaitTransactionMined(transaction, transactionCallabck);
+      // const { transactionState, hash } = await awaitTransactionMined(transaction, transactionCallabck);
 
-      console.log('hash::', hash);
-      const params = {
-        onlineStatus: transactionState === TransactionState.SUCCESS ? 1 : 0,
-        user: account,
-        cellId: detailData.cellId,
-        txhash: hash,
-        params: detailData.requestParams
-      };
-      console.log('callCells Data:', params);
-      const { code, data, error } = await Server.callCells(params);
-      if (code !== 0) throw new Error(error);
+      // console.log('hash::', hash);
+      // const params = {
+      //   onlineStatus: transactionState === TransactionState.SUCCESS ? 1 : 0,
+      //   user: publicKey.toBase58(),
+      //   cellId: detailData.cellId,
+      //   txhash: hash,
+      //   params: detailData.requestParams
+      // };
+      // console.log('callCells Data:', params);
+      // const { code, data, error } = await Server.callCells(params);
+      // if (code !== 0) throw new Error(error);
 
-      if (isApproveAction) {
-        handApproveResultModal({
-          open: false
-        });
-      }
-      if (transactionState === TransactionState.SUCCESS) {
-        notification.success({ message: 'Call Successfully' });
-        fetchHistory();
-        handHasNewHistory(true);
-        setDetailData(null);
-        handResultModal({
-          open: true,
-          type: 'success',
-          hash: hash,
-          callInfo: detailData
-        });
-      } else {
-        handResultModal({
-          open: true,
-          type: 'fail',
-          hash: hash
-        });
-        // throw new Error('Call Failed');
-      }
+      // if (isApproveAction) {
+      //   handApproveResultModal({
+      //     open: false
+      //   });
+      // }
+      // if (transactionState === TransactionState.SUCCESS) {
+      //   notification.success({ message: 'Call Successfully' });
+      //   fetchHistory();
+      //   handHasNewHistory(true);
+      //   setDetailData(null);
+      //   handResultModal({
+      //     open: true,
+      //     type: 'success',
+      //     hash: hash,
+      //     callInfo: detailData
+      //   });
+      // } else {
+      //   handResultModal({
+      //     open: true,
+      //     type: 'fail',
+      //     hash: hash
+      //   });
+      // }
     } catch (e: any) {
       notification.error({ message: e.reason || e.message || 'Call Failed' });
       handResultModal({
@@ -206,9 +205,9 @@ const Home: FC = (): ReactElement => {
         callInfo: detailData
       });
 
-      await approve(10 ** 18);
-      const token = new ERC20(wallet, detailData.denom);
-      getAllowance(token, detailData.cellAddress, $shiftedByFixed(detailData.price, -1 * detailData.tokeninfo.decimals, 8));
+      // await approve(10 ** 18);
+      // const token = new ERC20(wallet, detailData.denom);
+      // getAllowance(token, detailData.cellAddress, $shiftedByFixed(detailData.price, -1 * detailData.tokeninfo.decimals, 8));
       handApproveResultModal({
         step: 'call',
         type: 'wating'
@@ -222,40 +221,40 @@ const Home: FC = (): ReactElement => {
     }
   };
 
-  useEffect(() => {
-    if (approveResultDialog.open && approveResultDialog.step === 'approve' && approvalState === ApprovalState.APPROVED) {
-      handApproveResultModal({
-        step: 'call',
-        type: 'wating'
-      });
-      handleCall(true);
-    }
-  }, [approvalState, approveResultDialog]);
+  // useEffect(() => {
+  //   if (approveResultDialog.open && approveResultDialog.step === 'approve' && approvalState === ApprovalState.APPROVED) {
+  //     handApproveResultModal({
+  //       step: 'call',
+  //       type: 'wating'
+  //     });
+  //     handleCall(true);
+  //   }
+  // }, [approvalState, approveResultDialog]);
+
+  // useEffect(() => {
+  //   console.log('transactionState', transactionState);
+  //   if (transactionState === TransactionState.PENDING) {
+  //     handApproveResultModal({
+  //       step: 'approve',
+  //       type: 'pending'
+  //     });
+  //   } else if (transactionState === TransactionState.SUCCESS) {
+  //     handApproveResultModal({
+  //       step: 'approve',
+  //       type: 'success'
+  //     });
+  //   } else if (transactionState === TransactionState.FAIL) {
+  //     handApproveResultModal({
+  //       step: 'approve',
+  //       type: 'fail'
+  //     });
+  //   }
+  // }, [transactionState]);
 
   useEffect(() => {
-    console.log('transactionState', transactionState);
-    if (transactionState === TransactionState.PENDING) {
-      handApproveResultModal({
-        step: 'approve',
-        type: 'pending'
-      });
-    } else if (transactionState === TransactionState.SUCCESS) {
-      handApproveResultModal({
-        step: 'approve',
-        type: 'success'
-      });
-    } else if (transactionState === TransactionState.FAIL) {
-      handApproveResultModal({
-        step: 'approve',
-        type: 'fail'
-      });
-    }
-  }, [transactionState]);
-
-  useEffect(() => {
-    if (account) fetchHistory();
+    if (connected) fetchHistory();
     else reset();
-  }, [account]);
+  }, [connected]);
 
   useEffect(() => {
     getCellList();
@@ -266,7 +265,7 @@ const Home: FC = (): ReactElement => {
       <div className={ps.full}>
         <div className={ps.container}>
           <div className={ps.tit}>Call Cell</div>
-          <Input className={ps.search} value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e) => hangSearch(e.target.value)} />
+          <Input className={ps.search} value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e: any) => hangSearch(e.target.value)} />
           <div className={ps.group}>
             {cellLoad ? (
               <>
@@ -415,34 +414,25 @@ const Home: FC = (): ReactElement => {
                           </div>
                         ) : null}
 
-                        {!account ? (
+                        {!connected ? (
                           <Button className={ps['btn']}>Connect Wallet</Button>
                         ) : (
                           <>
-                            {!walletReady ? (
-                              <Button
-                                className={ps['btn']}
-                                onClick={() => {
-                                  switchNetwork();
-                                }}
-                              >
-                                Connect to BNB Chain
-                              </Button>
-                            ) : !balanceHealth ? (
+                            {!balanceHealth ? (
                               <Button className={ps['btn']} disabled>
                                 Insufficient balance
                               </Button>
                             ) : (
                               <>
-                                {approvalState !== ApprovalState.APPROVED ? (
+                                {/* {approvalState !== ApprovalState.APPROVED ? (
                                   <Button className={ps['btn']} loading={approveLoading || loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handApprove()}>
                                     Approve and Call
                                   </Button>
-                                ) : (
-                                  <Button className={ps['btn']} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall()}>
-                                    Call
-                                  </Button>
-                                )}
+                                ) : ( */}
+                                <Button className={ps['btn']} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall()}>
+                                  Call
+                                </Button>
+                                {/* )} */}
                               </>
                             )}
                           </>

@@ -3,11 +3,11 @@ import { FC, ReactElement } from 'react';
 import { Modal } from 'antd';
 import styled from 'styled-components';
 import { IconClose } from '@/components/Icon';
-import { useWallet } from '@/hooks';
+import { useScan } from '@/hooks';
 import { useApproveDialog, useHasNewHistory, useHistoryDialog, useResultModal } from '@/state/call/hooks';
 
 const ApproveModal: FC = (): ReactElement => {
-  const { getScanAddress } = useWallet();
+  const { getScanAddress } = useScan();
   const [resultInfo, handResultModal] = useResultModal();
   const [approveResultDialog, handApproveResultModal] = useApproveDialog();
   const [, handShowHistoryModal] = useHistoryDialog();

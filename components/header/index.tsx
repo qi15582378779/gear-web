@@ -1,4 +1,5 @@
-import { useBalance, useWallet } from '@/hooks';
+// import { useBalance, useWallet } from '@/hooks';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useConnectWallet, useDisconnectWallet } from '@/state/chain/hooks';
 import { $hash } from '@/utils/met';
 import { useRouter } from 'next/router';
@@ -18,7 +19,8 @@ const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
   const router = useRouter();
   const [isCreate, setIsCreate] = useIsCreate();
-  const { account, chainId, walletReady, switchNetwork } = useWallet();
+  // const { account, chainId, walletReady, switchNetwork } = useWallet();
+  const { wallet, publicKey, connected } = useWallet();
   const [, connectWallet] = useConnectWallet();
   const [, disconnectWallet] = useDisconnectWallet();
   const [balance, getUserBalance] = useUserBalance();
@@ -42,7 +44,7 @@ const Header: FC<any> = (): ReactElement => {
       label: (
         <ChainItems
           onClick={() => {
-            switchNetwork();
+            // switchNetwork();
           }}
         >
           <ChainImg src="/images/chain/BSC.svg" />
@@ -70,14 +72,14 @@ const Header: FC<any> = (): ReactElement => {
   };
 
   useEffect(() => {
-    if (!walletReady) return;
+    if (!connected) return;
     getUserBalance();
-  }, [walletReady]);
+  }, [connected]);
 
   useEffect(() => {
-    if (!account || !open) return;
+    if (!connected || !open) return;
     getUserBalance();
-  }, [account, open]);
+  }, [connected, open]);
 
   const handleDocumentClick = (event: MouseEvent) => {
     if (open && H5DropRef.current && !H5DropRef.current.contains(event.target as Node)) {
@@ -118,11 +120,11 @@ const Header: FC<any> = (): ReactElement => {
           </History>
 
           <Chain>
-            {!walletReady && account ? (
+            {connected ? (
               // eslint-disable-next-line react/no-unescaped-entities
               <PopoverGroup placement="left" content={<PopoverContent>Your wallet's current network is unsupported.</PopoverContent>}>
                 <Dropdown menu={{ items }} placement="bottomRight" trigger={['click']} overlayClassName="chain-dropdown">
-                  <PopoverImg onClick={(e) => e.preventDefault()}>
+                  <PopoverImg onClick={(e: any) => e.preventDefault()}>
                     <WainImg src="/images/other/1.svg" />
                   </PopoverImg>
                 </Dropdown>
@@ -134,10 +136,10 @@ const Header: FC<any> = (): ReactElement => {
             {/* <ChainName>BNB Chain</ChainName> */}
           </Chain>
 
-          {account ? (
+          {connected ? (
             <Wallet ref={H5DropRef} onClick={() => handOpen()}>
               <AvatarIcon src="/images/avatar.svg" />
-              <WalletAddressTxt>{$hash(account, 6, 4)}</WalletAddressTxt>
+              <WalletAddressTxt>{$hash(publicKey.toBase58(), 6, 4)}</WalletAddressTxt>
               <WalletDownIcon src="/images/other/3.svg" />
             </Wallet>
           ) : (
@@ -169,7 +171,7 @@ const Header: FC<any> = (): ReactElement => {
             </H5MenuItem>
           ))}
 
-          {account ? (
+          {connected ? (
             <H5WalletInfo
               onClick={(e) => {
                 e.stopPropagation();
@@ -186,7 +188,7 @@ const Header: FC<any> = (): ReactElement => {
             </H5ConnectFull>
           )}
 
-          {account && (
+          {connected && (
             <H5InfoDrop
               onClick={(e) => {
                 e.stopPropagation();
@@ -196,7 +198,7 @@ const Header: FC<any> = (): ReactElement => {
             >
               <Account>
                 <Avatar src="/images/avatar-metamask.png" />
-                {$hash(account, 4, 4)}
+                {$hash(publicKey.toBase58(), 4, 4)}
                 <IconCopy />
               </Account>
 
@@ -224,7 +226,7 @@ const Header: FC<any> = (): ReactElement => {
           {open && (
             <Modal ref={modalRef} initial={initial} animate={animate} exit={initial}>
               <ModalContent>
-                {account ? (
+                {connected ? (
                   <>
                     <ModalTit>
                       My Profile <IconOut onClick={() => setOpen(false)} />
@@ -232,7 +234,7 @@ const Header: FC<any> = (): ReactElement => {
 
                     <Account>
                       <Avatar src="/images/avatar-metamask.png" />
-                      {$hash(account, 4, 4)}
+                      {$hash(publicKey.toBase58(), 4, 4)}
                       <IconCopy />
                     </Account>
 

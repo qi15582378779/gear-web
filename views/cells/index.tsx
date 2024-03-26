@@ -1,4 +1,4 @@
-import { useWallet } from '@/hooks';
+// import { useWallet } from '@/hooks';
 import ps from './styles/index.module.scss';
 import { useCells, useIsCreate } from '@/state/cells/hooks';
 import { useEffect, useState } from 'react';
@@ -8,18 +8,19 @@ import TooltipLine from '@/components/TooltipLine';
 import { Button, ConfigProvider, Skeleton, theme } from 'antd';
 import { Copy } from '@/components';
 import { $copy } from '@/utils/met';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 const Cells: React.FC = () => {
-  const { account, chainId, walletReady } = useWallet();
+  const { wallet, publicKey, connected } = useWallet();
   const [list, fetchCells, , reset, loading] = useCells();
   const [isCreate, setIsCreate] = useIsCreate();
 
   const [isExpanded, setIsExpanded] = useState<any[]>([]);
 
   useEffect(() => {
-    if (account) fetchCells();
-    if (!walletReady) reset();
-  }, [account]);
+    if (connected) fetchCells();
+    else reset();
+  }, [connected]);
 
   return (
     <div className={ps.full}>

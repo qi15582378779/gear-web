@@ -3,7 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { setTokensModal, setHistory, setResultDialog, setHistoryModal, setHasNewHistory, setApproveResultDialog } from './actions';
 import { AppState, useAppDispatch } from '../index';
 import Server from '@/service';
-import { useWallet } from '@/hooks';
+// import { useWallet } from '@/hooks';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { message, notification } from 'antd';
 
 export function useTokensModal(): [boolean, (open: boolean) => void] {
@@ -21,13 +22,14 @@ export function useTokensModal(): [boolean, (open: boolean) => void] {
 
 export function useHistory(): [{ historyList: any[]; listLoad: boolean }, { fetchHistory: () => void; reset: () => void }] {
   const dispatch = useAppDispatch();
-  const { wallet, account } = useWallet();
+  const { wallet, publicKey } = useWallet();
+
   const historyList = useSelector<AppState, AppState['call']['history']>((state: AppState) => state.call.history);
   const [listLoad, setListLoad] = useState<boolean>(false);
   const fetchHistory = useCallback(async () => {
     setListLoad(true);
     try {
-      const params = { owner: account };
+      const params = { owner: publicKey!.toBase58() };
       const { code, data, error } = await Server.fetchHistory(params);
       if (code !== 0) throw new Error(error);
       dispatch(setHistory(data));
@@ -38,7 +40,7 @@ export function useHistory(): [{ historyList: any[]; listLoad: boolean }, { fetc
     } finally {
       setListLoad(false);
     }
-  }, [dispatch, account, wallet]);
+  }, [dispatch, publicKey, wallet]);
 
   const reset = () => {
     dispatch(setHistory([]));

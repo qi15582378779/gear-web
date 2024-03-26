@@ -2,7 +2,7 @@ import { ChangeEvent, FC, ReactElement, useCallback, useMemo, useState } from 'r
 import styled from 'styled-components';
 import { Button, Input, Tooltip, message, notification } from 'antd';
 import FormData from 'form-data';
-import { useWallet, useTransactionMined } from '@/hooks';
+// import { useWallet, useTransactionMined } from '@/hooks';
 import { TransactionState } from '@/typings';
 import { useRouter } from 'next/router';
 import { TokensModal, RequestTypeModal } from './index';
@@ -17,6 +17,8 @@ import DataUtil from '@/utils/datautil';
 import { bigNumberJsonToString } from '@/utils/contract';
 import { BigNumber } from 'ethers';
 import { useConnectWallet } from '@/state/chain/hooks';
+import { useWallet } from '@solana/wallet-adapter-react';
+
 // import { useResultModal } from '@/state/base/hooks';
 // import { useMessage, useTransactionMined, useWallet } from '@/hooks';
 
@@ -33,12 +35,13 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
 
   // const { toastSuccess, toastError } = useToast();
 
-  const [, { awaitTransactionMined }, hash] = useTransactionMined();
+  // const [, { awaitTransactionMined }, hash] = useTransactionMined();
 
   const [, handTokensModal] = useTokensModal();
   const [, handRequestTypeModal] = useRequestTypeModal();
+  const { wallet, publicKey, connected } = useWallet();
 
-  const { account, chainId, factory, wallet, switchNetwork, walletReady } = useWallet();
+  // const { account, chainId, factory, wallet, switchNetwork, walletReady } = useWallet();
   const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState('');
   const [errorTag, setErrorTag] = useState('');
@@ -83,8 +86,8 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
   });
 
   const btn_disable = useMemo(() => {
-    return !account || Object.values(formData).filter((ele) => !ele).length > 0;
-  }, [account, formData]);
+    return !connected || Object.values(formData).filter((ele) => !ele).length > 0;
+  }, [connected, formData]);
 
   const handUpload = () => {
     if (typeof document === 'undefined') return;
@@ -111,12 +114,12 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
 
   const parseLog = (log: any) => {
     try {
-      const res: any = factory.contract.interface.parseLog(log);
-      const data: any = DataUtil.deepCopy(res);
-      for (let i = 0; i < res.args.length; i++) {
-        data.args[i] = bigNumberJsonToString(res.args[i]);
-      }
-      return data;
+      // const res: any = factory.contract.interface.parseLog(log);
+      // const data: any = DataUtil.deepCopy(res);
+      // for (let i = 0; i < res.args.length; i++) {
+      //   data.args[i] = bigNumberJsonToString(res.args[i]);
+      // }
+      return log;
     } catch (e) {
       console.warn('PaymentEvent unknown event:', log);
       // throw e;
@@ -126,10 +129,8 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
 
   const submit = async () => {
     try {
-      if (!walletReady) {
-        switchNetwork();
-        return;
-      }
+      if (!connected) return;
+
       setLoading(true);
 
       if (formData.requestURL.indexOf('https://') === -1 && formData.requestURL.indexOf('http://') === -1) {
@@ -156,13 +157,10 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
       setErrorTag('');
       form = new FormData();
 
-      // console.log('(tokens as any)[chainId]', tokens, chainId);
-      // console.log('(tokens as any)[chainId]', (tokens as any)[chainId], chainId, formData.denom);
+      // const tokeninfo = (tokens as any)[chainId][formData.denom];
+      // const price = $shiftedBy(formData.price, tokeninfo.decimals);
 
-      const tokeninfo = (tokens as any)[chainId][formData.denom];
-      const price = $shiftedBy(formData.price, tokeninfo.decimals);
-
-      form.append('owner', account);
+      form.append('owner', publicKey.toBase58());
       form.append('requestURL', formData.requestURL);
       form.append('requestParams', formData.requestParams);
       form.append('requestType', formData.requestType);
@@ -170,8 +168,8 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
       form.append('description', formData.description);
 
       form.append('price', price);
-      form.append('denom', tokeninfo.address);
-      form.append('tokeninfo', JSON.stringify(tokeninfo));
+      // form.append('denom', tokeninfo.address);
+      // form.append('tokeninfo', JSON.stringify(tokeninfo));
       form.append('logoFile', formData.logoFile);
 
       handResultModal({
@@ -182,27 +180,27 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
       const { code, data, error }: any = await Server.submitCell(form);
       if (code !== 0) throw new Error(error);
 
-      const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
-      const { transactionState, hash } = await awaitTransactionMined(transaction);
-      console.log('hash::', hash);
+      // const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
+      // const { transactionState, hash } = await awaitTransactionMined(transaction);
+      // console.log('hash::', hash);
 
-      setLoading(false);
-      if (transactionState === TransactionState.SUCCESS) {
-        handResultModal({
-          open: true,
-          type: 'success',
-          hash: hash
-        });
-        updateCell(data.cellId, hash);
-        // notification.success({message: 'Create Successfully'});
-      } else {
-        handResultModal({
-          open: true,
-          type: 'fail',
-          hash: hash
-        });
-        throw new Error('Create Fail');
-      }
+      // setLoading(false);
+      // if (transactionState === TransactionState.SUCCESS) {
+      //   handResultModal({
+      //     open: true,
+      //     type: 'success',
+      //     hash: hash
+      //   });
+      //   updateCell(data.cellId, hash);
+      //   // notification.success({message: 'Create Successfully'});
+      // } else {
+      //   handResultModal({
+      //     open: true,
+      //     type: 'fail',
+      //     hash: hash
+      //   });
+      //   throw new Error('Create Fail');
+      // }
     } catch (error: any) {
       handResultModal({
         open: true,
@@ -219,6 +217,8 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
   const updateCell = async (cellId: string, txhash: string) => {
     try {
       const transactionInfo = await wallet.getTransactionReceipt(txhash);
+
+      alert('parseLog function');
       const datas = await parseLog(transactionInfo.logs[1]);
       console.log('datas', datas);
       const params = {
@@ -271,7 +271,7 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
             <Line>
               <FromBlock>
                 <Label>Name</Label>
-                <InputContent value={formData.name} onChange={(e) => onInputChange(e, 'name')} />
+                <InputContent value={formData.name} onChange={(e: any) => onInputChange(e, 'name')} />
               </FromBlock>
               <FromBlock>
                 <Label>Type</Label>
@@ -284,19 +284,19 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
             <Line>
               <FromBlock>
                 <Label>URL</Label>
-                <InputContent className={errorTag === 'url' ? '_error' : ''} value={formData.requestURL} onChange={(e) => onInputChange(e, 'requestURL')} />
+                <InputContent className={errorTag === 'url' ? '_error' : ''} value={formData.requestURL} onChange={(e: any) => onInputChange(e, 'requestURL')} />
               </FromBlock>
             </Line>
             <Line>
               <FromBlock>
                 <Label>Params（JSON）</Label>
-                <TextArea className={errorTag === 'params' ? '_error' : ''} value={formData.requestParams} onChange={(e) => onInputChange(e, 'requestParams')} />
+                <TextArea className={errorTag === 'params' ? '_error' : ''} value={formData.requestParams} onChange={(e: any) => onInputChange(e, 'requestParams')} />
               </FromBlock>
             </Line>
             <Line>
               <FromBlock>
                 <Label>Description</Label>
-                <TextArea value={formData.description} onChange={(e) => onInputChange(e, 'description')} />
+                <TextArea value={formData.description} onChange={(e: any) => onInputChange(e, 'description')} />
               </FromBlock>
               <FromBlock>
                 <Label>Logo</Label>
@@ -305,7 +305,7 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
                     <Avatar src={avatarSrc} />
                   ) : (
                     <>
-                      <UploadFile id="avatarFiles" type="file" accept="image/*" onChange={(e) => onUpload(e)} />
+                      <UploadFile id="avatarFiles" type="file" accept="image/*" onChange={(e: any) => onUpload(e)} />
                       <UpLoadIcon src="/images/home/upload.svg" />
                       <UploadTip>
                         Drag & Drop or <span>Choose file</span> to upload <br />
@@ -353,7 +353,7 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
             </FeeContent>
           </FeeSetting>
 
-          {!account ? (
+          {!connected ? (
             <Submit
               onClick={() => {
                 connectWallet('m');
@@ -363,10 +363,10 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
             </Submit>
           ) : (
             <>
-              {!walletReady ? (
+              {!connected ? (
                 <Submit
                   onClick={() => {
-                    switchNetwork();
+                    // switchNetwork();
                   }}
                 >
                   Connect to BNB Chain

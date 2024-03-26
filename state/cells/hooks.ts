@@ -3,11 +3,12 @@ import { useCallback, useState } from 'react';
 import { setTokensModal, setRequestTypeModal, setIsCreate, setList, updateList, setResultDialog } from './actions';
 import { AppState, useAppDispatch } from '../index';
 import Server from '@/service';
-import { useTransactionMined, useWallet } from '@/hooks';
+// import { useTransactionMined } from '@/hooks';
 import { Cell, constants, getERC20, getRegistry } from '@/sdk';
 import { $shiftedByFixed } from '@/utils/met';
 import { TransactionState } from '@/typings';
 import { message, notification } from 'antd';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 export function useIsCreate(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
@@ -50,55 +51,53 @@ export function useRequestTypeModal(): [boolean, (open: boolean) => void] {
 
 export function useCells(): [any[], () => void, (data: Record<string, any>) => Promise<any>, () => void, boolean] {
   const dispatch = useAppDispatch();
-  const { wallet, account, chainId } = useWallet();
+  // const { wallet, account, chainId } = useWallet();
+  const { wallet, publicKey } = useWallet();
   const [loading, setLoading] = useState(false);
   const list = useSelector<AppState, AppState['cells']['list']>((state: AppState) => state.cells.list);
   const fetchList = useCallback(async () => {
     try {
-      const Registry = constants.CHAIN_CONTRACTS[chainId].Registry;
-      const registry = getRegistry(wallet, Registry);
-      setLoading(true);
-      const balanceOf: any = await registry.balanceOf(account);
-      console.log('balanceOf', balanceOf);
-      let index = 0,
-        tokenIds = [];
-      do {
-        try {
-          const tokenid = await registry.tokenOfOwnerByIndex(account, index);
-          tokenIds.push(tokenid.toString());
-          console.log('tokenid', tokenid.toString(), 'index', index);
-        } catch (e) {}
-        index++;
-      } while (balanceOf > 0 && index < balanceOf);
-      console.log('tokenIds', tokenIds);
-      // const params = { owner: account };
-      const params = { tokenIds };
-
-      const { code, data, error } = await Server.fetchCells(params);
-      if (code !== 0) throw new Error(error);
-      const list = [];
-
-      let i = 0;
-      for (i; i < data.length; i++) {
-        const erc20 = getERC20(wallet, data[i].denom);
-        const balance = await erc20.balanceOf(data[i].cellAddress);
-        list.push({ ...data[i], Registry, reward: $shiftedByFixed(balance, -1 * data[i].tokeninfo.decimals, 3) });
-      }
-
-      dispatch(setList(list));
+      // const Registry = constants.CHAIN_CONTRACTS[chainId].Registry;
+      // const registry = getRegistry(wallet, Registry);
+      // setLoading(true);
+      // const balanceOf: any = await registry.balanceOf(account);
+      // console.log('balanceOf', balanceOf);
+      // let index = 0,
+      //   tokenIds = [];
+      // do {
+      //   try {
+      //     const tokenid = await registry.tokenOfOwnerByIndex(account, index);
+      //     tokenIds.push(tokenid.toString());
+      //     console.log('tokenid', tokenid.toString(), 'index', index);
+      //   } catch (e) {}
+      //   index++;
+      // } while (balanceOf > 0 && index < balanceOf);
+      // console.log('tokenIds', tokenIds);
+      // // const params = { owner: account };
+      // const params = { tokenIds };
+      // const { code, data, error } = await Server.fetchCells(params);
+      // if (code !== 0) throw new Error(error);
+      // const list = [];
+      // let i = 0;
+      // for (i; i < data.length; i++) {
+      //   const erc20 = getERC20(wallet, data[i].denom);
+      //   const balance = await erc20.balanceOf(data[i].cellAddress);
+      //   list.push({ ...data[i], Registry, reward: $shiftedByFixed(balance, -1 * data[i].tokeninfo.decimals, 3) });
+      // }
+      // dispatch(setList(list));
     } catch (e: any) {
       console.error('----', e.reason || e.message);
     } finally {
       setLoading(false);
     }
-  }, [dispatch, account, wallet]);
+  }, [dispatch, publicKey, wallet]);
 
   const update = useCallback(
     async (data: Record<string, any>) => {
       try {
-        const erc20 = getERC20(wallet, data.denom);
-        const reward = await erc20.balanceOf(data.cellAddress);
-        dispatch(updateList({ cellAddress: data.cellAddress, reward: $shiftedByFixed(reward, -1 * data.tokeninfo.decimals, 4) }));
+        // const erc20 = getERC20(wallet, data.denom);
+        // const reward = await erc20.balanceOf(data.cellAddress);
+        // dispatch(updateList({ cellAddress: data.cellAddress, reward: $shiftedByFixed(reward, -1 * data.tokeninfo.decimals, 4) }));
       } catch (e: any) {
         console.error('----', e.reason || e.message);
       }
@@ -120,30 +119,30 @@ export function useCells(): [any[], () => void, (data: Record<string, any>) => P
 export function useClaim(): [(data: Record<string, any>) => void, boolean] {
   const dispatch = useAppDispatch();
   const [, , update] = useCells();
-  const { wallet, account } = useWallet();
-  const [, { awaitTransactionMined }] = useTransactionMined();
+  const { wallet, publicKey } = useWallet();
+  // const [, { awaitTransactionMined }] = useTransactionMined();
   const [loading, setLoading] = useState(false);
   const claim = useCallback(
     async (data: Record<string, any>) => {
       try {
         setLoading(true);
-        const transaction = new Cell(wallet, data.cellAddress).withdraw(account);
-        const { transactionState, hash } = await awaitTransactionMined(transaction);
-        console.log('hash::', hash);
+        // const transaction = new Cell(wallet, data.cellAddress).withdraw(account);
+        // const { transactionState, hash } = await awaitTransactionMined(transaction);
+        // console.log('hash::', hash);
 
-        if (transactionState === TransactionState.SUCCESS) {
-          await update(data);
-          notification.success({ message: 'Claim Successfully' });
-        } else {
-          throw new Error('Claim Fail');
-        }
+        // if (transactionState === TransactionState.SUCCESS) {
+        //   await update(data);
+        //   notification.success({ message: 'Claim Successfully' });
+        // } else {
+        //   throw new Error('Claim Fail');
+        // }
       } catch (e: any) {
         notification.error({ message: e.reason || e.message || 'Claim fail' });
       } finally {
         setLoading(false);
       }
     },
-    [dispatch, account, wallet]
+    [dispatch, publicKey, wallet]
   );
 
   return [claim, loading];

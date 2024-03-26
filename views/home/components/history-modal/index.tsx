@@ -6,15 +6,16 @@ import { FC, ReactElement, useEffect, useRef, useState } from 'react';
 import { useHistory } from '@/state/call/hooks';
 import { $copy, $hash, $shiftedBy, $shiftedByFixed, $sleep } from '@/utils/met';
 import moment from 'moment';
-import { useWallet } from '@/hooks';
+import { useScan } from '@/hooks';
 import cn from 'classnames';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 type IProps = {
   data: Record<string, any>;
 };
 const HtmlRef: FC<IProps> = ({ data }): ReactElement => {
   const outputRef = useRef<any>(null);
-  const { openscan } = useWallet();
+  const { openscan } = useScan();
   const [show, setShow] = useState(false);
   const [showTipIcon, setShowTipIcon] = useState(false);
 
@@ -91,7 +92,7 @@ const HtmlRef: FC<IProps> = ({ data }): ReactElement => {
 
 const HistoryModal: React.FC<{ isOpen: boolean; handleCancelModal: (update: boolean) => void }> = ({ isOpen, handleCancelModal }) => {
   const [{ historyList, listLoad }] = useHistory();
-  const { account } = useWallet();
+  const { connected } = useWallet();
   const [list, setList] = useState<any[]>([]);
 
   //   const Labs = [
@@ -191,7 +192,7 @@ const HistoryModal: React.FC<{ isOpen: boolean; handleCancelModal: (update: bool
         <IconClose onClick={() => handleCancelModal(false)} />
       </div>
 
-      {account && (
+      {connected && (
         <>
           {listLoad && historyList.length === 0 ? (
             <>

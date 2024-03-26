@@ -1,5 +1,6 @@
 import { FC, ReactElement, useState } from 'react';
-import { useTransactionMined, useWallet } from '@/hooks';
+// import { useTransactionMined, useWallet } from '@/hooks';
+import { useScan } from '@/hooks';
 import styled from 'styled-components';
 import { IconAddress, IconCopy, IconDown, IconPlus } from '@/components/Icon';
 import { Button } from 'antd';
@@ -10,12 +11,16 @@ import { TransactionState } from '@/typings';
 import { useClaim } from '@/state/cells/hooks';
 import { Copy } from '@/components';
 import classNames from 'classnames';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 type IProps = {
   data: Record<string, any>;
 };
 const Item: FC<IProps> = ({ data }): ReactElement => {
-  const { wallet, chainId, account, getScanAddress, getGreenfieldScanAddress, walletReady, switchNetwork, scan } = useWallet();
+  const { wallet, publicKey, connected } = useWallet();
+  const { getScanAddress, getGreenfieldScanAddress, scan } = useScan();
+
+  // const { wallet, chainId, account, getScanAddress, getGreenfieldScanAddress, walletReady, switchNetwork, scan } = useWallet();
   const [claim, calimLoading] = useClaim();
 
   const [open, setOpen] = useState(false);
@@ -60,10 +65,10 @@ const Item: FC<IProps> = ({ data }): ReactElement => {
             className="_common_btn"
             loading={calimLoading}
             disabled={Number(data.reward) === 0}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
-              if (!walletReady) {
-                switchNetwork();
+              if (!connected) {
+                // switchNetwork();
                 return;
               }
               claim(data);
@@ -93,8 +98,8 @@ const Item: FC<IProps> = ({ data }): ReactElement => {
         </Line>
         <Line>
           <Label>aicell nft</Label>
-          <Link href={`${scan[chainId]}/nft/${data.Registry}/${data.tokenId}`} target="_blank">
-            {$hash(`${scan[chainId]}/nft/${data.Registry}/${data.tokenId}`, 15, 8)}
+          <Link href={`${scan}/nft/${data.Registry}/${data.tokenId}`} target="_blank">
+            {$hash(`${scan}/nft/${data.Registry}/${data.tokenId}`, 15, 8)}
             <img src="/images/cells/link.svg" alt="" />
           </Link>
         </Line>

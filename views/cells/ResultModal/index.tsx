@@ -3,11 +3,13 @@ import { FC, ReactElement } from 'react';
 import { Modal } from 'antd';
 import styled from 'styled-components';
 import { IconClose } from '@/components/Icon';
-import { useWallet } from '@/hooks';
+import { useScan } from '@/hooks';
+// import { useWallet } from '@solana/wallet-adapter-react';
+
 import { useIsCreate, useResultModal } from '@/state/cells/hooks';
 
 const ResultModal: FC = (): ReactElement => {
-  const { getScanAddress } = useWallet();
+  const { getScanAddress } = useScan();
   const [resultInfo, handResultModal] = useResultModal();
   const [, setIsCreate] = useIsCreate();
 

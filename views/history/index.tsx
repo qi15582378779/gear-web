@@ -5,13 +5,13 @@ import { Copy } from '@/components';
 import { $copy, $hash, $shiftedBy } from '@/utils/met';
 import { useState } from 'react';
 import { useHistory } from '@/state/call/hooks';
-import { useWallet } from '@/hooks';
+// import { useWallet } from '@/hooks';
 import moment from 'moment';
 import { ConfigProvider, Skeleton, theme } from 'antd';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 const History: React.FC = () => {
-  const { account } = useWallet();
-
+  const { connected } = useWallet();
   const [open, setOpen] = useState<boolean>(false);
   const [openIndex, setOpenIndex] = useState<number>(-1);
 
@@ -23,7 +23,7 @@ const History: React.FC = () => {
         <div className={ps.tit}>Calls History</div>
 
         <div className={ps.group}>
-          {account && (
+          {connected && (
             <>
               {listLoad && historyList.length <= 0 ? (
                 <>

@@ -1,6 +1,6 @@
 import { Copy } from '@/components';
 import { IconClose, IconCopy, IconDown, IconSearch, IconSelectDown } from '@/components/Icon';
-import { useDebounce, useWallet } from '@/hooks';
+import { useDebounce, useScan } from '@/hooks';
 import Server from '@/service';
 import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed } from '@/utils/met';
 import { Input, Modal, Popover, Skeleton, message, notification } from 'antd';
@@ -61,7 +61,7 @@ const test = [
 
 const CellModal: React.FC<{ showCellModal: boolean; handleSelect: (item: any) => void; handleCloseModal: (update: boolean) => void }> = ({ showCellModal, handleSelect, handleCloseModal }) => {
   const [debounce] = useDebounce(1500);
-  const { openGreenfieldScan } = useWallet();
+  const { openGreenfieldScan } = useScan();
   const [cellList, setCellList] = useState<any[]>([]);
   const [cellLoad, setCellLoad] = useState<boolean>(false);
   const [search, setSearch] = useState<string>('');
@@ -109,7 +109,7 @@ const CellModal: React.FC<{ showCellModal: boolean; handleSelect: (item: any) =>
       </Header>
 
       <Group>
-        <Search value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e) => hangSearch(e.target.value)} />
+        <Search value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e: any) => hangSearch(e.target.value)} />
       </Group>
 
       <ListGroup>
@@ -153,7 +153,7 @@ const CellModal: React.FC<{ showCellModal: boolean; handleSelect: (item: any) =>
                     <span>{$shiftedBy(item.price, -item.tokeninfo.decimals)}/</span>Call
                     <IconGroup
                       className={cn(showIndex === index ? 'show' : '')}
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.stopPropagation();
                         setShowIndex(showIndex === index ? -1 : index);
                       }}
