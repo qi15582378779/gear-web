@@ -2,10 +2,10 @@ import * as anchor from '@project-serum/anchor';
 import { BN, Program } from '@project-serum/anchor';
 
 // import ProgramIDL from '@/abi/nft_social_media.json';
-import { HelloWorld } from '@/abi/hello_world';
+import { HelloWorld } from '@/idl/hello_world';
 import { PublicKey } from '@solana/web3.js';
 
-import { IDL } from '@/abi/hello_world';
+import { IDL } from '@/idl/hello_world';
 
 const PROGRAM_ID = new PublicKey('5NjgwpGKcNsR5TNWSmCFTjR4PZ6kjZ4YqncqYJZccxFk');
 
