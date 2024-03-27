@@ -1,14 +1,14 @@
 import { Connection } from '@solana/web3.js';
-import { Provider, AnchorProvider, Program } from '@project-serum/anchor';
+import { Provider, AnchorProvider } from '@project-serum/anchor';
 import { AnchorWallet, useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useMemo } from 'react';
-import { HelloWorld } from '@/programs'
+import { HelloWorld, Gear } from '@/programs'
 
 export interface Workspace {
   wallet: AnchorWallet;
   connection: Connection;
   provider: Provider;
-  program: Program;
+  program: any;
 }
 
 const preflightCommitment = 'confirmed';
@@ -30,7 +30,7 @@ export function useWorkspaceHW() {
     }
   }, [connection, wallet]);
 
-  const ins = useMemo(() => {
+  const program = useMemo(() => {
     if (provider) {
       // @ts-ignore
       return new HelloWorld(provider!);
@@ -39,27 +39,18 @@ export function useWorkspaceHW() {
     }
   }, [provider]);
 
-  // const program = useMemo(() => {
-  //   if (ins) {
-  //     // @ts-ignore
-  //     return ins.program;
-  //   } else {
-  //     return null;
-  //   }
-  // }, [ins]);
-
   const workspace = useMemo(() => {
-    if (wallet && connected && ins) {
+    if (wallet && connected && program) {
       return {
+        wallet,
         connection,
-        program: ins.program,
-        programId: ins.programId,
-        wallet
+        provider,
+        program
       };
     } else {
       return null;
     }
-  }, [connection, wallet, connected, ins]);
+  }, [connection, wallet, connected, provider, program]);
 
   return workspace;
 }
@@ -80,36 +71,27 @@ export function useWorkspaceGear() {
     }
   }, [connection, wallet]);
 
-  const ins = useMemo(() => {
+  const program = useMemo(() => {
     if (provider) {
       // @ts-ignore
-      return new HelloWorld(provider!);
+      return new Gear(provider!);
     } else {
       return null;
     }
   }, [provider]);
 
-  // const program = useMemo(() => {
-  //   if (ins) {
-  //     // @ts-ignore
-  //     return ins.program;
-  //   } else {
-  //     return null;
-  //   }
-  // }, [ins]);
-
   const workspace = useMemo(() => {
-    if (wallet && connected && ins) {
+    if (wallet && connected && program) {
       return {
         connection,
-        program: ins.program,
-        programId: ins.programId,
-        wallet
+        wallet,
+        provider,
+        program,
       };
     } else {
       return null;
     }
-  }, [connection, wallet, connected, ins]);
+  }, [connection, wallet, connected, program, provider]);
 
   return workspace;
 }
