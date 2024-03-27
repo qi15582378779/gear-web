@@ -1,13 +1,22 @@
 import cn from 'classnames';
 import ps from './styles/index.module.scss';
-import { Button, Dropdown, Input } from 'antd';
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { Button, Dropdown, Input, notification } from 'antd';
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { IconDown } from '@/components/Icon';
-import { $filterNumber } from '@/utils/met';
+import { $BigNumber, $filterNumber, $shiftedBy } from '@/utils/met';
+import { useWallet } from '@solana/wallet-adapter-react';
+import tokens from '@/utils/tokens.json';
+import { useResultModal } from '@/state/call/hooks';
+import Server from '@/service';
+import { BigNumber } from 'ethers';
 
 const { TextArea } = Input;
-
+let form = new FormData();
 const Create: React.FC = () => {
+  const { wallet, publicKey, connected } = useWallet();
+  const [, handResultModal] = useResultModal();
+
+  const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState<string>('');
   const [errorTag, setErrorTag] = useState('');
 
@@ -23,24 +32,24 @@ const Create: React.FC = () => {
   ];
   const tokenList = [{ symbol: 'SOL', decimals: 9, describe: 'solana', value: 'SOL' }];
 
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    requestURL: '',
-    requestParams: '',
-    requestType: '',
-    price: '',
-    denom: '',
-    logoFile: null
-
-    // name: 'translate 2',
-    // description: 'translate',
-    // requestURL: 'https://api.aicell.world/v1/ai/text-to-en',
-    // requestParams: '{"text":""}',
-    // requestType: 'POST',
-    // price: '0.01',
-    // denom: 'BNB',
+  const [formData, setFormData] = useState<{ [key: string]: any }>({
+    // name: '',
+    // description: '',
+    // requestURL: '',
+    // requestParams: '',
+    // requestType: '',
+    // price: '',
+    // denom: '',
     // logoFile: null
+
+    name: 'translate 2',
+    description: 'translate',
+    requestURL: 'https://api.aicell.world/v1/ai/text-to-en',
+    requestParams: '{"text":""}',
+    requestType: 'POST',
+    price: '1',
+    denom: 'SOL',
+    logoFile: null
 
     // name: 'image-gen',
     // description: 'image gen',
@@ -51,6 +60,10 @@ const Create: React.FC = () => {
     // denom: 'BNB',
     // logoFile: null
   });
+
+  const btn_disable = useMemo(() => {
+    return !connected || Object.values(formData).filter((ele) => !ele).length > 0;
+  }, [connected, formData]);
 
   const handUpload = () => {
     if (typeof document === 'undefined') return;
@@ -64,15 +77,107 @@ const Create: React.FC = () => {
     } else if (e.target) {
       files = e.target.files;
     }
-    // setFormData((state: any) => ({
-    //   ...state,
-    //   logoFile: files[0]
-    // }));
+    setFormData((state: any) => ({
+      ...state,
+      logoFile: files[0]
+    }));
     const reader = new FileReader();
     reader.onload = () => {
       setAvatarSrc(reader.result as string);
     };
     reader.readAsDataURL(files[0]);
+  };
+
+  const submit = async () => {
+    try {
+      if (!connected) return;
+
+      setLoading(true);
+
+      if (formData.requestURL.indexOf('https://') === -1 && formData.requestURL.indexOf('http://') === -1) {
+        setErrorTag('url');
+        notification.error({
+          message: 'Invalid URL'
+        });
+        return;
+      }
+
+      try {
+        const data = JSON.parse(formData.requestParams);
+        console.log('data', data, formData.requestParams);
+        if (data.constructor !== Object) throw new Error('Invalid Params');
+      } catch (error: any) {
+        setErrorTag('params');
+        notification.error({
+          message: 'Invalid Params'
+        });
+        return;
+      }
+      if ($BigNumber(formData.price).lt(0.001)) throw new Error('Price is less than 0.001');
+
+      setErrorTag('');
+      form = new FormData();
+
+      // console.log('(tokens as any)[chainId]', tokens, chainId);
+      // console.log('(tokens as any)[chainId]', (tokens as any)[chainId], chainId, formData.denom);
+
+      const tokeninfo = (tokens as any)['devnet'][formData.denom];
+      const price = $shiftedBy(formData.price, tokeninfo.decimals);
+
+      form.append('owner', publicKey.toBase58());
+      form.append('requestURL', formData.requestURL);
+      form.append('requestParams', formData.requestParams);
+      form.append('requestType', formData.requestType);
+      form.append('name', formData.name);
+      form.append('description', formData.description);
+
+      form.append('price', price);
+      form.append('denom', tokeninfo.address);
+      form.append('tokeninfo', JSON.stringify(tokeninfo));
+      form.append('logoFile', formData.logoFile);
+
+      handResultModal({
+        open: true,
+        type: 'wating'
+      });
+
+      console.log('form', form);
+
+      const { code, data, error }: any = await Server.submitCell(form);
+      if (code !== 0) throw new Error(error);
+
+      // const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
+      // const { transactionState, hash } = await awaitTransactionMined(transaction);
+      // console.log('hash::', hash);
+
+      // setLoading(false);
+      // if (transactionState === TransactionState.SUCCESS) {
+      //   handResultModal({
+      //     open: true,
+      //     type: 'success',
+      //     hash: hash
+      //   });
+
+      //   // notification.success({message: 'Create Successfully'});
+      // } else {
+      //   handResultModal({
+      //     open: true,
+      //     type: 'fail',
+      //     hash: hash
+      //   });
+      //   throw new Error('Create Fail');
+      // }
+    } catch (error: any) {
+      handResultModal({
+        open: true,
+        type: 'fail'
+      });
+      notification.error({
+        message: error.reason || error.message || 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onChangeRequestType = useCallback((info: Record<string, any>) => {
@@ -226,7 +331,7 @@ const Create: React.FC = () => {
           </div>
         </section>
 
-        <Button block className={ps['submit-btn']}>
+        <Button block className={ps['submit-btn']} disabled={!!btn_disable} loading={loading} onClick={submit}>
           Submit
         </Button>
       </div>

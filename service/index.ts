@@ -1,7 +1,7 @@
 import service from './axios';
 class Server {
   static submitCell = async (data: Record<string, any> = {}, _options: Record<string, any> = {}): Promise<any> => {
-    return await service.post('/v1/cell/create-cell', data, _options);
+    return await service.post('/v1/cell/create-cell12', data, _options);
   };
   static updateCell = async (data: Record<string, any> = {}, _options: Record<string, any> = { withCredentials: true }): Promise<any> => {
     return await service.post('/v1/cell/update-cell', data, _options);
