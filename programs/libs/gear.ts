@@ -12,6 +12,7 @@ import {
     mplTokenMetadata,
     MPL_TOKEN_METADATA_PROGRAM_ID,
 } from "@metaplex-foundation/mpl-token-metadata";
+import { publicKey } from "@metaplex-foundation/umi";
 
 export class Gear {
     public idl: any;
@@ -56,13 +57,13 @@ export class Gear {
 
         // Derive the metadata account
         let metadataAccount = findMetadataPda(umi, {
-            mint: mint.publicKey,
+            mint: publicKey(mint.publicKey),
         })[0];
         console.log("metadataAccount address=", metadataAccount);
 
         //Derive the master edition pda
         let masterEditionAccount = findMasterEditionPda(umi, {
-            mint: mint.publicKey,
+            mint: publicKey(mint.publicKey),
         })[0];
         console.log("masterEditionAccount address=", masterEditionAccount);
 
