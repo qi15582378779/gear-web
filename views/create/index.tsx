@@ -59,11 +59,11 @@ const Create: React.FC = () => {
   return (
     <div className={ps.full}>
       <div className={ps.container}>
-        <div className={ps.tit}>Create cell</div>
+        <div className={ps.tit}>Create gear</div>
 
         <section className={ps['sub-tit']}>
           <div>Basic information</div>
-          <div>Please select an API cell and enter a command to call it.</div>
+          <div>Please select an API gear and enter a command to call it.</div>
         </section>
 
         <section className={ps.name}>
@@ -126,7 +126,7 @@ const Create: React.FC = () => {
 
         <section className={ps['token-price']}>
           <div>Price Setting</div>
-          <div>Please select an API cell and enter a command to call it.</div>
+          <div>Please select an API gear and enter a command to call it.</div>
           <div>
             <div>
               <div>Token</div>
