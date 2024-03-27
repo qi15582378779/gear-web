@@ -125,12 +125,20 @@ const Create: React.FC = () => {
           <div className={ps.logo}>
             <div>Logo</div>
             <div onClick={handUpload}>
-              <input type="file" className={ps.file} id="avatarFiles" accept="image/*" onChange={(e) => onUpload(e)} />
-              <img src="/images/create/1.svg" alt="" className={ps['upload-icon']} />
-              <div className={ps['upload-tip']}>
-                Drag & Drop or <span>Choose file</span> to upload <br />
-                JPG or GIF
-              </div>
+              {avatarSrc ? (
+                <>
+                  <img src={avatarSrc} alt="" className={ps['avatar-img']} />
+                </>
+              ) : (
+                <>
+                  <input type="file" className={ps.file} id="avatarFiles" accept="image/*" onChange={(e) => onUpload(e)} />
+                  <img src="/images/create/1.svg" alt="" className={ps['upload-icon']} />
+                  <div className={ps['upload-tip']}>
+                    Drag & Drop or <span>Choose file</span> to upload <br />
+                    JPG or GIF
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
