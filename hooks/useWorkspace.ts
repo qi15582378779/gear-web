@@ -1,5 +1,5 @@
 import { Connection } from '@solana/web3.js';
-import { Provider, AnchorProvider } from '@project-serum/anchor';
+import { Provider, AnchorProvider } from '@coral-xyz/anchor';
 import { AnchorWallet, useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useMemo } from 'react';
 import { HelloWorld, Gear } from '@/programs'

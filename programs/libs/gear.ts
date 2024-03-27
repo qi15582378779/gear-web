@@ -1,5 +1,5 @@
-import * as anchor from '@project-serum/anchor';
-import { Program } from '@project-serum/anchor';
+import * as anchor from '@coral-xyz/anchor';
+import { Program } from '@coral-xyz/anchor';
 import { GearProtocol, IDL } from '@/programs/types/gear_protocol';
 import { PROGRAM_IDS } from '@/programs/constants';
 import { PublicKey } from '@solana/web3.js';
@@ -36,24 +36,25 @@ export class Gear {
      * @param uri string
      * @returns transaction signature
      */
-    public async createGear(name: string, symbol: string, uri: string, price: number): Promise<any> {
+    public async createGear(name: string, symbol: string, uri: string, price: number, path: string): Promise<any> {
 
         const umi = createUmi(this.provider.connection)
-            .use(walletAdapterIdentity(this.provider.wallet as any))
+            .use(walletAdapterIdentity(this.provider.wallet))
             .use(mplTokenMetadata());
 
         const mint = anchor.web3.Keypair.generate();
-        console.log("mint address=", mint.publicKey);
+        console.log("mint address=", mint.publicKey.toBase58());
 
         // Derive the gear account
         const gearAccount = await this.getGearPda(mint.publicKey);
+        console.log('gearAccount address=', gearAccount.toBase58())
 
         // Derive the associated token address account for the mint
         const associatedTokenAccount = await getAssociatedTokenAddress(
             mint.publicKey,
             this.provider.publicKey
         );
-        console.log("associatedTokenAccount address=", associatedTokenAccount);
+        console.log("associatedTokenAccount address=", associatedTokenAccount.toBase58());
 
         // Derive the metadata account
         let metadataAccount = findMetadataPda(umi, {
@@ -68,21 +69,22 @@ export class Gear {
         console.log("masterEditionAccount address=", masterEditionAccount);
 
         const tx = await this._program.methods
-            .createGear(name, symbol, uri, price)
+            .createGear(name, symbol, uri, price, path)
             .accounts({
                 signer: this.provider.publicKey,
-                mint: mint.publicKey,
                 gearAccount: gearAccount,
+                mint: mint.publicKey,
                 associatedTokenAccount,
-                metadataAccount,
-                masterEditionAccount,
+                metadataAccount: metadataAccount,
+                masterEditionAccount: masterEditionAccount,
                 tokenProgram: TOKEN_PROGRAM_ID,
                 associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                 tokenMetadataProgram: MPL_TOKEN_METADATA_PROGRAM_ID,
                 systemProgram: anchor.web3.SystemProgram.programId,
                 rent: anchor.web3.SYSVAR_RENT_PUBKEY,
             })
-            .rpc();
+            .signers([mint])
+            .rpc({ skipPreflight: true });
         return { gearAddress: mint.publicKey, tx };
     }
 

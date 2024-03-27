@@ -1,5 +1,5 @@
-import * as anchor from '@project-serum/anchor';
-import { Program } from '@project-serum/anchor';
+import * as anchor from '@coral-xyz/anchor';
+import { Program } from '@coral-xyz/anchor';
 import { HelloWorld as HW, IDL } from '@/programs/types/hello_world';
 import { PROGRAM_IDS } from '@/programs/constants';
 import { PublicKey } from '@solana/web3.js';

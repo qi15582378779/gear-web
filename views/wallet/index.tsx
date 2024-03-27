@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
 import * as BufferLayout from "buffer-layout";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -9,7 +9,7 @@ import { AccountLayout, TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, cre
 
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { message } from "antd";
-import { useWorkspaceHW } from "@/hooks";
+import { useWorkspaceHW, useWorkspaceGear } from "@/hooks";
 
 declare var Uint8Array: any;
 const Wallet = () => {
@@ -19,6 +19,7 @@ const Wallet = () => {
   const [devTokenBalance, setDevTokenBalance] = useState(0);
   const [account, setAccount] = useState("");
   const workspaceHW = useWorkspaceHW();
+  const workspaceGear = useWorkspaceGear();
 
   // System
   const getBaseInfo = async () => {
@@ -349,6 +350,22 @@ const Wallet = () => {
     }
   };
 
+  // Gear
+  const createGear = async () => {
+    try {
+      if (!workspaceGear) return;
+      const name = "Translator";
+      const symbol = "GEAR";
+      const uri = "https://test.com";
+      const price = 0.001;
+      const path = "test-path";
+      const tx = await workspaceGear.program.createGear(name, symbol, uri, price, path);
+      console.log("========createGear tx: ", tx);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     if (!connection || !publicKey) {
       return;
@@ -395,7 +412,6 @@ const Wallet = () => {
         {devTokenBalance}
       </h2>
       {connected && <Button onClick={getTokenBalance}>getTokenBalance</Button>}
-
       {connected && <Button onClick={transferSol}>transferSol</Button>}
       {connected && <Button onClick={createMintToken}>createMintToken</Button>}
       {connected && <Button onClick={createTokenAccount}>createTokenAccount</Button>}
@@ -404,6 +420,7 @@ const Wallet = () => {
       {connected && <Button onClick={initHelloWorld}>initHelloWorld</Button>}
       {connected && <Button onClick={updateHelloWorld}>updateHelloWorld</Button>}
       {connected && <Button onClick={getAccountState}>getAccountState</Button>}
+      {connected && <Button onClick={createGear}>createGear</Button>}
       {connected && <Button onClick={disconnect}>断开连接</Button>}
       <WalletMultiButton />
     </Main>

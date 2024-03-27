@@ -77,6 +77,10 @@
         {
           "name": "price",
           "type": "f64"
+        },
+        {
+          "name": "path",
+          "type": "string"
         }
       ]
     },
@@ -145,6 +149,10 @@
           {
             "name": "price",
             "type": "f64"
+          },
+          {
+            "name": "encryptPath",
+            "type": "string"
           }
         ]
       }
