@@ -464,6 +464,8 @@
     justify-content: space-between;
 
     & > div {
+      position: relative;
+      z-index: 2;
       &:nth-of-type(1) {
         display: flex;
         align-items: center;
