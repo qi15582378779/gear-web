@@ -1,20 +1,56 @@
 import cn from 'classnames';
 import ps from './styles/index.module.scss';
-import type { MenuProps } from 'antd';
 import { Button, Dropdown, Input } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { IconDown } from '@/components/Icon';
+import { $filterNumber } from '@/utils/met';
 
 const { TextArea } = Input;
 
 const Create: React.FC = () => {
   const [avatarSrc, setAvatarSrc] = useState<string>('');
+  const [errorTag, setErrorTag] = useState('');
 
   const [typeOpen, setTypeOpen] = useState<boolean>(false);
   const typeRef = useRef<HTMLDivElement | null>(null);
 
   const [tokenOpen, setTokenOpen] = useState<boolean>(false);
   const tokenRef = useRef<HTMLDivElement | null>(null);
+
+  const requestTypes = [
+    { type: 'GET', value: 'GET' },
+    { type: 'POST', value: 'POST' }
+  ];
+  const tokenList = [{ symbol: 'SOL', decimals: 9, describe: 'solana', value: 'SOL' }];
+
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    requestURL: '',
+    requestParams: '',
+    requestType: '',
+    price: '',
+    denom: '',
+    logoFile: null
+
+    // name: 'translate 2',
+    // description: 'translate',
+    // requestURL: 'https://api.aicell.world/v1/ai/text-to-en',
+    // requestParams: '{"text":""}',
+    // requestType: 'POST',
+    // price: '0.01',
+    // denom: 'BNB',
+    // logoFile: null
+
+    // name: 'image-gen',
+    // description: 'image gen',
+    // requestURL: 'https://api.aicell.world/v1/ai/image-gen-dev',
+    // requestParams: '{"text":""}',
+    // requestType: 'POST',
+    // price: '0.01',
+    // denom: 'BNB',
+    // logoFile: null
+  });
 
   const handUpload = () => {
     if (typeof document === 'undefined') return;
@@ -37,6 +73,20 @@ const Create: React.FC = () => {
       setAvatarSrc(reader.result as string);
     };
     reader.readAsDataURL(files[0]);
+  };
+
+  const onChangeRequestType = useCallback((info: Record<string, any>) => {
+    setFormData((state) => ({ ...state, requestType: info.value }));
+    setTypeOpen(false);
+  }, []);
+
+  const onChangeToken = useCallback((info: Record<string, any>) => {
+    setFormData((state) => ({ ...state, denom: info.value }));
+    setTokenOpen(false);
+  }, []);
+
+  const onInputChange = (e: ChangeEvent<any>, key: string) => {
+    setFormData((state) => ({ ...state, [key]: e?.target ? e.target.value : e }));
   };
 
   const handleDocumentClick = (event: MouseEvent) => {
@@ -68,7 +118,7 @@ const Create: React.FC = () => {
 
         <section className={ps.name}>
           <div>Name</div>
-          <Input placeholder="" />
+          <Input placeholder="" value={formData.name} onChange={(e: any) => onInputChange(e, 'name')} />
         </section>
 
         <section className={ps['logo-des']}>
@@ -87,7 +137,7 @@ const Create: React.FC = () => {
           <div className={ps.des}>
             <div>Description</div>
             <div>
-              <TextArea placeholder="eg: URL: https://www.linkloud.com/po" />
+              <TextArea placeholder="" value={formData.description} onChange={(e: any) => onInputChange(e, 'description')} />
             </div>
           </div>
         </section>
@@ -101,26 +151,29 @@ const Create: React.FC = () => {
                   setTypeOpen(!typeOpen);
                 }}
               >
-                Get
+                {formData.requestType ? formData.requestType : <span></span>}
                 <IconDown />
               </div>
               <div className={cn(ps['down-items'], { [ps['open-down']]: typeOpen })}>
-                <div>Select Type</div>
-                <div>Get</div>
-                <div>Post</div>
+                {/* <div>Select Type</div> */}
+                {requestTypes.map((ele) => (
+                  <div key={ele.value} onClick={() => onChangeRequestType(ele)}>
+                    {ele.type}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
           <div className={ps.url}>
             <div>URL</div>
-            <Input />
+            <Input className={errorTag === 'url' ? ps['_error'] : ''} value={formData.requestURL} onChange={(e: any) => onInputChange(e, 'requestURL')} />
           </div>
         </section>
 
         <section className={ps.params}>
           <div>Params（JSON）</div>
           <div>
-            <TextArea placeholder="eg: URL: https://www.linkloud.com/po" />
+            <TextArea className={errorTag === 'params' ? ps['_error'] : ''} value={formData.requestParams} onChange={(e: any) => onInputChange(e, 'requestParams')} placeholder="" />
           </div>
         </section>
 
@@ -136,31 +189,31 @@ const Create: React.FC = () => {
                     setTokenOpen(!tokenOpen);
                   }}
                 >
-                  Get
+                  {formData.denom ? formData.denom : <span></span>}
                   <IconDown />
                 </div>
                 <div className={cn(ps['down-items'], ps['down-tokens'], { [ps['open-down']]: tokenOpen })}>
                   <div>Select Token</div>
-                  <div>
-                    <img src="/images/tokens/USDC.png" alt="" />
-                    <div>
-                      <div>USDC</div>
-                      <div>Usdc</div>
+                  {tokenList.map((ele) => (
+                    <div key={ele.value}>
+                      <img src={`/images/tokens/${ele.symbol}.png`} alt="" />
+                      <div onClick={() => onChangeToken(ele)}>
+                        <div>{ele.symbol}</div>
+                        <div>{ele.describe}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <img src="/images/tokens/USDC.png" alt="" />
-                    <div>
-                      <div>USDC</div>
-                      <div>Usdc</div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
             <div className={ps.url}>
               <div>Price</div>
-              <Input />
+              <Input
+                value={formData.price}
+                onChange={(e: any) => {
+                  onInputChange($filterNumber(e), 'price');
+                }}
+              />
             </div>
           </div>
         </section>
