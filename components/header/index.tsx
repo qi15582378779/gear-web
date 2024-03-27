@@ -217,7 +217,7 @@ const Header: FC<any> = (): ReactElement => {
                     <SymbolIcon src="/images/tokens/SOL.png" />
                     SOL
                   </Symbol>
-                  <b>{balance.bnb}</b>
+                  <b>{balance.sol}</b>
                 </Balance>
               </AssetsContent>
             </H5InfoDrop>
@@ -243,17 +243,10 @@ const Header: FC<any> = (): ReactElement => {
                     <AssetsContent>
                       <Balance>
                         <Symbol>
-                          <SymbolIcon src="/images/tokens/USDC.png" />
-                          USDC
-                        </Symbol>
-                        <b>{balance.usdt}</b>
-                      </Balance>
-                      <Balance>
-                        <Symbol>
                           <SymbolIcon src="/images/tokens/SOL.png" />
                           SOL
                         </Symbol>
-                        <b>{balance.bnb}</b>
+                        <b>{balance.sol}</b>
                       </Balance>
                     </AssetsContent>
                   </>

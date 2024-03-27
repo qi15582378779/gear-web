@@ -124,7 +124,7 @@ const Create: React.FC = () => {
       const tokeninfo = (tokens as any)['devnet'][formData.denom];
       const price = $shiftedBy(formData.price, tokeninfo.decimals);
 
-      form.append('owner', publicKey.toBase58());
+      form.append('owner', publicKey!.toBase58());
       form.append('requestURL', formData.requestURL);
       form.append('requestParams', formData.requestParams);
       form.append('requestType', formData.requestType);
@@ -268,7 +268,7 @@ const Create: React.FC = () => {
                 <IconDown />
               </div>
               <div className={cn(ps['down-items'], { [ps['open-down']]: typeOpen })}>
-                {/* <div>Select Type</div> */}
+                <div>Select Type</div>
                 {requestTypes.map((ele) => (
                   <div key={ele.value} onClick={() => onChangeRequestType(ele)}>
                     {ele.type}
@@ -308,9 +308,9 @@ const Create: React.FC = () => {
                 <div className={cn(ps['down-items'], ps['down-tokens'], { [ps['open-down']]: tokenOpen })}>
                   <div>Select Token</div>
                   {tokenList.map((ele) => (
-                    <div key={ele.value}>
+                    <div key={ele.value} onClick={() => onChangeToken(ele)}>
                       <img src={`/images/tokens/${ele.symbol}.png`} alt="" />
-                      <div onClick={() => onChangeToken(ele)}>
+                      <div>
                         <div>{ele.symbol}</div>
                         <div>{ele.describe}</div>
                       </div>

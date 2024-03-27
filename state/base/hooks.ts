@@ -4,28 +4,26 @@ import { setBalance } from './actions';
 import tokens from '@/utils/tokens.json';
 import { AppState, useAppDispatch } from '../index';
 // import { useBalance, useWallet } from '@/hooks';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 export function useUserBalance(): [{ [key: string]: any }, () => void] {
   const dispatch = useAppDispatch();
   // const { account, chainId } = useWallet();
   const { wallet, publicKey, connected } = useWallet();
+  const { connection } = useConnection();
 
   // const [, getBalance] = useBalance();
 
   const balance = useSelector<AppState, AppState['base']['balance']>((state: AppState) => state.base.balance);
   const getUserBalance = useCallback(async () => {
     try {
-      // const usdtInfo = (tokens as any)[chainId].USDT;
-      // const bnbInfo = (tokens as any)[chainId].BNB;
-      // const usdtBalance = await getBalance(usdtInfo.address, account);
-      // const bnbBalance = await getBalance(bnbInfo.address, account);
-      // dispatch(
-      //   setBalance({
-      //     bnb: bnbBalance,
-      //     usdt: usdtBalance
-      //   })
-      // );
+      const balance = await connection.getBalance(publicKey!);
+      dispatch(
+        setBalance({
+          sol: balance / LAMPORTS_PER_SOL
+        })
+      );
     } catch (e: any) {
       console.error('getUserBalance error', e.message);
     }

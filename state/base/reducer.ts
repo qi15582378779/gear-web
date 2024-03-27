@@ -2,8 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   balance: {
-    bnb: '0.00',
-    usdt: '0.00'
+    sol: '0.00'
   }
 };
 
