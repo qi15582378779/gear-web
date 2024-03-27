@@ -35,7 +35,7 @@ const Header: FC<any> = (): ReactElement => {
 
   const nav = [
     { name: 'Call', path: '/' },
-    { name: 'Cells', path: '/cells' },
+    { name: 'Gears', path: '/gears' },
     { name: 'Create', path: '/create' }
   ];
 
@@ -121,7 +121,7 @@ const Header: FC<any> = (): ReactElement => {
           </History>
 
           <Chain>
-            {connected ? (
+            {/* {connected ? (
               // eslint-disable-next-line react/no-unescaped-entities
               <PopoverGroup placement="left" content={<PopoverContent>Your wallet's current network is unsupported.</PopoverContent>}>
                 <Dropdown menu={{ items }} placement="bottomRight" trigger={['click']} overlayClassName="chain-dropdown">
@@ -132,9 +132,9 @@ const Header: FC<any> = (): ReactElement => {
               </PopoverGroup>
             ) : (
               <ChainImg src="/images/chain/SOL.svg" />
-            )}
+            )} */}
 
-            {/* <ChainName>BNB Chain</ChainName> */}
+            {connected && <ChainImg src="/images/chain/SOL.svg" />}
           </Chain>
 
           {connected ? (

@@ -27,7 +27,7 @@ const Cells: React.FC = () => {
       <div className={ps.container}>
         <div className={ps.tit}>
           <div>
-            Interface cell <span>({list.length})</span>
+            Interface gear <span>({list.length})</span>
           </div>
 
           <div className={ps['rt-create']}>
