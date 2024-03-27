@@ -14,6 +14,7 @@ import { Dropdown, Popover } from 'antd';
 import { useUserBalance } from '@/state/base/hooks';
 import type { MenuProps } from 'antd';
 import cn from 'classnames';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
@@ -139,11 +140,12 @@ const Header: FC<any> = (): ReactElement => {
           {connected ? (
             <Wallet ref={H5DropRef} onClick={() => handOpen()}>
               <AvatarIcon src="/images/avatar.svg" />
-              <WalletAddressTxt>{$hash(publicKey.toBase58(), 6, 4)}</WalletAddressTxt>
+              <WalletAddressTxt>{$hash(publicKey!.toBase58(), 6, 4)}</WalletAddressTxt>
               <WalletDownIcon src="/images/other/3.svg" />
             </Wallet>
           ) : (
-            <ConnectWallet onClick={() => connectWallet('m')}>Connect Wallet</ConnectWallet>
+            // <ConnectWallet onClick={() => connectWallet('m')}>Connect Wallet</ConnectWallet>
+            <WalletMultiButton>Connect Wallet</WalletMultiButton>
           )}
 
           <H5Menu
@@ -198,7 +200,7 @@ const Header: FC<any> = (): ReactElement => {
             >
               <Account>
                 <Avatar src="/images/avatar-metamask.png" />
-                {$hash(publicKey.toBase58(), 4, 4)}
+                {$hash(publicKey!.toBase58(), 4, 4)}
                 <IconCopy />
               </Account>
 
@@ -234,7 +236,7 @@ const Header: FC<any> = (): ReactElement => {
 
                     <Account>
                       <Avatar src="/images/avatar-metamask.png" />
-                      {$hash(publicKey.toBase58(), 4, 4)}
+                      {$hash(publicKey!.toBase58(), 4, 4)}
                       <IconCopy />
                     </Account>
 

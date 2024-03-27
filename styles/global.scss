@@ -102,3 +102,27 @@
     animation: moveX 0.6s linear;
   }
 }
+
+///
+.wallet-adapter-dropdown {
+  .wallet-adapter-button {
+    border-radius: 0.32rem;
+    height: 0.4rem;
+    padding: 0 0.16rem;
+    color: #07071c;
+    font-size: 0.14rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #c4cbd4 !important;
+    }
+
+    &.wallet-adapter-button-trigger {
+      background: #fbfbfb;
+    }
+  }
+}

@@ -1,8 +1,10 @@
+import '@solana/wallet-adapter-react-ui/styles.css';
 import 'styles/index.scss';
 import dynamic from 'next/dynamic';
+
 import { createGlobalStyle } from 'styled-components';
 import type { AppProps } from 'next/app';
-import '@solana/wallet-adapter-react-ui/styles.css';
+
 import Header from 'components/header';
 import Footer from 'components/footer';
 import Head from 'next/head';
