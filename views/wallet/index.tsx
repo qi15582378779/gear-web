@@ -351,6 +351,17 @@ const Wallet = () => {
     }
   };
 
+  const getPdaBalance = async () => {
+    try {
+      if (!workspaceHW) return;
+      const res = await workspaceGear!.program.getGearPda(new PublicKey("2UYQ6d99PBCBjoBLoqPzTXmBuT13X7pbbBbVhh48XAtx"));
+      console.log("=========res: ", res);
+      console.log("=========account ", res.toBase58());
+    } catch (e: any) {
+      console.error("getParams error", e.message);
+    }
+  };
+
   // Gear
   const createGear = async () => {
     try {
@@ -422,6 +433,7 @@ const Wallet = () => {
       {connected && <Button onClick={updateHelloWorld}>updateHelloWorld</Button>}
       {connected && <Button onClick={getAccountState}>getAccountState</Button>}
       {connected && <Button onClick={createGear}>createGear</Button>}
+      {connected && <Button onClick={getPdaBalance}>getPdaBalance</Button>}
       {connected && <Button onClick={disconnect}>断开连接</Button>}
       <WalletMultiButton />
     </Main>

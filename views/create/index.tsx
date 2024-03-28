@@ -124,7 +124,7 @@ const Create: React.FC = () => {
       // console.log('(tokens as any)[chainId]', (tokens as any)[chainId], chainId, formData.denom);
 
       const tokeninfo = (tokens as any)["devnet"][formData.denom];
-      const price = $shiftedBy(formData.price, tokeninfo.decimals);
+      // const price = $shiftedBy(formData.price, tokeninfo.decimals);
 
       form.append("owner", publicKey!.toBase58());
       form.append("requestURL", formData.requestURL);
@@ -133,9 +133,8 @@ const Create: React.FC = () => {
       form.append("name", formData.name);
       form.append("description", formData.description);
 
-      form.append("price", price);
+      form.append("price", formData.price);
       form.append("denom", tokeninfo.address);
-      form.append("tokeninfo", JSON.stringify(tokeninfo));
       form.append("logoFile", formData.logoFile);
 
       handResultModal({
@@ -144,20 +143,22 @@ const Create: React.FC = () => {
       });
 
       console.log("form", form);
+      const { code, data, error }: any = await Server.submitGear(form);
+      if (code !== 0) throw new Error(error);
 
-      // const { code, data, error }: any = await Server.submitGear(form);
-      // if (code !== 0) throw new Error(error);
-
-      let data = {
-        gearId: "d23384e2f771478384fbd69423063d2c",
-        tokenURL: "kGm5LVn0S8tXOaYiZGL6a9AAtgXTreZxzknPdDU_nEY",
-        encryptURL: "U2FsdGVkX19SGVJRVKzRGPq07hauckA0UCw7Fp6xI4bhHWvUSsMxHtKnLRhNSQWIzDLhcIVgBkZvzUKMV7/zKw==",
-        denom: "0x55d398326f99059fF775485246999027B3197955",
-        price: "1000000000"
-      };
-      // const { gearAddress, tx }: any = workspace!.program.createGear("DogBro", data.denom, data.encryptURL, Number(data.price), "test-path");
-      const { gearAddress, tx }: any = await workspace!.program.createGear("DogBro", "DGB", "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json", 0.0001, "test-path");
+      const { gearAddress, tx }: any = await workspace!.program.createGear(data.name, data.symbol, data.tokenURL, data.price, data.encryptURL);
+      // const { gearAddress, tx }: any = await workspace!.program.createGear("DogBro", "DGB", "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json", 0.0001, "test-path");
+      console.log("gearAddress, tx", gearAddress, tx);
       console.log("gearAddress, tx", gearAddress.toBase58(), tx);
+
+      const params = {
+        gearAddress: gearAddress.toBase58(),
+        txhash: tx,
+        gearId: data.gearId
+      };
+
+      const { code: _code, data: _data, error: _error }: any = await Server.updateGear(params);
+      if (_code !== 0) throw new Error(_error);
       handResultModal({
         open: true,
         type: "success",
