@@ -170,7 +170,7 @@ const Cells: React.FC = () => {
                 </div>
 
                 <div className={ps.des}>
-                  <TooltipLine name={ele.description} index={index} length={null} clamp="2" />
+                  <TooltipLine name={ele.description} index={index} length={null} clamp="2" placement="top" />
                 </div>
 
                 <div className={ps.reward}>
