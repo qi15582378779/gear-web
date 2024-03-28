@@ -145,7 +145,8 @@ export class Gear {
   public async getClaimableAmount(gearAddress: PublicKey): Promise<string> {
     const padPubKey = await this.getGearPda(gearAddress);
     console.log('====padPubKey', padPubKey.toBase58());
-    const rent = await getMinimumBalanceForRentExemptMint(this.provider.connection)
+    let pdaInfo = await this._program.account.gear.getAccountInfo(padPubKey)
+    const rent = await this.provider.connection.getMinimumBalanceForRentExemption(pdaInfo?.data.byteLength!)
     const res = await this.provider.connection.getBalance(padPubKey);
     return ((res - rent) / LAMPORTS_PER_SOL).toString();
   }

@@ -10,6 +10,8 @@ import { useResultModal } from "@/state/call/hooks";
 import Server from "@/service";
 import { BigNumber } from "ethers";
 import { useWorkspaceGear } from "@/hooks/useWorkspace";
+import ResultModal from "../home/ResultModal";
+import { useRouter } from "next/router";
 
 const { TextArea } = Input;
 let form = new FormData();
@@ -17,6 +19,7 @@ const Create: React.FC = () => {
   const { wallet, publicKey, connected } = useWallet();
   const [, handResultModal] = useResultModal();
   const workspace = useWorkspaceGear();
+  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState<string>("");
@@ -142,15 +145,10 @@ const Create: React.FC = () => {
         type: "wating"
       });
 
-      console.log("form", form);
       const { code, data, error }: any = await Server.submitGear(form);
       if (code !== 0) throw new Error(error);
 
       const { gearAddress, tx }: any = await workspace!.program.createGear(data.name, data.symbol, data.tokenURL, data.price, data.encryptURL);
-      // const { gearAddress, tx }: any = await workspace!.program.createGear("DogBro", "DGB", "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json", 0.0001, "test-path");
-      console.log("gearAddress, tx", gearAddress, tx);
-      console.log("gearAddress, tx", gearAddress.toBase58(), tx);
-
       const params = {
         gearAddress: gearAddress.toBase58(),
         txhash: tx,
@@ -165,28 +163,7 @@ const Create: React.FC = () => {
         hash: tx
       });
       setLoading(false);
-
-      // const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
-      // const { transactionState, hash } = await awaitTransactionMined(transaction);
-      // console.log('hash::', hash);
-
-      // setLoading(false);
-      // if (transactionState === TransactionState.SUCCESS) {
-      //   handResultModal({
-      //     open: true,
-      //     type: 'success',
-      //     hash: hash
-      //   });
-
-      //   // notification.success({message: 'Create Successfully'});
-      // } else {
-      //   handResultModal({
-      //     open: true,
-      //     type: 'fail',
-      //     hash: hash
-      //   });
-      //   throw new Error('Create Fail');
-      // }
+      router.push("/gears");
     } catch (error: any) {
       handResultModal({
         open: true,
@@ -232,130 +209,133 @@ const Create: React.FC = () => {
   }, [typeOpen, tokenOpen]);
 
   return (
-    <div className={ps.full}>
-      <div className={ps.container}>
-        <div className={ps.tit}>Create gear</div>
+    <>
+      <div className={ps.full}>
+        <div className={ps.container}>
+          <div className={ps.tit}>Create gear</div>
 
-        <section className={ps["sub-tit"]}>
-          <div>Basic information</div>
-          <div>Please select an API gear and enter a command to call it.</div>
-        </section>
+          <section className={ps["sub-tit"]}>
+            <div>Basic information</div>
+            <div>Please select an API gear and enter a command to call it.</div>
+          </section>
 
-        <section className={ps.name}>
-          <div>Name</div>
-          <Input placeholder="" value={formData.name} onChange={(e: any) => onInputChange(e, "name")} />
-        </section>
+          <section className={ps.name}>
+            <div>Name</div>
+            <Input placeholder="" value={formData.name} onChange={(e: any) => onInputChange(e, "name")} />
+          </section>
 
-        <section className={ps["logo-des"]}>
-          <div className={ps.logo}>
-            <div>Logo</div>
-            <div onClick={handUpload}>
-              {avatarSrc ? (
-                <>
-                  <img src={avatarSrc} alt="" className={ps["avatar-img"]} />
-                </>
-              ) : (
-                <>
-                  <input type="file" className={ps.file} id="avatarFiles" accept="image/*" onChange={(e) => onUpload(e)} />
-                  <img src="/images/create/1.svg" alt="" className={ps["upload-icon"]} />
-                  <div className={ps["upload-tip"]}>
-                    Drag & Drop or <span>Choose file</span> to upload <br />
-                    JPG or GIF
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className={ps.des}>
-            <div>Description</div>
-            <div>
-              <TextArea placeholder="" value={formData.description} onChange={(e: any) => onInputChange(e, "description")} />
-            </div>
-          </div>
-        </section>
-
-        <section className={ps["type-url"]}>
-          <div className={ps.type}>
-            <div>Type</div>
-            <div className={ps["down-group"]} ref={typeRef}>
-              <div
-                onClick={() => {
-                  setTypeOpen(!typeOpen);
-                }}
-              >
-                {formData.requestType ? formData.requestType : <span></span>}
-                <IconDown />
-              </div>
-              <div className={cn(ps["down-items"], { [ps["open-down"]]: typeOpen })}>
-                <div>Select Type</div>
-                {requestTypes.map((ele) => (
-                  <div key={ele.value} onClick={() => onChangeRequestType(ele)}>
-                    {ele.type}
-                  </div>
-                ))}
+          <section className={ps["logo-des"]}>
+            <div className={ps.logo}>
+              <div>Logo</div>
+              <div onClick={handUpload}>
+                {avatarSrc ? (
+                  <>
+                    <img src={avatarSrc} alt="" className={ps["avatar-img"]} />
+                  </>
+                ) : (
+                  <>
+                    <input type="file" className={ps.file} id="avatarFiles" accept="image/*" onChange={(e) => onUpload(e)} />
+                    <img src="/images/create/1.svg" alt="" className={ps["upload-icon"]} />
+                    <div className={ps["upload-tip"]}>
+                      Drag & Drop or <span>Choose file</span> to upload <br />
+                      JPG or GIF
+                    </div>
+                  </>
+                )}
               </div>
             </div>
-          </div>
-          <div className={ps.url}>
-            <div>URL</div>
-            <Input className={errorTag === "url" ? ps["_error"] : ""} value={formData.requestURL} onChange={(e: any) => onInputChange(e, "requestURL")} />
-          </div>
-        </section>
 
-        <section className={ps.params}>
-          <div>Params（JSON）</div>
-          <div>
-            <TextArea className={errorTag === "params" ? ps["_error"] : ""} value={formData.requestParams} onChange={(e: any) => onInputChange(e, "requestParams")} placeholder="" />
-          </div>
-        </section>
+            <div className={ps.des}>
+              <div>Description</div>
+              <div>
+                <TextArea placeholder="" value={formData.description} onChange={(e: any) => onInputChange(e, "description")} />
+              </div>
+            </div>
+          </section>
 
-        <section className={ps["token-price"]}>
-          <div>Price Setting</div>
-          <div>Please select an API gear and enter a command to call it.</div>
-          <div>
-            <div>
-              <div>Token</div>
-              <div className={ps["down-group"]} ref={tokenRef}>
+          <section className={ps["type-url"]}>
+            <div className={ps.type}>
+              <div>Type</div>
+              <div className={ps["down-group"]} ref={typeRef}>
                 <div
                   onClick={() => {
-                    setTokenOpen(!tokenOpen);
+                    setTypeOpen(!typeOpen);
                   }}
                 >
-                  {formData.denom ? formData.denom : <span></span>}
+                  {formData.requestType ? formData.requestType : <span></span>}
                   <IconDown />
                 </div>
-                <div className={cn(ps["down-items"], ps["down-tokens"], { [ps["open-down"]]: tokenOpen })}>
-                  <div>Select Token</div>
-                  {tokenList.map((ele) => (
-                    <div key={ele.value} onClick={() => onChangeToken(ele)}>
-                      <img src={`/images/tokens/${ele.symbol}.png`} alt="" />
-                      <div>
-                        <div>{ele.symbol}</div>
-                        <div>{ele.describe}</div>
-                      </div>
+                <div className={cn(ps["down-items"], { [ps["open-down"]]: typeOpen })}>
+                  <div>Select Type</div>
+                  {requestTypes.map((ele) => (
+                    <div key={ele.value} onClick={() => onChangeRequestType(ele)}>
+                      {ele.type}
                     </div>
                   ))}
                 </div>
               </div>
             </div>
             <div className={ps.url}>
-              <div>Price</div>
-              <Input
-                value={formData.price}
-                onChange={(e: any) => {
-                  onInputChange($filterNumber(e), "price");
-                }}
-              />
+              <div>URL</div>
+              <Input className={errorTag === "url" ? ps["_error"] : ""} value={formData.requestURL} onChange={(e: any) => onInputChange(e, "requestURL")} />
             </div>
-          </div>
-        </section>
+          </section>
 
-        <Button block className={ps["submit-btn"]} disabled={!!btn_disable} loading={loading} onClick={submit}>
-          Submit
-        </Button>
+          <section className={ps.params}>
+            <div>Params（JSON）</div>
+            <div>
+              <TextArea className={errorTag === "params" ? ps["_error"] : ""} value={formData.requestParams} onChange={(e: any) => onInputChange(e, "requestParams")} placeholder="" />
+            </div>
+          </section>
+
+          <section className={ps["token-price"]}>
+            <div>Price Setting</div>
+            <div>Please select an API gear and enter a command to call it.</div>
+            <div>
+              <div>
+                <div>Token</div>
+                <div className={ps["down-group"]} ref={tokenRef}>
+                  <div
+                    onClick={() => {
+                      setTokenOpen(!tokenOpen);
+                    }}
+                  >
+                    {formData.denom ? formData.denom : <span></span>}
+                    <IconDown />
+                  </div>
+                  <div className={cn(ps["down-items"], ps["down-tokens"], { [ps["open-down"]]: tokenOpen })}>
+                    <div>Select Token</div>
+                    {tokenList.map((ele) => (
+                      <div key={ele.value} onClick={() => onChangeToken(ele)}>
+                        <img src={`/images/tokens/${ele.symbol}.png`} alt="" />
+                        <div>
+                          <div>{ele.symbol}</div>
+                          <div>{ele.describe}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className={ps.url}>
+                <div>Price</div>
+                <Input
+                  value={formData.price}
+                  onChange={(e: any) => {
+                    onInputChange($filterNumber(e), "price");
+                  }}
+                />
+              </div>
+            </div>
+          </section>
+
+          <Button block className={ps["submit-btn"]} disabled={!!btn_disable} loading={loading} onClick={submit}>
+            Submit
+          </Button>
+        </div>
       </div>
-    </div>
+      <ResultModal />
+    </>
   );
 };
 

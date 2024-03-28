@@ -2,7 +2,7 @@
   overflow-x: hidden;
   padding: 0.56rem 0;
   height: 100%;
-  background-image: url('/images/cells/bg.png');
+  background-image: url("/images/cells/bg.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
@@ -48,7 +48,7 @@
   background: linear-gradient(48deg, #9945ff 0.57%, #8a53f4 14.41%, #6377d6 42.09%, #24b0a7 78.67%, #00d18c 98.45%, #00d18c 99.43%);
   column-gap: 0.08rem;
   color: #fff;
-  font-family: 'IBM Plex Mono';
+  font-family: "IBM Plex Mono";
   font-size: 0.16rem;
   font-style: normal;
   font-weight: 600;
@@ -108,7 +108,7 @@
   backdrop-filter: blur(33px);
 
   &::after {
-    content: '';
+    content: "";
     width: 4.17rem;
     height: 2.51rem;
     position: absolute;
@@ -135,6 +135,7 @@
         width: 0.48rem;
         height: 0.48rem;
         margin-right: 0.08rem;
+        border-radius: 50%;
       }
 
       & > div {
@@ -188,6 +189,7 @@
   font-weight: 400;
   line-height: 166.667%;
   margin-bottom: 0.24rem;
+  min-height: 0.48rem;
 }
 
 .reward {
@@ -289,7 +291,7 @@
 
   &:hover {
     color: #fff !important;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.06) 100%), linear-gradient(48deg, #9945ff 0.57%, #8a53f4 14.41%, #6377d6 42.09%, #24b0a7 78.67%, #00d18c 98.45%, #00d18c 99.43%);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.06) 100%), linear-gradient(48deg, #9945ff 0.57%, #8a53f4 14.41%, #6377d6 42.09%, #24b0a7 78.67%, #00d18c 98.45%, #00d18c 99.43%) !important;
   }
 }
 
