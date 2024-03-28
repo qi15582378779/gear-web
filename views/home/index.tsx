@@ -20,12 +20,14 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import ps from "./styles/index.module.scss";
 import TooltipLine from "@/components/TooltipLine";
 import { Copy } from "@/components";
-import { useScan, useWorkspaceGear } from "@/hooks";
+import { useDebounce, useScan, useWorkspaceGear } from "@/hooks";
+import Empty from "@/components/Empty";
 
 const { TextArea } = Input;
 
 const Home: FC = (): ReactElement => {
   const workspace = useWorkspaceGear();
+  const [debounce] = useDebounce(1000);
 
   const [, connectWallet] = useConnectWallet();
   const [history, { fetchHistory, reset }] = useHistory();
@@ -59,6 +61,8 @@ const Home: FC = (): ReactElement => {
 
   const hangSearch = (value: string) => {
     setSearch(value);
+    params.current.text = value;
+    debounce(() => getCellList());
   };
 
   const getCellList = () => {
@@ -334,7 +338,7 @@ const Home: FC = (): ReactElement => {
                 ))}
               </>
             )}
-            <></>
+            <>{!cellLoad && cellList.length <= 0 ? <Empty text="Nothing" /> : null}</>
           </div>
         </div>
       </div>
