@@ -1,11 +1,11 @@
-import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
-import { GearProtocol, IDL } from "@/programs/types/gear_protocol";
-import { PROGRAM_IDS } from "@/programs/constants";
-import { PublicKey } from "@solana/web3.js";
+import * as anchor from '@coral-xyz/anchor';
+import { Program } from '@coral-xyz/anchor';
+import { GearProtocol, IDL } from '@/programs/types/gear_protocol';
+import { PROGRAM_IDS } from '@/programs/constants';
+import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
-import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { getAssociatedTokenAddress, getMinimumBalanceForRentExemptMint, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { findMasterEditionPda, findMetadataPda, mplTokenMetadata, MPL_TOKEN_METADATA_PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata";
 import { publicKey } from "@metaplex-foundation/umi";
 
@@ -25,35 +25,43 @@ export class Gear {
   }
 
   /**
-   * @instruction createGear
-   * @param name string
-   * @param symbol string
-   * @param uri string
-   * @returns transaction signature
+   * @notice The instruction createGear.
+   * @param name The name of gear NFT.
+   * @param symbol The synmbol of gear NFT.
+   * @param uri The tokenURI of gear NFT.
+   * @param price Amount the caller need to pay.
+   * @param path Request encrypted path.
+   * @returns Transaction signature
    */
   public async createGear(name: string, symbol: string, uri: string, price: number, path: string): Promise<any> {
-    const umi = createUmi(this.provider.connection).use(walletAdapterIdentity(this.provider.wallet)).use(mplTokenMetadata());
+
+    const umi = createUmi(this.provider.connection)
+      .use(walletAdapterIdentity(this.provider.wallet))
+      .use(mplTokenMetadata());
 
     const mint = anchor.web3.Keypair.generate();
     console.log("mint address=", mint.publicKey.toBase58());
 
     // Derive the gear account
     const gearAccount = await this.getGearPda(mint.publicKey);
-    console.log("gearAccount address=", gearAccount.toBase58());
+    console.log('gearAccount address=', gearAccount.toBase58())
 
     // Derive the associated token address account for the mint
-    const associatedTokenAccount = await getAssociatedTokenAddress(mint.publicKey, this.provider.publicKey);
+    const associatedTokenAccount = await getAssociatedTokenAddress(
+      mint.publicKey,
+      this.provider.publicKey
+    );
     console.log("associatedTokenAccount address=", associatedTokenAccount.toBase58());
 
     // Derive the metadata account
     let metadataAccount = findMetadataPda(umi, {
-      mint: publicKey(mint.publicKey)
+      mint: publicKey(mint.publicKey),
     })[0];
     console.log("metadataAccount address=", metadataAccount);
 
     //Derive the master edition pda
     let masterEditionAccount = findMasterEditionPda(umi, {
-      mint: publicKey(mint.publicKey)
+      mint: publicKey(mint.publicKey),
     })[0];
     console.log("masterEditionAccount address=", masterEditionAccount);
 
@@ -70,7 +78,7 @@ export class Gear {
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenMetadataProgram: MPL_TOKEN_METADATA_PROGRAM_ID,
         systemProgram: anchor.web3.SystemProgram.programId,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
       })
       .signers([mint])
       .rpc({ skipPreflight: true });
@@ -78,9 +86,9 @@ export class Gear {
   }
 
   /**
-   * @instruction callGear
-   * @param gearAddress string
-   * @returns transaction signature
+   * @notice The instruction callGear
+   * @param gearAddress The mint (NFT) address
+   * @returns Transaction signature
    */
   public async callGear(gearAddress: string): Promise<string> {
     const mintPubKey = new PublicKey(gearAddress);
@@ -94,12 +102,17 @@ export class Gear {
         systemProgram: anchor.web3.SystemProgram.programId
       })
       .rpc();
-    return tx;
+    return tx
   }
 
+  /**
+   * @notice The instruction claim.
+   * @param gearAddress The mint (NFT) address.
+   * @returns Transaction signature.
+  */
   public async claim(gearAddress: string): Promise<string> {
     const mintPubKey = new PublicKey(gearAddress);
-    const gearPda = await this.getGearPda(mintPubKey);
+    const gearPda = await this.getGearPda(mintPubKey)
     const tx = await this._program.methods
       .claim()
       .accounts({
@@ -114,18 +127,38 @@ export class Gear {
   }
 
   /**
-   * @account HelloWorld
+   * @notice Get pad gearAccount state.
+   * @param gearAddress The mint (NFT) address.
    * @returns authority publicKey
    * @returns data string
    */
-  public async getGearState(mint: PublicKey): Promise<any> {
-    let padPubKey = await this.getGearPda(mint);
+  public async getGearState(gearAddress: PublicKey): Promise<any> {
+    let padPubKey = await this.getGearPda(gearAddress);
     let state = await this._program.account.gear.fetch(padPubKey);
-    return state;
+    return state
+  };
+
+  /**
+   * @notice Get the claimable amount of denom token.
+   * @param gearAddress The mint (NFT) address.
+  */
+  public async getClaimableAmount(gearAddress: PublicKey): Promise<string> {
+    const padPubKey = await this.getGearPda(gearAddress);
+    console.log('====padPubKey', padPubKey.toBase58());
+    const rent = await getMinimumBalanceForRentExemptMint(this.provider.connection)
+    const res = await this.provider.connection.getBalance(padPubKey);
+    return ((res - rent) / LAMPORTS_PER_SOL).toString();
   }
 
+  /**
+   * @notice Get the gearAccount pda address.
+   * @param mint The mint address.
+  */
   public async getGearPda(mint: PublicKey): Promise<PublicKey> {
-    const [gearAccount] = await anchor.web3.PublicKey.findProgramAddressSync([mint.toBuffer()], this.programId);
+    const [gearAccount] = await anchor.web3.PublicKey.findProgramAddressSync(
+      [mint.toBuffer()],
+      this.programId
+    );
     return gearAccount;
   }
 }

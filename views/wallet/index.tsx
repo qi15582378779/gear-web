@@ -5,7 +5,7 @@ import * as BufferLayout from "buffer-layout";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { LAMPORTS_PER_SOL, PublicKey, TransactionInstruction, Transaction, SystemProgram } from "@solana/web3.js";
-import { AccountLayout, TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, createTransferInstruction, createAssociatedTokenAccountInstruction, createMint } from "@solana/spl-token";
+import { AccountLayout, TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, createTransferInstruction, createAssociatedTokenAccountInstruction, createMint, getMinimumBalanceForRentExemptMint } from "@solana/spl-token";
 
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { message } from "antd";
@@ -378,6 +378,17 @@ const Wallet = () => {
     }
   };
 
+  const getClaimableAmount = async () => {
+    try {
+      if (!workspaceGear) return;
+      const mint = new PublicKey("2UYQ6d99PBCBjoBLoqPzTXmBuT13X7pbbBbVhh48XAtx");
+      const res = await workspaceGear.program.getClaimableAmount(mint);
+      console.log("========getClaimableAmount res: ", res);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     if (!connection || !publicKey) {
       return;
@@ -433,7 +444,7 @@ const Wallet = () => {
       {connected && <Button onClick={updateHelloWorld}>updateHelloWorld</Button>}
       {connected && <Button onClick={getAccountState}>getAccountState</Button>}
       {connected && <Button onClick={createGear}>createGear</Button>}
-      {connected && <Button onClick={getPdaBalance}>getPdaBalance</Button>}
+      {connected && <Button onClick={getClaimableAmount}>getClaimableAmount</Button>}
       {connected && <Button onClick={disconnect}>断开连接</Button>}
       <WalletMultiButton />
     </Main>
