@@ -381,7 +381,7 @@ const Wallet = () => {
   const getClaimableAmount = async () => {
     try {
       if (!workspaceGear) return;
-      const mint = new PublicKey("2UYQ6d99PBCBjoBLoqPzTXmBuT13X7pbbBbVhh48XAtx");
+      const mint = new PublicKey("79J2txcVrqo8A1fN1818JkCNtT9UUUQ1LYLbLzFWzzRk");
       const res = await workspaceGear.program.getClaimableAmount(mint);
       console.log("========getClaimableAmount res: ", res);
     } catch (error: any) {
