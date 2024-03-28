@@ -145,12 +145,26 @@ const Create: React.FC = () => {
 
       console.log("form", form);
 
-      // const { code, data, error }: any = await Server.submitCell(form);
+      // const { code, data, error }: any = await Server.submitGear(form);
       // if (code !== 0) throw new Error(error);
 
-      // const {} = workspace!.program.createGear("DogBro", data.denom, data.encryptURL, data.price);
-      const { gearAddress, tx }: any = await workspace!.program.createGear("DogBro", "DGB", "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json", 0.0001);
-      console.log("gearAddress, tx", gearAddress, tx);
+      let data = {
+        gearId: "d23384e2f771478384fbd69423063d2c",
+        tokenURL: "kGm5LVn0S8tXOaYiZGL6a9AAtgXTreZxzknPdDU_nEY",
+        encryptURL: "U2FsdGVkX19SGVJRVKzRGPq07hauckA0UCw7Fp6xI4bhHWvUSsMxHtKnLRhNSQWIzDLhcIVgBkZvzUKMV7/zKw==",
+        denom: "0x55d398326f99059fF775485246999027B3197955",
+        price: "1000000000"
+      };
+      // const { gearAddress, tx }: any = workspace!.program.createGear("DogBro", data.denom, data.encryptURL, Number(data.price), "test-path");
+      const { gearAddress, tx }: any = await workspace!.program.createGear("DogBro", "DGB", "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json", 0.0001, "test-path");
+      console.log("gearAddress, tx", gearAddress.toBase58(), tx);
+      handResultModal({
+        open: true,
+        type: "success",
+        hash: tx
+      });
+      setLoading(false);
+
       // const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
       // const { transactionState, hash } = await awaitTransactionMined(transaction);
       // console.log('hash::', hash);

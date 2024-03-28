@@ -1,61 +1,61 @@
-import { Copy } from '@/components';
-import { IconClose, IconCopy, IconDown, IconSearch, IconSelectDown } from '@/components/Icon';
-import { useDebounce, useScan } from '@/hooks';
-import Server from '@/service';
-import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed } from '@/utils/met';
-import { Input, Modal, Popover, Skeleton, message, notification } from 'antd';
-import cn from 'classnames';
-import { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import { Copy } from "@/components";
+import { IconClose, IconCopy, IconDown, IconSearch, IconSelectDown } from "@/components/Icon";
+import { useDebounce, useScan } from "@/hooks";
+import Server from "@/service";
+import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed } from "@/utils/met";
+import { Input, Modal, Popover, Skeleton, message, notification } from "antd";
+import cn from "classnames";
+import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 
 const test = [
   {
-    _id: '65bb2468b0dd647b9a365ffa',
-    owner: '0xef6191a5c8e983da45dac2a787d49fe3f2b6d54e',
-    name: 'translate local 1',
-    description: 'translate en',
-    requestType: 'POST',
+    _id: "65bb2468b0dd647b9a365ffa",
+    owner: "0xef6191a5c8e983da45dac2a787d49fe3f2b6d54e",
+    name: "translate local 1",
+    description: "translate en",
+    requestType: "POST",
     requestHeaders: null,
     requestParams: '{"data":"","test":""}',
-    requestURL: 'http://localhost:3011/v1/ai/text-to-en',
-    price: '10000000000000000',
-    denom: '0x0000000000000000000000000000000000000000',
+    requestURL: "http://localhost:3011/v1/ai/text-to-en",
+    price: "10000000000000000",
+    denom: "0x0000000000000000000000000000000000000000",
     tokeninfo: {
-      symbol: 'BNB',
+      symbol: "BNB",
       decimals: 18,
-      address: '0x0000000000000000000000000000000000000000'
+      address: "0x0000000000000000000000000000000000000000"
     },
-    logoFile: 'https://sp.web3go.xyz/view/ai-cell-test-bucket/fold-logo/1706763352223_ishot_2024-01-31_16.36.51.png',
-    cellId: '4cb65326950d41b0bb984354229abd03',
-    created_at: '2024-02-01T04:56:08.475Z',
-    updated_at: '2024-02-01T04:56:30.329Z',
-    cellAddress: '0x79eD2D3CF65DCdA4c079aB072cab31DA298cA7e7',
-    tokenId: '6',
-    txhash: '0x0f8fdb869dc999307116669f78cbfaa19167b0b9eb330bf4c62070771a627375'
+    logoFile: "https://sp.web3go.xyz/view/ai-cell-test-bucket/fold-logo/1706763352223_ishot_2024-01-31_16.36.51.png",
+    cellId: "4cb65326950d41b0bb984354229abd03",
+    created_at: "2024-02-01T04:56:08.475Z",
+    updated_at: "2024-02-01T04:56:30.329Z",
+    cellAddress: "0x79eD2D3CF65DCdA4c079aB072cab31DA298cA7e7",
+    tokenId: "6",
+    txhash: "0x0f8fdb869dc999307116669f78cbfaa19167b0b9eb330bf4c62070771a627375"
   },
   {
-    _id: '65bb13d127b528eba3fc172e',
-    owner: '0xef6191a5c8e983da45dac2a787d49fe3f2b6d54e',
-    name: 'translate local',
-    description: 'translate',
-    requestType: 'POST',
+    _id: "65bb13d127b528eba3fc172e",
+    owner: "0xef6191a5c8e983da45dac2a787d49fe3f2b6d54e",
+    name: "translate local",
+    description: "translate",
+    requestType: "POST",
     requestHeaders: null,
     requestParams: '{"text":""}',
-    requestURL: 'http://localhost:3011/v1/ai/text-to-en',
-    price: '10000000000000000',
-    denom: '0x0000000000000000000000000000000000000000',
+    requestURL: "http://localhost:3011/v1/ai/text-to-en",
+    price: "10000000000000000",
+    denom: "0x0000000000000000000000000000000000000000",
     tokeninfo: {
-      symbol: 'BNB',
+      symbol: "BNB",
       decimals: 18,
-      address: '0x0000000000000000000000000000000000000000'
+      address: "0x0000000000000000000000000000000000000000"
     },
-    logoFile: 'https://sp.web3go.xyz/view/ai-cell-test-bucket/fold-logo/1706759106869_ishot_2024-01-31_16.36.51.png',
-    created_at: '2024-02-01T03:45:21.570Z',
-    updated_at: '2024-02-01T03:57:43.768Z',
-    cellAddress: '0x5aBa3888Eb4db95731680b8B821a4A475C23730c',
-    tokenId: '5',
-    txhash: '0x4364fa84f8ef9a35abe0bddcddce2f0953106148f36192f811a7dc299241c4b9',
-    cellId: '865d88c1046240088cd6b26fa8980e50'
+    logoFile: "https://sp.web3go.xyz/view/ai-cell-test-bucket/fold-logo/1706759106869_ishot_2024-01-31_16.36.51.png",
+    created_at: "2024-02-01T03:45:21.570Z",
+    updated_at: "2024-02-01T03:57:43.768Z",
+    cellAddress: "0x5aBa3888Eb4db95731680b8B821a4A475C23730c",
+    tokenId: "5",
+    txhash: "0x4364fa84f8ef9a35abe0bddcddce2f0953106148f36192f811a7dc299241c4b9",
+    cellId: "865d88c1046240088cd6b26fa8980e50"
   }
 ];
 
@@ -64,23 +64,23 @@ const CellModal: React.FC<{ showCellModal: boolean; handleSelect: (item: any) =>
   const { openGreenfieldScan } = useScan();
   const [cellList, setCellList] = useState<any[]>([]);
   const [cellLoad, setCellLoad] = useState<boolean>(false);
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
   const [showIndex, setShowIndex] = useState(-1);
   const params = useRef({
-    text: ''
+    text: ""
   });
 
   const getCellList = () => {
     setCellLoad(true);
-    Server.fetchCells({ ...params.current })
+    Server.fetchGears({ ...params.current })
       .then((res) => {
-        console.log('res---->', res);
+        console.log("res---->", res);
         if (res.code === 0) {
           setCellList(res.data);
         }
       })
       .catch((e) => {
-        console.log('error--->', e);
+        console.log("error--->", e);
         notification.error({ message: e.error || e.message });
       })
       .finally(() => {
@@ -133,8 +133,8 @@ const CellModal: React.FC<{ showCellModal: boolean; handleSelect: (item: any) =>
                 key={`${item._id}-${index}`}
                 onClick={() => {
                   handleSelect(item);
-                  setSearch('');
-                  params.current.text = '';
+                  setSearch("");
+                  params.current.text = "";
                   handleCloseModal(false);
                 }}
               >
@@ -152,7 +152,7 @@ const CellModal: React.FC<{ showCellModal: boolean; handleSelect: (item: any) =>
                     <Img src={`/images/tokens/${item.tokeninfo.symbol}.png`} />
                     <span>{$shiftedBy(item.price, -item.tokeninfo.decimals)}/</span>Call
                     <IconGroup
-                      className={cn(showIndex === index ? 'show' : '')}
+                      className={cn(showIndex === index ? "show" : "")}
                       onClick={(e: any) => {
                         e.stopPropagation();
                         setShowIndex(showIndex === index ? -1 : index);
@@ -206,7 +206,7 @@ const CellModal: React.FC<{ showCellModal: boolean; handleSelect: (item: any) =>
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
-                          openGreenfieldScan(item.metadataObjectId, 'object');
+                          openGreenfieldScan(item.metadataObjectId, "object");
                         }}
                       >
                         {$hash(item.metadataObjectId)}
@@ -266,7 +266,7 @@ const Header = styled.header`
   align-items: center;
   justify-content: space-between;
   color: #222;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.16rem;
   font-style: normal;
   font-weight: 500;

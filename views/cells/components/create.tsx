@@ -1,23 +1,23 @@
-import { ChangeEvent, FC, ReactElement, useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { Button, Input, Tooltip, message, notification } from 'antd';
-import FormData from 'form-data';
+import { ChangeEvent, FC, ReactElement, useCallback, useMemo, useState } from "react";
+import styled from "styled-components";
+import { Button, Input, Tooltip, message, notification } from "antd";
+import FormData from "form-data";
 // import { useWallet, useTransactionMined } from '@/hooks';
-import { TransactionState } from '@/typings';
-import { useRouter } from 'next/router';
-import { TokensModal, RequestTypeModal } from './index';
-import { useCells, useRequestTypeModal, useResultModal, useTokensModal } from '@/state/cells/hooks';
-import { IconDown, IconWen, IconBack } from '@/components/Icon';
-import cn from 'classnames';
-import { $BigNumber, $filterNumber, $shiftedBy } from '@/utils/met';
-import Server from '@/service';
-import tokens from '@/utils/tokens.json';
-import { frameData } from 'framer-motion';
-import DataUtil from '@/utils/datautil';
-import { bigNumberJsonToString } from '@/utils/contract';
-import { BigNumber } from 'ethers';
-import { useConnectWallet } from '@/state/chain/hooks';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { TransactionState } from "@/typings";
+import { useRouter } from "next/router";
+import { TokensModal, RequestTypeModal } from "./index";
+import { useCells, useRequestTypeModal, useResultModal, useTokensModal } from "@/state/cells/hooks";
+import { IconDown, IconWen, IconBack } from "@/components/Icon";
+import cn from "classnames";
+import { $BigNumber, $filterNumber, $shiftedBy } from "@/utils/met";
+import Server from "@/service";
+import tokens from "@/utils/tokens.json";
+import { frameData } from "framer-motion";
+import DataUtil from "@/utils/datautil";
+import { bigNumberJsonToString } from "@/utils/contract";
+import { BigNumber } from "ethers";
+import { useConnectWallet } from "@/state/chain/hooks";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 // import { useResultModal } from '@/state/base/hooks';
 // import { useMessage, useTransactionMined, useWallet } from '@/hooks';
@@ -43,27 +43,27 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
 
   // const { account, chainId, factory, wallet, switchNetwork, walletReady } = useWallet();
   const [loading, setLoading] = useState(false);
-  const [avatarSrc, setAvatarSrc] = useState('');
-  const [errorTag, setErrorTag] = useState('');
+  const [avatarSrc, setAvatarSrc] = useState("");
+  const [errorTag, setErrorTag] = useState("");
 
   const requestTypes = [
-    { type: 'GET', value: 'GET' },
-    { type: 'POST', value: 'POST' }
+    { type: "GET", value: "GET" },
+    { type: "POST", value: "POST" }
   ];
 
   const tokenList = [
-    { symbol: 'BNB', decimals: 18, describe: 'Binance coin', value: 'BNB' },
-    { symbol: 'USDT', decimals: 18, describe: 'Usdt', value: 'USDT' }
+    { symbol: "BNB", decimals: 18, describe: "Binance coin", value: "BNB" },
+    { symbol: "USDT", decimals: 18, describe: "Usdt", value: "USDT" }
   ];
 
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    requestURL: '',
-    requestParams: '',
-    requestType: '',
-    price: '',
-    denom: '',
+    name: "",
+    description: "",
+    requestURL: "",
+    requestParams: "",
+    requestType: "",
+    price: "",
+    denom: "",
     logoFile: null
 
     // name: 'translate 2',
@@ -90,8 +90,8 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
   }, [connected, formData]);
 
   const handUpload = () => {
-    if (typeof document === 'undefined') return;
-    (document.querySelector('#avatarFiles') as any).click();
+    if (typeof document === "undefined") return;
+    (document.querySelector("#avatarFiles") as any).click();
   };
 
   const onUpload = (e: any) => {
@@ -121,7 +121,7 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
       // }
       return log;
     } catch (e) {
-      console.warn('PaymentEvent unknown event:', log);
+      console.warn("PaymentEvent unknown event:", log);
       // throw e;
       return null;
     }
@@ -133,51 +133,51 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
 
       setLoading(true);
 
-      if (formData.requestURL.indexOf('https://') === -1 && formData.requestURL.indexOf('http://') === -1) {
-        setErrorTag('url');
+      if (formData.requestURL.indexOf("https://") === -1 && formData.requestURL.indexOf("http://") === -1) {
+        setErrorTag("url");
         notification.error({
-          message: 'Invalid URL'
+          message: "Invalid URL"
         });
         return;
       }
 
       try {
         const data = JSON.parse(formData.requestParams);
-        console.log('data', data, formData.requestParams);
-        if (data.constructor !== Object) throw new Error('Invalid Params');
+        console.log("data", data, formData.requestParams);
+        if (data.constructor !== Object) throw new Error("Invalid Params");
       } catch (error: any) {
-        setErrorTag('params');
+        setErrorTag("params");
         notification.error({
-          message: 'Invalid Params'
+          message: "Invalid Params"
         });
         return;
       }
-      if ($BigNumber(formData.price).lt(0.001)) throw new Error('Price is less than 0.001');
+      if ($BigNumber(formData.price).lt(0.001)) throw new Error("Price is less than 0.001");
 
-      setErrorTag('');
+      setErrorTag("");
       form = new FormData();
 
       // const tokeninfo = (tokens as any)[chainId][formData.denom];
       // const price = $shiftedBy(formData.price, tokeninfo.decimals);
 
-      form.append('owner', publicKey.toBase58());
-      form.append('requestURL', formData.requestURL);
-      form.append('requestParams', formData.requestParams);
-      form.append('requestType', formData.requestType);
-      form.append('name', formData.name);
-      form.append('description', formData.description);
+      form.append("owner", publicKey.toBase58());
+      form.append("requestURL", formData.requestURL);
+      form.append("requestParams", formData.requestParams);
+      form.append("requestType", formData.requestType);
+      form.append("name", formData.name);
+      form.append("description", formData.description);
 
-      form.append('price', price);
+      form.append("price", price);
       // form.append('denom', tokeninfo.address);
       // form.append('tokeninfo', JSON.stringify(tokeninfo));
-      form.append('logoFile', formData.logoFile);
+      form.append("logoFile", formData.logoFile);
 
       handResultModal({
         open: true,
-        type: 'wating'
+        type: "wating"
       });
 
-      const { code, data, error }: any = await Server.submitCell(form);
+      const { code, data, error }: any = await Server.submitGear(form);
       if (code !== 0) throw new Error(error);
 
       // const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
@@ -204,10 +204,10 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
     } catch (error: any) {
       handResultModal({
         open: true,
-        type: 'fail'
+        type: "fail"
       });
       notification.error({
-        message: error.reason || error.message || 'error'
+        message: error.reason || error.message || "error"
       });
     } finally {
       setLoading(false);
@@ -218,9 +218,9 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
     try {
       const transactionInfo = await wallet.getTransactionReceipt(txhash);
 
-      alert('parseLog function');
+      alert("parseLog function");
       const datas = await parseLog(transactionInfo.logs[1]);
-      console.log('datas', datas);
+      console.log("datas", datas);
       const params = {
         tokenId: BigNumber.from(datas.args.tokenId).toString(),
         cellAddress: datas.args.cell,
@@ -228,15 +228,15 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
         cellId
       };
 
-      const { code, data, error }: any = await Server.updateCell(params);
+      const { code, data, error }: any = await Server.updateGear(params);
       if (code !== 0) throw new Error(error);
       fetchCells();
       notification.success({
-        message: 'Create Successfully'
+        message: "Create Successfully"
       });
     } catch (error: any) {
       notification.error({
-        message: error.reason || error.message || 'Create Fail'
+        message: error.reason || error.message || "Create Fail"
       });
     } finally {
       setLoading(false);
@@ -262,7 +262,7 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
           <Header>
             <IconBack className="back" onClick={() => back()} />
             Create New Cell
-            <Tooltip placement="right" title={'Create your interface, supporting everyone to call it.'}>
+            <Tooltip placement="right" title={"Create your interface, supporting everyone to call it."}>
               <IconWen className="wenhao" />
             </Tooltip>
           </Header>
@@ -271,11 +271,11 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
             <Line>
               <FromBlock>
                 <Label>Name</Label>
-                <InputContent value={formData.name} onChange={(e: any) => onInputChange(e, 'name')} />
+                <InputContent value={formData.name} onChange={(e: any) => onInputChange(e, "name")} />
               </FromBlock>
               <FromBlock>
                 <Label>Type</Label>
-                <SelectView className={cn(!formData.requestType ? 'empty' : '', formData.requestType ? '_value' : '')} onClick={() => handRequestTypeModal(true)}>
+                <SelectView className={cn(!formData.requestType ? "empty" : "", formData.requestType ? "_value" : "")} onClick={() => handRequestTypeModal(true)}>
                   {formData.requestType ? <Type>{formData.requestType}</Type> : <Empty>Select type</Empty>}
                   <IconDown />
                 </SelectView>
@@ -284,19 +284,19 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
             <Line>
               <FromBlock>
                 <Label>URL</Label>
-                <InputContent className={errorTag === 'url' ? '_error' : ''} value={formData.requestURL} onChange={(e: any) => onInputChange(e, 'requestURL')} />
+                <InputContent className={errorTag === "url" ? "_error" : ""} value={formData.requestURL} onChange={(e: any) => onInputChange(e, "requestURL")} />
               </FromBlock>
             </Line>
             <Line>
               <FromBlock>
                 <Label>Params（JSON）</Label>
-                <TextArea className={errorTag === 'params' ? '_error' : ''} value={formData.requestParams} onChange={(e: any) => onInputChange(e, 'requestParams')} />
+                <TextArea className={errorTag === "params" ? "_error" : ""} value={formData.requestParams} onChange={(e: any) => onInputChange(e, "requestParams")} />
               </FromBlock>
             </Line>
             <Line>
               <FromBlock>
                 <Label>Description</Label>
-                <TextArea value={formData.description} onChange={(e: any) => onInputChange(e, 'description')} />
+                <TextArea value={formData.description} onChange={(e: any) => onInputChange(e, "description")} />
               </FromBlock>
               <FromBlock>
                 <Label>Logo</Label>
@@ -321,14 +321,14 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
           <FeeSetting>
             <Title>
               Fee Setting
-              <Tooltip placement="right" title={'Please fill your information so we can get in touch with you.'}>
+              <Tooltip placement="right" title={"Please fill your information so we can get in touch with you."}>
                 <IconWen className="wenhao" />
               </Tooltip>
             </Title>
             <FeeContent>
               <FeeItem>
                 <FeeLabel>Token</FeeLabel>
-                <SelectView className={cn(!formData.denom ? 'empty' : '')} onClick={() => handTokensModal(true)}>
+                <SelectView className={cn(!formData.denom ? "empty" : "")} onClick={() => handTokensModal(true)}>
                   {formData.denom ? (
                     <Token>
                       <TokenIcon src={`/images/tokens/${formData.denom}.png`} />
@@ -346,7 +346,7 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
                 <InputContent
                   value={formData.price}
                   onChange={(e: any) => {
-                    onInputChange($filterNumber(e), 'price');
+                    onInputChange($filterNumber(e), "price");
                   }}
                 />
               </FeeItem>
@@ -356,7 +356,7 @@ const Create: FC<IProps> = ({ back }: IProps): ReactElement => {
           {!connected ? (
             <Submit
               onClick={() => {
-                connectWallet('m');
+                connectWallet("m");
               }}
             >
               Connect Wallet
@@ -417,7 +417,7 @@ const Header = styled.div`
   justify-content: center;
 
   color: #222;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.2rem;
   font-weight: 600;
   position: relative;
@@ -469,7 +469,7 @@ const FromBlock = styled.div`
 const Label = styled.div`
   margin-bottom: 0.04rem;
   color: #222;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.14rem;
   font-style: normal;
   font-weight: 500;
@@ -481,7 +481,7 @@ const InputContent = styled(Input)`
   background: #f9f9f9 !important;
   border: 1px solid #f9f9f9;
   color: #170f49;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   /* font-size: 0.14rem; */
   font-style: normal;
   font-weight: 400;
@@ -541,7 +541,7 @@ const SelectView = styled.div`
 
 const Empty = styled.div`
   color: #fff;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.16rem;
   font-style: normal;
   font-weight: 500;
@@ -550,7 +550,7 @@ const Empty = styled.div`
 
 const Type = styled.div`
   color: #170f49;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.14rem;
   font-style: normal;
   font-weight: 400;
@@ -560,7 +560,7 @@ const Token = styled.div`
   display: flex;
   align-items: center;
   color: #222;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.14rem;
   font-style: normal;
   font-weight: 600;
@@ -578,7 +578,7 @@ const TextArea = styled(Input.TextArea)`
   border-radius: 0.12rem;
   background: #f9f9f9 !important;
   color: #170f49;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   /* font-size: 0.14rem; */
   font-style: normal;
   font-weight: 400;
@@ -605,7 +605,7 @@ const PhotoBlock = styled.div`
   &:hover {
     &::after {
       transition: all 0.2s;
-      content: '';
+      content: "";
       width: 100%;
       height: 100%;
       position: absolute;
@@ -648,7 +648,7 @@ const FeeSetting = styled.section`
 `;
 const Title = styled.h4`
   color: #222;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.16rem;
   font-style: normal;
   font-weight: 600;
@@ -678,7 +678,7 @@ const FeeItem = styled.div`
 `;
 const FeeLabel = styled.div`
   color: #222;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.14rem;
   font-style: normal;
   font-weight: 500;
@@ -691,7 +691,7 @@ const Submit = styled(Button)`
   height: 0.56rem;
   background: #fc72ff;
   color: #fff;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.2rem;
   font-weight: 500;
   margin-top: 0.32rem;

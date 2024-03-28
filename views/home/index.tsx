@@ -1,30 +1,32 @@
-import { IconSearch } from '@/components/Icon';
-import cn from 'classnames';
-import { FC, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+import { IconSearch } from "@/components/Icon";
+import cn from "classnames";
+import { FC, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 
-import { Button, ConfigProvider, Input, Skeleton, notification, theme } from 'antd';
-import HistoryModal from './components/history-modal';
+import { Button, ConfigProvider, Input, Skeleton, notification, theme } from "antd";
+import HistoryModal from "./components/history-modal";
 // import { useApproveByToken, useTransactionMined, useWallet } from '@/hooks';
-import { useConnectWallet } from '@/state/chain/hooks';
-import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed, $sleep } from '@/utils/met';
-import { getCell, ERC20 } from '@/sdk';
+import { useConnectWallet } from "@/state/chain/hooks";
+import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed, $sleep } from "@/utils/met";
+import { getCell, ERC20 } from "@/sdk";
 
-import Server from '@/service';
-import { ApprovalState, TransactionState } from '@/typings';
-import { useApproveDialog, useHasNewHistory, useHistory, useHistoryDialog, useResultModal } from '@/state/call/hooks';
-import ResultModal from './ResultModal';
-import ApproveModal from './ApproveModal';
-import { useUserBalance } from '@/state/base/hooks';
-import { useWallet } from '@solana/wallet-adapter-react';
+import Server from "@/service";
+import { ApprovalState, TransactionState } from "@/typings";
+import { useApproveDialog, useHasNewHistory, useHistory, useHistoryDialog, useResultModal } from "@/state/call/hooks";
+import ResultModal from "./ResultModal";
+import ApproveModal from "./ApproveModal";
+import { useUserBalance } from "@/state/base/hooks";
+import { useWallet } from "@solana/wallet-adapter-react";
 
-import ps from './styles/index.module.scss';
-import TooltipLine from '@/components/TooltipLine';
-import { Copy } from '@/components';
-import { useScan } from '@/hooks';
+import ps from "./styles/index.module.scss";
+import TooltipLine from "@/components/TooltipLine";
+import { Copy } from "@/components";
+import { useScan, useWorkspaceGear } from "@/hooks";
 
 const { TextArea } = Input;
 
 const Home: FC = (): ReactElement => {
+  const workspace = useWorkspaceGear();
+
   const [, connectWallet] = useConnectWallet();
   const [history, { fetchHistory, reset }] = useHistory();
   const { wallet, publicKey, connected } = useWallet();
@@ -44,7 +46,7 @@ const Home: FC = (): ReactElement => {
   const [cellModalFlag, setCellModalFlag] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState<any[]>([]);
 
   const [cellList, setCellList] = useState<any[]>([]);
@@ -52,7 +54,7 @@ const Home: FC = (): ReactElement => {
   const [loadingStates, setLoadingStates] = useState(Array(cellList.length).fill(false));
 
   const params = useRef({
-    text: ''
+    text: ""
   });
 
   const hangSearch = (value: string) => {
@@ -61,15 +63,15 @@ const Home: FC = (): ReactElement => {
 
   const getCellList = () => {
     setCellLoad(true);
-    Server.fetchCells({ ...params.current })
+    Server.fetchGears({ ...params.current })
       .then((res) => {
-        console.log('res---->', res);
+        console.log("res---->", res);
         if (res.code === 0) {
           setCellList(res.data);
         }
       })
       .catch((e) => {
-        console.log('error--->', e);
+        console.log("error--->", e);
         notification.error({ message: e.error || e.message });
       })
       .finally(() => {
@@ -120,20 +122,23 @@ const Home: FC = (): ReactElement => {
 
   const handleCall = async (isApproveAction: boolean = false) => {
     try {
+      const tx = await workspace?.program.callGear("4tF4xZY6ppTKcrgnaCTpeQ8wQjbQep4V8vdpnBmVp5fo");
+      console.log("tx", tx);
+      return;
       setLoading(true);
 
       if (!isApproveAction) {
         handResultModal({
           open: true,
-          type: 'wating',
+          type: "wating",
           callInfo: detailData
         });
       }
 
-      console.log('detailData:', detailData);
+      console.log("detailData:", detailData);
 
       const overrides = {};
-      if (detailData.denom === '0x0000000000000000000000000000000000000000') Object.assign(overrides, { value: detailData.price });
+      if (detailData.denom === "0x0000000000000000000000000000000000000000") Object.assign(overrides, { value: detailData.price });
 
       const transaction = getCell(wallet, detailData.cellAddress).makeRequest(JSON.stringify(detailData.requestParams), overrides);
 
@@ -141,8 +146,8 @@ const Home: FC = (): ReactElement => {
         if (!isApproveAction) return;
         if (_transactionState === TransactionState.PENDING) {
           handApproveResultModal({
-            step: 'call',
-            type: 'pending'
+            step: "call",
+            type: "pending"
           });
         }
       };
@@ -185,7 +190,7 @@ const Home: FC = (): ReactElement => {
       //   });
       // }
     } catch (e: any) {
-      notification.error({ message: e.reason || e.message || 'Call Failed' });
+      notification.error({ message: e.reason || e.message || "Call Failed" });
       handResultModal({
         open: false
         // type: 'wating',
@@ -200,8 +205,8 @@ const Home: FC = (): ReactElement => {
     try {
       handApproveResultModal({
         open: true,
-        step: 'approve',
-        type: 'wating',
+        step: "approve",
+        type: "wating",
         callInfo: detailData
       });
 
@@ -209,14 +214,14 @@ const Home: FC = (): ReactElement => {
       // const token = new ERC20(wallet, detailData.denom);
       // getAllowance(token, detailData.cellAddress, $shiftedByFixed(detailData.price, -1 * detailData.tokeninfo.decimals, 8));
       handApproveResultModal({
-        step: 'call',
-        type: 'wating'
+        step: "call",
+        type: "wating"
       });
     } catch (e: any) {
-      notification.error({ message: e.reason || e.message || 'Fail' });
+      notification.error({ message: e.reason || e.message || "Fail" });
       handApproveResultModal({
-        step: 'approve',
-        type: 'fail'
+        step: "approve",
+        type: "fail"
       });
     }
   };
@@ -270,8 +275,8 @@ const Home: FC = (): ReactElement => {
             {cellLoad ? (
               <>
                 {Array.from({ length: 5 }, (_, index) => (
-                  <section className={cn(ps.item, ps['load-item'])} key={index}>
-                    <div className={ps['data-item']}>
+                  <section className={cn(ps.item, ps["load-item"])} key={index}>
+                    <div className={ps["data-item"]}>
                       <div>
                         <ConfigProvider
                           theme={{
@@ -306,11 +311,11 @@ const Home: FC = (): ReactElement => {
             ) : (
               <>
                 {cellList.map((item, index) => (
-                  <div className={cn(ps.item, { [ps['open-item']]: isExpanded.includes(index) })} key={`${item._id}-${index}`}>
-                    <section className={ps['data-item']}>
-                      <div className={ps['item-top']}>
+                  <div className={cn(ps.item, { [ps["open-item"]]: isExpanded.includes(index) })} key={`${item._id}-${index}`}>
+                    <section className={ps["data-item"]}>
+                      <div className={ps["item-top"]}>
                         <div>
-                          <div className={ps['top-img']}>
+                          <div className={ps["top-img"]}>
                             <ConfigProvider
                               theme={{
                                 algorithm: theme.darkAlgorithm
@@ -322,11 +327,11 @@ const Home: FC = (): ReactElement => {
                           </div>
 
                           <div>
-                            <div className={ps['top-tit']}>{item.name}</div>
+                            <div className={ps["top-tit"]}>{item.name}</div>
                             <TooltipLine name={item.description} index={index} length={null} clamp="2" />
                           </div>
                         </div>
-                        <div className={ps['top-rt']}>
+                        <div className={ps["top-rt"]}>
                           <img src={`/images/tokens/${item.tokeninfo.symbol}.png`} alt="" />
 
                           <div>
@@ -350,9 +355,9 @@ const Home: FC = (): ReactElement => {
                       </div>
                     </section>
 
-                    <section className={ps['more-item']}>
+                    <section className={ps["more-item"]}>
                       <div>
-                        <div className={ps['more-top']}>
+                        <div className={ps["more-top"]}>
                           <div>
                             <div>Price</div>
                             <div>
@@ -369,10 +374,10 @@ const Home: FC = (): ReactElement => {
                             <div
                               onClick={(e) => {
                                 e.stopPropagation();
-                                openGreenfieldScan(item.metadataObjectId, 'object');
+                                openGreenfieldScan(item.metadataObjectId, "object");
                               }}
                             >
-                              Txn Hash: {$hash(item.metadataObjectId)}{' '}
+                              Txn Hash: {$hash(item.metadataObjectId)}{" "}
                               <Copy
                                 className="copy"
                                 copy={() => {
@@ -387,9 +392,9 @@ const Home: FC = (): ReactElement => {
                           {Object.keys(item.requestParams).length > 0 && (
                             <>
                               {Object.entries(item.requestParams).map(([key, value]) => (
-                                <div className={ps['more-list']} key={key}>
-                                  <div className={ps['list-lab']}>{key}</div>
-                                  <TextArea className={ps['list-input']} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(index, key, e.target.value)} />
+                                <div className={ps["more-list"]} key={key}>
+                                  <div className={ps["list-lab"]}>{key}</div>
+                                  <TextArea className={ps["list-input"]} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(index, key, e.target.value)} />
                                 </div>
                               ))}
                             </>
@@ -397,7 +402,7 @@ const Home: FC = (): ReactElement => {
                         </>
 
                         {!btn_disabled ? (
-                          <div className={ps['list-fee']}>
+                          <div className={ps["list-fee"]}>
                             <div>
                               <div>fee</div>
                               <div>
@@ -415,11 +420,11 @@ const Home: FC = (): ReactElement => {
                         ) : null}
 
                         {!connected ? (
-                          <Button className={ps['btn']}>Connect Wallet</Button>
+                          <Button className={ps["btn"]}>Connect Wallet</Button>
                         ) : (
                           <>
                             {!balanceHealth ? (
-                              <Button className={ps['btn']} disabled>
+                              <Button className={ps["btn"]} disabled>
                                 Insufficient balance
                               </Button>
                             ) : (
@@ -429,7 +434,7 @@ const Home: FC = (): ReactElement => {
                                     Approve and Call
                                   </Button>
                                 ) : ( */}
-                                <Button className={ps['btn']} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall()}>
+                                <Button className={ps["btn"]} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall()}>
                                   Call
                                 </Button>
                                 {/* )} */}
