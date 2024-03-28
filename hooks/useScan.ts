@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
-import { getConfig } from '@/common/config';
+import { getConfig } from "@/common/config";
 
 type IType = {
   scan: string;
@@ -12,33 +12,33 @@ type IType = {
 };
 
 const useScan = (): IType => {
-  const scan = getConfig('scan');
-  const greenfieldscanScan = getConfig('greenfieldscanScan');
+  const scan = getConfig("scan");
+  const greenfieldscanScan = getConfig("greenfieldscanScan");
   const openscan = useCallback(
-    (value: string, type: string = 'tx') => {
-      if (typeof window === 'undefined') return;
-      window.open(`${scan}${type}/${value}`);
+    (value: string, type: string = "tx") => {
+      if (typeof window === "undefined") return;
+      window.open(`${scan}${type}/${value}??cluster=devnet`);
     },
     [scan]
   );
 
   const openGreenfieldScan = useCallback(
-    (value: string, type: string = 'tx') => {
-      if (typeof window === 'undefined') return;
+    (value: string, type: string = "tx") => {
+      if (typeof window === "undefined") return;
       window.open(`${greenfieldscanScan}${type}/${value}`);
     },
     [greenfieldscanScan]
   );
 
   const getScanAddress = useCallback(
-    (value: string, type: string = 'tx') => {
+    (value: string, type: string = "tx") => {
       return `${scan}${type}/${value}`;
     },
     [scan]
   );
 
   const getGreenfieldScanAddress = useCallback(
-    (value: string, type: string = 'tx') => {
+    (value: string, type: string = "tx") => {
       return `${greenfieldscanScan}${type}/${value}`;
     },
     [greenfieldscanScan]

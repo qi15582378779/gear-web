@@ -1,15 +1,15 @@
-import { Popover } from 'antd';
-import React, { useState } from 'react';
-import { $hash } from '../../utils/met';
-import ps from './index.module.scss';
-import cn from 'classnames';
+import { Popover } from "antd";
+import React, { useState } from "react";
+import { $hash } from "../../utils/met";
+import ps from "./index.module.scss";
+import cn from "classnames";
 
-const TooltipLine = ({ name = '', index = 0, length = null, clamp = '' }) => {
+const TooltipLine = ({ name = "", index = 0, length = null, clamp = "", placement = "right" }) => {
   const [show, setShow] = useState<boolean>(false);
   const [tag, setTag] = useState(-1);
 
   const customStyle: any = {
-    ...(clamp ? { '-webkit-line-clamp': clamp } : {})
+    ...(clamp ? { "-webkit-line-clamp": clamp } : {})
   };
 
   // const handleMouseEnter = (e: any, index: number) => {
@@ -49,8 +49,8 @@ const TooltipLine = ({ name = '', index = 0, length = null, clamp = '' }) => {
   };
 
   return (
-    <Popover overlayClassName={'text-tip-popover'} content={<div className={ps['tip-txt']}>{name}</div>} placement="right" open={show && tag === index}>
-      <div className={cn(ps.text, clamp ? [ps['clamp-text']] : [ps['line-text']])} style={customStyle} onMouseEnter={(e: any) => handleMouseEnter(e, index)} onMouseLeave={handleMouseLeave}>
+    <Popover overlayClassName={"text-tip-popover"} content={<div className={cn(ps["tip-txt"], { [ps["top-width"]]: placement === "top" })}>{name}</div>} placement={placement as any} open={show && tag === index}>
+      <div className={cn(ps.text, clamp ? [ps["clamp-text"]] : [ps["line-text"]])} style={customStyle} onMouseEnter={(e: any) => handleMouseEnter(e, index)} onMouseLeave={handleMouseLeave}>
         {length ? `#${$hash(name, length, 0)}` : name}
       </div>
     </Popover>

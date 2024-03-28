@@ -2,7 +2,7 @@
   overflow-x: hidden;
   height: 100%;
   position: relative;
-  background-image: url('/images/home/bg.png');
+  background-image: url("/images/home/bg.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
@@ -94,7 +94,7 @@
   position: relative;
   background: rgba(219, 210, 224, 0.16);
   &::after {
-    content: '';
+    content: "";
     width: 100%;
     height: 100%;
     position: absolute;
@@ -137,6 +137,7 @@
   justify-content: center;
   background-color: #0f152e;
   position: relative;
+  flex-shrink: 0;
   & > img {
     display: block;
     width: 0.24rem;
@@ -257,7 +258,7 @@
   background: rgba(103, 103, 108, 0.15);
 
   &::after {
-    content: '';
+    content: "";
     width: 100%;
     height: 100%;
     position: absolute;

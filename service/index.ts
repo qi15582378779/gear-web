@@ -10,7 +10,7 @@ class Server {
     return await service.post("/v1/gear/gear-list", data, _options);
   };
   static fetchHistory = async (params: Record<string, any> = {}, _options: Record<string, any> = {}): Promise<any> => {
-    return await service.get("/v1/gear/gear-history", { params }, _options);
+    return await service.get("/v1/gear/call-history", { params }, _options);
   };
   static callGears = async (data: Record<string, any> = {}, _options: Record<string, any> = {}): Promise<any> => {
     return await service.post("/v1/gear/call-gear", data, _options);

@@ -79,36 +79,6 @@ const Home: FC = (): ReactElement => {
       });
   };
 
-  const btn_disabled = useMemo(() => {
-    if (detailData?.requestParams) {
-      return Object.values(detailData.requestParams).findIndex((ele: any) => ele.length === 0) !== -1;
-    } else {
-      return false;
-    }
-  }, [detailData]);
-
-  const balanceHealth = useMemo(() => {
-    if (!detailData) return true;
-    const symbol = detailData.tokeninfo.symbol.toLowerCase();
-    const amount = $shiftedByFixed(detailData.price, -1 * detailData.tokeninfo.decimals, 5);
-    return $BigNumber(balance?.[symbol] || 0).gte(amount);
-  }, [detailData, balance]);
-
-  const handleSelect = () => {
-    setCellModalFlag(true);
-  };
-
-  const handleSelectCell = (item: any) => {
-    // console.log('----------->', item);
-    // const _data = {
-    //   ...item,
-    //   requestParams: JSON.parse(item.requestParams)
-    // };
-    setDetailData(item);
-    const token = new ERC20(wallet, item.denom);
-    // getAllowance(token, item.cellAddress, $shiftedByFixed(item.price, -1 * item.tokeninfo.decimals, 8));
-  };
-
   const handleInputChange = (itemIndex: number, key: string, value: string) => {
     const updatedData = [...cellList];
 
@@ -120,75 +90,42 @@ const Home: FC = (): ReactElement => {
     setCellList(updatedData);
   };
 
-  const handleCall = async (isApproveAction: boolean = false) => {
+  const handleCall = async (item: any, index: number) => {
     try {
-      const tx = await workspace?.program.callGear("4tF4xZY6ppTKcrgnaCTpeQ8wQjbQep4V8vdpnBmVp5fo");
-      console.log("tx", tx);
-      return;
-      setLoading(true);
+      // setLoading(true);
+      const newLoadingStates = [...loadingStates];
+      newLoadingStates[index] = true;
+      setLoadingStates(newLoadingStates);
 
-      if (!isApproveAction) {
-        handResultModal({
-          open: true,
-          type: "wating",
-          callInfo: detailData
-        });
-      }
+      handResultModal({
+        open: true,
+        type: "wating",
+        callInfo: item
+      });
 
-      console.log("detailData:", detailData);
+      // return;
 
-      const overrides = {};
-      if (detailData.denom === "0x0000000000000000000000000000000000000000") Object.assign(overrides, { value: detailData.price });
+      const tx = await workspace?.program.callGear(item.gearAddress);
 
-      const transaction = getCell(wallet, detailData.cellAddress).makeRequest(JSON.stringify(detailData.requestParams), overrides);
-
-      const transactionCallabck = (_transactionState: TransactionState) => {
-        if (!isApproveAction) return;
-        if (_transactionState === TransactionState.PENDING) {
-          handApproveResultModal({
-            step: "call",
-            type: "pending"
-          });
-        }
+      const params = {
+        onlineStatus: 1,
+        user: publicKey!.toBase58(),
+        gearId: item.gearId,
+        txhash: tx,
+        params: item.requestParams
       };
 
-      // const { transactionState, hash } = await awaitTransactionMined(transaction, transactionCallabck);
-
-      // console.log('hash::', hash);
-      // const params = {
-      //   onlineStatus: transactionState === TransactionState.SUCCESS ? 1 : 0,
-      //   user: publicKey.toBase58(),
-      //   cellId: detailData.cellId,
-      //   txhash: hash,
-      //   params: detailData.requestParams
-      // };
       // console.log('callCells Data:', params);
-      // const { code, data, error } = await Server.callCells(params);
-      // if (code !== 0) throw new Error(error);
+      const { code, data, error } = await Server.callGears(params);
+      console.log("data--->", data);
+      if (code !== 0) throw new Error(error);
 
-      // if (isApproveAction) {
-      //   handApproveResultModal({
-      //     open: false
-      //   });
-      // }
-      // if (transactionState === TransactionState.SUCCESS) {
-      //   notification.success({ message: 'Call Successfully' });
-      //   fetchHistory();
-      //   handHasNewHistory(true);
-      //   setDetailData(null);
-      //   handResultModal({
-      //     open: true,
-      //     type: 'success',
-      //     hash: hash,
-      //     callInfo: detailData
-      //   });
-      // } else {
-      //   handResultModal({
-      //     open: true,
-      //     type: 'fail',
-      //     hash: hash
-      //   });
-      // }
+      handResultModal({
+        open: true,
+        type: "success",
+        hash: tx,
+        callInfo: item
+      });
     } catch (e: any) {
       notification.error({ message: e.reason || e.message || "Call Failed" });
       handResultModal({
@@ -196,70 +133,19 @@ const Home: FC = (): ReactElement => {
         // type: 'wating',
       });
     } finally {
-      setLoading(false);
+      // setLoading(false);
+      const newLoadingStates = [...loadingStates];
+      newLoadingStates[index] = false;
+      setLoadingStates(newLoadingStates);
+
       getUserBalance();
     }
   };
 
-  const handApprove = async () => {
-    try {
-      handApproveResultModal({
-        open: true,
-        step: "approve",
-        type: "wating",
-        callInfo: detailData
-      });
-
-      // await approve(10 ** 18);
-      // const token = new ERC20(wallet, detailData.denom);
-      // getAllowance(token, detailData.cellAddress, $shiftedByFixed(detailData.price, -1 * detailData.tokeninfo.decimals, 8));
-      handApproveResultModal({
-        step: "call",
-        type: "wating"
-      });
-    } catch (e: any) {
-      notification.error({ message: e.reason || e.message || "Fail" });
-      handApproveResultModal({
-        step: "approve",
-        type: "fail"
-      });
-    }
-  };
-
   // useEffect(() => {
-  //   if (approveResultDialog.open && approveResultDialog.step === 'approve' && approvalState === ApprovalState.APPROVED) {
-  //     handApproveResultModal({
-  //       step: 'call',
-  //       type: 'wating'
-  //     });
-  //     handleCall(true);
-  //   }
-  // }, [approvalState, approveResultDialog]);
-
-  // useEffect(() => {
-  //   console.log('transactionState', transactionState);
-  //   if (transactionState === TransactionState.PENDING) {
-  //     handApproveResultModal({
-  //       step: 'approve',
-  //       type: 'pending'
-  //     });
-  //   } else if (transactionState === TransactionState.SUCCESS) {
-  //     handApproveResultModal({
-  //       step: 'approve',
-  //       type: 'success'
-  //     });
-  //   } else if (transactionState === TransactionState.FAIL) {
-  //     handApproveResultModal({
-  //       step: 'approve',
-  //       type: 'fail'
-  //     });
-  //   }
-  // }, [transactionState]);
-
-  useEffect(() => {
-    if (connected) fetchHistory();
-    else reset();
-  }, [connected]);
+  //   if (connected) fetchHistory();
+  //   else reset();
+  // }, [connected]);
 
   useEffect(() => {
     getCellList();
@@ -332,10 +218,10 @@ const Home: FC = (): ReactElement => {
                           </div>
                         </div>
                         <div className={ps["top-rt"]}>
-                          <img src={`/images/tokens/${item.tokeninfo.symbol}.png`} alt="" />
+                          <img src={`/images/tokens/${item.symbol}.png`} alt="" />
 
                           <div>
-                            <span>${$shiftedBy(item.price, -item.tokeninfo.decimals)}</span>/Call
+                            <span>${item.price}</span>/Call
                           </div>
 
                           <div
@@ -361,8 +247,8 @@ const Home: FC = (): ReactElement => {
                           <div>
                             <div>Price</div>
                             <div>
-                              <img src={`/images/tokens/${item.tokeninfo.symbol}.png`} alt="" />
-                              <span>${$shiftedBy(item.price, -item.tokeninfo.decimals)}</span>/Call
+                              <img src={`/images/tokens/${item.symbol}.png`} alt="" />
+                              <span>${item.price}</span>/Call
                             </div>
                           </div>
                           <div>
@@ -401,21 +287,21 @@ const Home: FC = (): ReactElement => {
                           )}
                         </>
 
-                        {!btn_disabled ? (
+                        {!(Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1) ? (
                           <div className={ps["list-fee"]}>
                             <div>
                               <div>fee</div>
                               <div>
-                                <img src={`/images/tokens/${item.tokeninfo.symbol}.png`} alt="" /> ${$shiftedBy(item.price, -item.tokeninfo.decimals)}
+                                <img src={`/images/tokens/${item.symbol}.png`} alt="" /> ${item.price}
                               </div>
                             </div>
 
-                            <div>
+                            {/* <div>
                               <div>Network Cost</div>
                               <div>
                                 <img src="/images/tokens/USDC.png" alt="" /> $1.14
                               </div>
-                            </div>
+                            </div> */}
                           </div>
                         ) : null}
 
@@ -423,7 +309,7 @@ const Home: FC = (): ReactElement => {
                           <Button className={ps["btn"]}>Connect Wallet</Button>
                         ) : (
                           <>
-                            {!balanceHealth ? (
+                            {!$BigNumber(balance?.[item.symbol.toLowerCase()] || 0).gte(item.price) ? (
                               <Button className={ps["btn"]} disabled>
                                 Insufficient balance
                               </Button>
@@ -434,7 +320,7 @@ const Home: FC = (): ReactElement => {
                                     Approve and Call
                                   </Button>
                                 ) : ( */}
-                                <Button className={ps["btn"]} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall()}>
+                                <Button className={ps["btn"]} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall(item, index)}>
                                   Call
                                 </Button>
                                 {/* )} */}
@@ -460,7 +346,6 @@ const Home: FC = (): ReactElement => {
         }}
       />
       <ResultModal />
-      <ApproveModal />
     </>
   );
 };
