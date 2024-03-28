@@ -9,6 +9,8 @@ import { $shiftedByFixed } from "@/utils/met";
 import { TransactionState } from "@/typings";
 import { message, notification } from "antd";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useWorkspaceGear } from "@/hooks/useWorkspace";
+import { PublicKey } from "@solana/web3.js";
 
 export function useIsCreate(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
@@ -51,40 +53,24 @@ export function useRequestTypeModal(): [boolean, (open: boolean) => void] {
 
 export function useCells(): [any[], () => void, (data: Record<string, any>) => Promise<any>, () => void, boolean] {
   const dispatch = useAppDispatch();
+  const workspace = useWorkspaceGear();
+
   // const { wallet, account, chainId } = useWallet();
   const { wallet, publicKey } = useWallet();
   const [loading, setLoading] = useState(false);
   const list = useSelector<AppState, AppState["cells"]["list"]>((state: AppState) => state.cells.list);
   const fetchList = useCallback(async () => {
     try {
-      // const Registry = constants.CHAIN_CONTRACTS[chainId].Registry;
-      // const registry = getRegistry(wallet, Registry);
-      // setLoading(true);
-      // const balanceOf: any = await registry.balanceOf(account);
-      // console.log('balanceOf', balanceOf);
-      // let index = 0,
-      //   tokenIds = [];
-      // do {
-      //   try {
-      //     const tokenid = await registry.tokenOfOwnerByIndex(account, index);
-      //     tokenIds.push(tokenid.toString());
-      //     console.log('tokenid', tokenid.toString(), 'index', index);
-      //   } catch (e) {}
-      //   index++;
-      // } while (balanceOf > 0 && index < balanceOf);
-      // console.log('tokenIds', tokenIds);
-      // // const params = { owner: account };
-      // const params = { tokenIds };
-      // const { code, data, error } = await Server.fetchCells(params);
-      // if (code !== 0) throw new Error(error);
-      // const list = [];
-      // let i = 0;
-      // for (i; i < data.length; i++) {
-      //   const erc20 = getERC20(wallet, data[i].denom);
-      //   const balance = await erc20.balanceOf(data[i].cellAddress);
-      //   list.push({ ...data[i], Registry, reward: $shiftedByFixed(balance, -1 * data[i].tokeninfo.decimals, 3) });
-      // }
-      // dispatch(setList(list));
+      setLoading(true);
+      const { code, data, error } = await Server.fetchGears({ owner: publicKey!.toBase58().toLowerCase() });
+      if (code !== 0) throw new Error(error);
+      const list = [];
+      let i = 0;
+      for (i; i < data.length; i++) {
+        const reward = await workspace?.program.getClaimableAmount(new PublicKey(data[i].gearAddress));
+        list.push({ ...data[i], reward, gear_nft: `https://solscan.io/token/${data[i].gearAddress}?cluster=devnet#metadata`, arweave_storage: `https://arweave.net/${data[i].metadataObjectId}` });
+      }
+      dispatch(setList(list));
     } catch (e: any) {
       console.error("----", e.reason || e.message);
     } finally {
@@ -95,9 +81,8 @@ export function useCells(): [any[], () => void, (data: Record<string, any>) => P
   const update = useCallback(
     async (data: Record<string, any>) => {
       try {
-        // const erc20 = getERC20(wallet, data.denom);
-        // const reward = await erc20.balanceOf(data.cellAddress);
-        // dispatch(updateList({ cellAddress: data.cellAddress, reward: $shiftedByFixed(reward, -1 * data.tokeninfo.decimals, 4) }));
+        const reward = await workspace?.program.getClaimableAmount(new PublicKey(data.gearAddress));
+        dispatch(updateList({ gearAddress: data.gearAddress, reward }));
       } catch (e: any) {
         console.error("----", e.reason || e.message);
       }

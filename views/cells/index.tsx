@@ -1,26 +1,47 @@
 // import { useWallet } from '@/hooks';
-import ps from './styles/index.module.scss';
-import { useCells, useIsCreate } from '@/state/cells/hooks';
-import { useEffect, useState } from 'react';
-import { IconAdd } from '@/components/Icon';
-import cn from 'classnames';
-import TooltipLine from '@/components/TooltipLine';
-import { Button, ConfigProvider, Skeleton, theme } from 'antd';
-import { Copy } from '@/components';
-import { $copy } from '@/utils/met';
-import { useWallet } from '@solana/wallet-adapter-react';
+import ps from "./styles/index.module.scss";
+import { useCells } from "@/state/cells/hooks";
+import { useEffect, useState } from "react";
+import { IconAdd } from "@/components/Icon";
+import cn from "classnames";
+import TooltipLine from "@/components/TooltipLine";
+import { Button, ConfigProvider, Skeleton, notification, theme } from "antd";
+import { Copy } from "@/components";
+import { $BigNumber, $copy, $hash, $shiftedByFixed } from "@/utils/met";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useRouter } from "next/router";
+import { useWorkspaceGear } from "@/hooks";
 
 const Cells: React.FC = () => {
-  const { wallet, publicKey, connected } = useWallet();
-  const [list, fetchCells, , reset, loading] = useCells();
-  const [isCreate, setIsCreate] = useIsCreate();
+  const { wallet, connected } = useWallet();
+  const [list, fetchCells, update, reset, loading] = useCells();
+  const router = useRouter();
+  const workspace = useWorkspaceGear();
 
   const [isExpanded, setIsExpanded] = useState<any[]>([]);
+  const [claimLoading, setClaimLoading] = useState<any[]>([]);
+
+  const claim = async (data: { [key: string]: any }, index: number) => {
+    try {
+      setClaimLoading((prevState) => [...prevState, index]);
+      const tx = await workspace?.program.claim(data.gearAddress);
+      await update(data);
+      message: notification.success({
+        message: "Claim Successfully"
+      });
+    } catch (e: any) {
+      notification.error({
+        message: "Claim Failed"
+      });
+    } finally {
+      setClaimLoading((prevState) => prevState.filter((i) => i !== index));
+    }
+  };
 
   useEffect(() => {
     if (connected) fetchCells();
     else reset();
-  }, [connected]);
+  }, [connected, wallet]);
 
   return (
     <div className={ps.full}>
@@ -30,172 +51,193 @@ const Cells: React.FC = () => {
             Interface gear <span>({list.length})</span>
           </div>
 
-          <div className={ps['rt-create']}>
-            <IconAdd /> Create
-          </div>
+          {!loading && list.length > 0 && (
+            <div
+              className={ps["rt-create"]}
+              onClick={() => {
+                router.push("/create");
+              }}
+            >
+              <IconAdd /> Create
+            </div>
+          )}
         </div>
 
         <div className={ps.group}>
-          <section className={cn(ps.item, ps['load-item'])}>
-            <div>
-              <div>
-                <ConfigProvider
-                  theme={{
-                    algorithm: theme.darkAlgorithm
-                  }}
-                >
-                  <Skeleton.Image active />
-                </ConfigProvider>
-                <div>
-                  <ConfigProvider
-                    theme={{
-                      algorithm: theme.darkAlgorithm
-                    }}
-                  >
-                    <Skeleton.Input active block />
-                    <Skeleton.Input active block />
-                  </ConfigProvider>
-                </div>
-              </div>
+          {loading && list.length === 0 && (
+            <>
+              {new Array(9).fill(0).map((ele, index) => (
+                <section key={index} className={cn(ps.item, ps["load-item"])}>
+                  <div>
+                    <div>
+                      <ConfigProvider
+                        theme={{
+                          algorithm: theme.darkAlgorithm
+                        }}
+                      >
+                        <Skeleton.Image active />
+                      </ConfigProvider>
+                      <div>
+                        <ConfigProvider
+                          theme={{
+                            algorithm: theme.darkAlgorithm
+                          }}
+                        >
+                          <Skeleton.Input active block />
+                          <Skeleton.Input active block />
+                        </ConfigProvider>
+                      </div>
+                    </div>
 
-              <ConfigProvider
-                theme={{
-                  algorithm: theme.darkAlgorithm
-                }}
-              >
-                <Skeleton.Input active block />
-              </ConfigProvider>
+                    <ConfigProvider
+                      theme={{
+                        algorithm: theme.darkAlgorithm
+                      }}
+                    >
+                      <Skeleton.Input active block />
+                    </ConfigProvider>
 
-              <ConfigProvider
-                theme={{
-                  algorithm: theme.darkAlgorithm
-                }}
-              >
-                <Skeleton.Input active block />
-              </ConfigProvider>
+                    <ConfigProvider
+                      theme={{
+                        algorithm: theme.darkAlgorithm
+                      }}
+                    >
+                      <Skeleton.Input active block />
+                    </ConfigProvider>
 
-              <ConfigProvider
-                theme={{
-                  algorithm: theme.darkAlgorithm
-                }}
-              >
-                <Skeleton.Input active block />
-              </ConfigProvider>
-            </div>
-          </section>
-
-          <section className={cn(ps.item, { [ps['item-flipped']]: isExpanded.includes(1) })}>
-            <div
-              className={ps['flipped-icon']}
+                    <ConfigProvider
+                      theme={{
+                        algorithm: theme.darkAlgorithm
+                      }}
+                    >
+                      <Skeleton.Input active block />
+                    </ConfigProvider>
+                  </div>
+                </section>
+              ))}
+            </>
+          )}
+          {!loading && list.length === 0 && (
+            <section
+              className={cn(ps.create, ps.item)}
               onClick={() => {
-                setIsExpanded((prevState) => {
-                  if (prevState.includes(1)) {
-                    return prevState.filter((i) => i !== 1);
-                  } else {
-                    return [...prevState, 1];
-                  }
-                });
+                router.push("/create");
               }}
             >
-              <img src="/images/other/5.svg" alt="" />
-            </div>
-
-            <div className={ps['item-front']}>
-              <div className={ps['item-name']}>
+              <div>
                 <div>
-                  <img src="/images/other/google.svg" alt="" />
+                  <IconAdd />
+                  Create
+                </div>
+              </div>
+            </section>
+          )}
+
+          {list.map((ele, index) => (
+            <section key={ele.gearId} className={cn(ps.item, { [ps["item-flipped"]]: isExpanded.includes(index) })}>
+              <div
+                className={ps["flipped-icon"]}
+                onClick={() => {
+                  setIsExpanded((prevState) => {
+                    if (prevState.includes(index)) {
+                      return prevState.filter((i) => i !== index);
+                    } else {
+                      return [...prevState, index];
+                    }
+                  });
+                }}
+              >
+                <img src="/images/other/5.svg" alt="" />
+              </div>
+
+              <div className={ps["item-front"]}>
+                <div className={ps["item-name"]}>
                   <div>
-                    <div>Interface Cell</div>
+                    <img src={ele.image} alt="" />
                     <div>
-                      0x81...353b
+                      <div>{ele.name}</div>
+                      <div>
+                        {$hash(ele.txhash, 4, 4)}
+                        <Copy
+                          className="copy"
+                          copy={() => {
+                            $copy(ele.txhash);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={ps.des}>
+                  <TooltipLine name={ele.description} index={index} length={null} clamp="2" />
+                </div>
+
+                <div className={ps.reward}>
+                  Reward
+                  <div>
+                    <img src="/images/tokens/SOL.png" alt="" />
+                    {$shiftedByFixed(ele.reward, 1, 4)} SOL
+                  </div>
+                </div>
+
+                <Button block className={ps["claim-btn"]} disabled={$BigNumber(ele.reward).lte(0)} loading={claimLoading.includes(index)} onClick={() => claim(ele, index)}>
+                  Claim
+                </Button>
+              </div>
+
+              <div className={ps["item-back"]}>
+                <div className={ps.info}>
+                  <div>
+                    Fee
+                    <div>
+                      <img src="/images/tokens/SOL.png" alt="" />
+                      {ele.price}
+                    </div>
+                  </div>
+
+                  {/* <div>
+                    Network Cost
+                    <div>
+                      <img src="/images/tokens/SOL.png" alt="" />
+                      $0.14
+                    </div>
+                  </div> */}
+
+                  <div>
+                    gear nft
+                    <div>
+                      {$hash(ele.gear_nft)}
                       <Copy
                         className="copy"
                         copy={() => {
-                          $copy('');
+                          $copy(ele.gear_nft);
                         }}
                       />
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <div className={ps.des}>
-                <TooltipLine name={'Open your google browser and check my MetaMask wallet balance.Open your google '} index={1} length={null} clamp="2" />
-              </div>
-
-              <div className={ps.reward}>
-                Reward
-                <div>
-                  <img src="/images/tokens/USDC.png" alt="" />
-                  125.021921 SOL
-                </div>
-              </div>
-
-              <Button block className={ps['claim-btn']}>
-                Claim
-              </Button>
-            </div>
-
-            <div className={ps['item-back']}>
-              <div className={ps.info}>
-                <div>
-                  Fee
                   <div>
-                    <img src="/images/tokens/SOL.png" alt="" />
-                    $0.129104
+                    Arweave Storage
+                    <div>
+                      {$hash(ele.arweave_storage)}
+                      <Copy
+                        className="copy"
+                        copy={() => {
+                          $copy(ele.arweave_storage);
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    Time
+                    <div>2024-01-26</div>
                   </div>
                 </div>
-
-                <div>
-                  Network Cost
-                  <div>
-                    <img src="/images/tokens/SOL.png" alt="" />
-                    $0.14
-                  </div>
-                </div>
-
-                <div>
-                  Call Txn
-                  <div>
-                    0x81...353b
-                    <Copy
-                      className="copy"
-                      copy={() => {
-                        $copy('');
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  Purchase Txn
-                  <div>
-                    0x81...353b
-                    <Copy
-                      className="copy"
-                      copy={() => {
-                        $copy('');
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  Time
-                  <div>2024-01-26</div>
-                </div>
               </div>
-            </div>
-          </section>
-
-          <section className={cn(ps.create, ps.item)}>
-            <div>
-              <div>
-                <IconAdd />
-                Create
-              </div>
-            </div>
-          </section>
+            </section>
+          ))}
         </div>
       </div>
     </div>

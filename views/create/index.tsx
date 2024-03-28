@@ -11,6 +11,7 @@ import Server from "@/service";
 import { BigNumber } from "ethers";
 import { useWorkspaceGear } from "@/hooks/useWorkspace";
 import ResultModal from "../home/ResultModal";
+import { useRouter } from "next/router";
 
 const { TextArea } = Input;
 let form = new FormData();
@@ -18,6 +19,7 @@ const Create: React.FC = () => {
   const { wallet, publicKey, connected } = useWallet();
   const [, handResultModal] = useResultModal();
   const workspace = useWorkspaceGear();
+  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState<string>("");
@@ -147,7 +149,6 @@ const Create: React.FC = () => {
       if (code !== 0) throw new Error(error);
 
       const { gearAddress, tx }: any = await workspace!.program.createGear(data.name, data.symbol, data.tokenURL, data.price, data.encryptURL);
-      // const { gearAddress, tx }: any = await workspace!.program.createGear("DogBro", "DGB", "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json", 0.0001, "test-path");
       const params = {
         gearAddress: gearAddress.toBase58(),
         txhash: tx,
@@ -162,28 +163,7 @@ const Create: React.FC = () => {
         hash: tx
       });
       setLoading(false);
-
-      // const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
-      // const { transactionState, hash } = await awaitTransactionMined(transaction);
-      // console.log('hash::', hash);
-
-      // setLoading(false);
-      // if (transactionState === TransactionState.SUCCESS) {
-      //   handResultModal({
-      //     open: true,
-      //     type: 'success',
-      //     hash: hash
-      //   });
-
-      //   // notification.success({message: 'Create Successfully'});
-      // } else {
-      //   handResultModal({
-      //     open: true,
-      //     type: 'fail',
-      //     hash: hash
-      //   });
-      //   throw new Error('Create Fail');
-      // }
+      router.push("/gears");
     } catch (error: any) {
       handResultModal({
         open: true,

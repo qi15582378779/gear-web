@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   showTokensModal: false,
@@ -7,13 +7,13 @@ const initialState = {
   list: [] as any[],
   resultInfoByDialog: {
     open: false,
-    type: 'wating',
-    hash: ''
+    type: "wating",
+    hash: ""
   }
 };
 
 const CellsSlice = createSlice({
-  name: 'cells',
+  name: "cells",
   initialState,
   reducers: {
     setTokensModal(state, { payload: open }) {
@@ -29,7 +29,7 @@ const CellsSlice = createSlice({
       state.list = list;
     },
     updateList(state, { payload: info }) {
-      const index = state.list.findIndex((ele: any) => ele.cellAddress === info.cellAddress);
+      const index = state.list.findIndex((ele: any) => ele.gearAddress === info.gearAddress);
       if (index === -1) return;
       state.list[index] = { ...state.list[index], ...info };
     },
