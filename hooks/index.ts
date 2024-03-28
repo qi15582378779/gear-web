@@ -7,5 +7,5 @@ export { default as useSignature } from './useSignature';
 // export { useAllowanceByToken } from './useAllowance';
 export { default as useBalance } from './useBalance';
 export { default as useTransactionMined } from './useTransactionMined';
-export { default as useWorkspace } from './useWorkspace';
+export { useWorkspaceHW, useWorkspaceGear } from './useWorkspace';
 export { default as useScan } from './useScan';

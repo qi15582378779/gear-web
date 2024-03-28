@@ -77,6 +77,10 @@ export type GearProtocol = {
         {
           "name": "price",
           "type": "f64"
+        },
+        {
+          "name": "path",
+          "type": "string"
         }
       ]
     },
@@ -145,6 +149,10 @@ export type GearProtocol = {
           {
             "name": "price",
             "type": "f64"
+          },
+          {
+            "name": "encryptPath",
+            "type": "string"
           }
         ]
       }
@@ -238,6 +246,10 @@ export const IDL: GearProtocol = {
         {
           "name": "price",
           "type": "f64"
+        },
+        {
+          "name": "path",
+          "type": "string"
         }
       ]
     },
@@ -306,6 +318,10 @@ export const IDL: GearProtocol = {
           {
             "name": "price",
             "type": "f64"
+          },
+          {
+            "name": "encryptPath",
+            "type": "string"
           }
         ]
       }

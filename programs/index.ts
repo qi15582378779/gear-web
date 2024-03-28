@@ -1,1 +1,2 @@
-export * from './hello-world';
+export * from './libs/hello-world';
+export * from './libs/gear';
