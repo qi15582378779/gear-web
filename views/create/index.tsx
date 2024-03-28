@@ -6,11 +6,11 @@ import { IconDown } from "@/components/Icon";
 import { $BigNumber, $filterNumber, $shiftedBy } from "@/utils/met";
 import { useWallet } from "@solana/wallet-adapter-react";
 import tokens from "@/utils/tokens.json";
-import { useResultModal } from "@/state/call/hooks";
+import { useResultModal } from "@/state/cells/hooks";
 import Server from "@/service";
 import { BigNumber } from "ethers";
 import { useWorkspaceGear } from "@/hooks/useWorkspace";
-import ResultModal from "../home/ResultModal";
+import ResultModal from "./ResultModal";
 import { useRouter } from "next/router";
 
 const { TextArea } = Input;
@@ -163,7 +163,6 @@ const Create: React.FC = () => {
         hash: tx
       });
       setLoading(false);
-      router.push("/gears");
     } catch (error: any) {
       handResultModal({
         open: true,
@@ -207,6 +206,10 @@ const Create: React.FC = () => {
       document.removeEventListener("click", handleDocumentClick);
     };
   }, [typeOpen, tokenOpen]);
+
+  useEffect(() => {
+    return () => handResultModal({ open: false });
+  }, []);
 
   return (
     <>

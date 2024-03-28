@@ -2,7 +2,7 @@
 import ps from "./styles/index.module.scss";
 import { useCells } from "@/state/cells/hooks";
 import { useEffect, useState } from "react";
-import { IconAdd } from "@/components/Icon";
+import { IconAdd, IconSee } from "@/components/Icon";
 import cn from "classnames";
 import TooltipLine from "@/components/TooltipLine";
 import { Button, ConfigProvider, Skeleton, notification, theme } from "antd";
@@ -157,11 +157,19 @@ const Cells: React.FC = () => {
                     <div>
                       <div>{ele.name}</div>
                       <div>
-                        {$hash(ele.txhash, 4, 4)}
+                        <span
+                          onClick={() => {
+                            if (typeof window === "undefined") return;
+                            window.open(ele.gear_nft);
+                          }}
+                        >
+                          {$hash(ele.gearAddress, 4, 4)}
+                        </span>
+
                         <Copy
                           className="copy"
                           copy={() => {
-                            $copy(ele.txhash);
+                            $copy(ele.gearAddress);
                           }}
                         />
                       </div>
@@ -208,12 +216,7 @@ const Cells: React.FC = () => {
                     gear nft
                     <div>
                       {$hash(ele.gear_nft)}
-                      <Copy
-                        className="copy"
-                        copy={() => {
-                          $copy(ele.gear_nft);
-                        }}
-                      />
+                      <IconSee className={ps["see"]} />
                     </div>
                   </div>
 
@@ -221,12 +224,13 @@ const Cells: React.FC = () => {
                     Arweave Storage
                     <div>
                       {$hash(ele.arweave_storage)}
-                      <Copy
+                      <IconSee className={ps["see"]} />
+                      {/* <Copy
                         className="copy"
                         copy={() => {
                           $copy(ele.arweave_storage);
                         }}
-                      />
+                      /> */}
                     </div>
                   </div>
 

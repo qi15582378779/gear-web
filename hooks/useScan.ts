@@ -17,7 +17,7 @@ const useScan = (): IType => {
   const openscan = useCallback(
     (value: string, type: string = "tx") => {
       if (typeof window === "undefined") return;
-      window.open(`${scan}${type}/${value}??cluster=devnet`);
+      window.open(`${scan}${type}/${value}?cluster=devnet`);
     },
     [scan]
   );
