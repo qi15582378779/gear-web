@@ -263,7 +263,7 @@ const Home: FC = (): ReactElement => {
                                 openGreenfieldScan(item.metadataObjectId, "object");
                               }}
                             >
-                              Txn Hash: {$hash(item.metadataObjectId)}{" "}
+                              <span>{$hash(item.metadataObjectId)}</span>
                               <Copy
                                 className="copy"
                                 copy={() => {
