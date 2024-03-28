@@ -5,8 +5,10 @@ import styled from "styled-components";
 import { IconClose } from "@/components/Icon";
 import { useScan } from "@/hooks";
 import { useHasNewHistory, useHistoryDialog, useResultModal } from "@/state/call/hooks";
+import { useRouter } from "next/router";
 
 const ResultModal: FC = (): ReactElement => {
+  const router = useRouter();
   const { getScanAddress } = useScan();
   const [resultInfo, handResultModal] = useResultModal();
   const [, handShowHistoryModal] = useHistoryDialog();
@@ -48,7 +50,11 @@ const ResultModal: FC = (): ReactElement => {
           <SeeScan href={`${getScanAddress(resultInfo.hash, "tx")}`} target="_blank">
             View on SolScan
           </SeeScan>
-          <SeeHistory onClick={seeHistory}>
+          <SeeHistory
+            onClick={() => {
+              router.push("/history");
+            }}
+          >
             <HistoryIcon src="/images/dialog/history.svg" />
             View history
           </SeeHistory>
