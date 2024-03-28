@@ -1,24 +1,26 @@
-import cn from 'classnames';
-import ps from './styles/index.module.scss';
-import { Button, Dropdown, Input, notification } from 'antd';
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { IconDown } from '@/components/Icon';
-import { $BigNumber, $filterNumber, $shiftedBy } from '@/utils/met';
-import { useWallet } from '@solana/wallet-adapter-react';
-import tokens from '@/utils/tokens.json';
-import { useResultModal } from '@/state/call/hooks';
-import Server from '@/service';
-import { BigNumber } from 'ethers';
+import cn from "classnames";
+import ps from "./styles/index.module.scss";
+import { Button, Dropdown, Input, notification } from "antd";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { IconDown } from "@/components/Icon";
+import { $BigNumber, $filterNumber, $shiftedBy } from "@/utils/met";
+import { useWallet } from "@solana/wallet-adapter-react";
+import tokens from "@/utils/tokens.json";
+import { useResultModal } from "@/state/call/hooks";
+import Server from "@/service";
+import { BigNumber } from "ethers";
+import { useWorkspaceGear } from "@/hooks/useWorkspace";
 
 const { TextArea } = Input;
 let form = new FormData();
 const Create: React.FC = () => {
   const { wallet, publicKey, connected } = useWallet();
   const [, handResultModal] = useResultModal();
+  const workspace = useWorkspaceGear();
 
   const [loading, setLoading] = useState(false);
-  const [avatarSrc, setAvatarSrc] = useState<string>('');
-  const [errorTag, setErrorTag] = useState('');
+  const [avatarSrc, setAvatarSrc] = useState<string>("");
+  const [errorTag, setErrorTag] = useState("");
 
   const [typeOpen, setTypeOpen] = useState<boolean>(false);
   const typeRef = useRef<HTMLDivElement | null>(null);
@@ -27,10 +29,10 @@ const Create: React.FC = () => {
   const tokenRef = useRef<HTMLDivElement | null>(null);
 
   const requestTypes = [
-    { type: 'GET', value: 'GET' },
-    { type: 'POST', value: 'POST' }
+    { type: "GET", value: "GET" },
+    { type: "POST", value: "POST" }
   ];
-  const tokenList = [{ symbol: 'SOL', decimals: 9, describe: 'solana', value: 'SOL' }];
+  const tokenList = [{ symbol: "SOL", decimals: 9, describe: "solana", value: "SOL" }];
 
   const [formData, setFormData] = useState<{ [key: string]: any }>({
     // name: '',
@@ -42,13 +44,13 @@ const Create: React.FC = () => {
     // denom: '',
     // logoFile: null
 
-    name: 'translate 2',
-    description: 'translate',
-    requestURL: 'https://api.aicell.world/v1/ai/text-to-en',
+    name: "translate 2",
+    description: "translate",
+    requestURL: "https://api.aicell.world/v1/ai/text-to-en",
     requestParams: '{"text":""}',
-    requestType: 'POST',
-    price: '1',
-    denom: 'SOL',
+    requestType: "POST",
+    price: "1",
+    denom: "SOL",
     logoFile: null
 
     // name: 'image-gen',
@@ -66,8 +68,8 @@ const Create: React.FC = () => {
   }, [connected, formData]);
 
   const handUpload = () => {
-    if (typeof document === 'undefined') return;
-    (document.querySelector('#avatarFiles') as any).click();
+    if (typeof document === "undefined") return;
+    (document.querySelector("#avatarFiles") as any).click();
   };
 
   const onUpload = (e: any) => {
@@ -94,58 +96,61 @@ const Create: React.FC = () => {
 
       setLoading(true);
 
-      if (formData.requestURL.indexOf('https://') === -1 && formData.requestURL.indexOf('http://') === -1) {
-        setErrorTag('url');
+      if (formData.requestURL.indexOf("https://") === -1 && formData.requestURL.indexOf("http://") === -1) {
+        setErrorTag("url");
         notification.error({
-          message: 'Invalid URL'
+          message: "Invalid URL"
         });
         return;
       }
 
       try {
         const data = JSON.parse(formData.requestParams);
-        console.log('data', data, formData.requestParams);
-        if (data.constructor !== Object) throw new Error('Invalid Params');
+        console.log("data", data, formData.requestParams);
+        if (data.constructor !== Object) throw new Error("Invalid Params");
       } catch (error: any) {
-        setErrorTag('params');
+        setErrorTag("params");
         notification.error({
-          message: 'Invalid Params'
+          message: "Invalid Params"
         });
         return;
       }
-      if ($BigNumber(formData.price).lt(0.001)) throw new Error('Price is less than 0.001');
+      if ($BigNumber(formData.price).lt(0.001)) throw new Error("Price is less than 0.001");
 
-      setErrorTag('');
+      setErrorTag("");
       form = new FormData();
 
       // console.log('(tokens as any)[chainId]', tokens, chainId);
       // console.log('(tokens as any)[chainId]', (tokens as any)[chainId], chainId, formData.denom);
 
-      const tokeninfo = (tokens as any)['devnet'][formData.denom];
+      const tokeninfo = (tokens as any)["devnet"][formData.denom];
       const price = $shiftedBy(formData.price, tokeninfo.decimals);
 
-      form.append('owner', publicKey!.toBase58());
-      form.append('requestURL', formData.requestURL);
-      form.append('requestParams', formData.requestParams);
-      form.append('requestType', formData.requestType);
-      form.append('name', formData.name);
-      form.append('description', formData.description);
+      form.append("owner", publicKey!.toBase58());
+      form.append("requestURL", formData.requestURL);
+      form.append("requestParams", formData.requestParams);
+      form.append("requestType", formData.requestType);
+      form.append("name", formData.name);
+      form.append("description", formData.description);
 
-      form.append('price', price);
-      form.append('denom', tokeninfo.address);
-      form.append('tokeninfo', JSON.stringify(tokeninfo));
-      form.append('logoFile', formData.logoFile);
+      form.append("price", price);
+      form.append("denom", tokeninfo.address);
+      form.append("tokeninfo", JSON.stringify(tokeninfo));
+      form.append("logoFile", formData.logoFile);
 
       handResultModal({
         open: true,
-        type: 'wating'
+        type: "wating"
       });
 
-      console.log('form', form);
+      console.log("form", form);
 
-      const { code, data, error }: any = await Server.submitCell(form);
-      if (code !== 0) throw new Error(error);
+      // const { code, data, error }: any = await Server.submitCell(form);
+      // if (code !== 0) throw new Error(error);
 
+      // const {} = workspace!.program.createGear("DogBro", data.denom, data.encryptURL, data.price);
+      const { gearAddress, tx }: any = await workspace!.program.createGear("DogBro", "DGB", "https://raw.githubusercontent.com/687c/solana-nft-native-client/main/metadata.json", 0.0001);
+      console.log("gearAddress, tx", gearAddress, tx);
       // const transaction = factory.create(account, data.tokenURL, data.encryptURL, data.denom, data.price);
       // const { transactionState, hash } = await awaitTransactionMined(transaction);
       // console.log('hash::', hash);
@@ -170,10 +175,10 @@ const Create: React.FC = () => {
     } catch (error: any) {
       handResultModal({
         open: true,
-        type: 'fail'
+        type: "fail"
       });
       notification.error({
-        message: error.reason || error.message || 'error'
+        message: error.reason || error.message || "error"
       });
     } finally {
       setLoading(false);
@@ -205,9 +210,9 @@ const Create: React.FC = () => {
   };
 
   useEffect(() => {
-    document.addEventListener('click', handleDocumentClick);
+    document.addEventListener("click", handleDocumentClick);
     return () => {
-      document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener("click", handleDocumentClick);
     };
   }, [typeOpen, tokenOpen]);
 
@@ -216,29 +221,29 @@ const Create: React.FC = () => {
       <div className={ps.container}>
         <div className={ps.tit}>Create gear</div>
 
-        <section className={ps['sub-tit']}>
+        <section className={ps["sub-tit"]}>
           <div>Basic information</div>
           <div>Please select an API gear and enter a command to call it.</div>
         </section>
 
         <section className={ps.name}>
           <div>Name</div>
-          <Input placeholder="" value={formData.name} onChange={(e: any) => onInputChange(e, 'name')} />
+          <Input placeholder="" value={formData.name} onChange={(e: any) => onInputChange(e, "name")} />
         </section>
 
-        <section className={ps['logo-des']}>
+        <section className={ps["logo-des"]}>
           <div className={ps.logo}>
             <div>Logo</div>
             <div onClick={handUpload}>
               {avatarSrc ? (
                 <>
-                  <img src={avatarSrc} alt="" className={ps['avatar-img']} />
+                  <img src={avatarSrc} alt="" className={ps["avatar-img"]} />
                 </>
               ) : (
                 <>
                   <input type="file" className={ps.file} id="avatarFiles" accept="image/*" onChange={(e) => onUpload(e)} />
-                  <img src="/images/create/1.svg" alt="" className={ps['upload-icon']} />
-                  <div className={ps['upload-tip']}>
+                  <img src="/images/create/1.svg" alt="" className={ps["upload-icon"]} />
+                  <div className={ps["upload-tip"]}>
                     Drag & Drop or <span>Choose file</span> to upload <br />
                     JPG or GIF
                   </div>
@@ -250,15 +255,15 @@ const Create: React.FC = () => {
           <div className={ps.des}>
             <div>Description</div>
             <div>
-              <TextArea placeholder="" value={formData.description} onChange={(e: any) => onInputChange(e, 'description')} />
+              <TextArea placeholder="" value={formData.description} onChange={(e: any) => onInputChange(e, "description")} />
             </div>
           </div>
         </section>
 
-        <section className={ps['type-url']}>
+        <section className={ps["type-url"]}>
           <div className={ps.type}>
             <div>Type</div>
-            <div className={ps['down-group']} ref={typeRef}>
+            <div className={ps["down-group"]} ref={typeRef}>
               <div
                 onClick={() => {
                   setTypeOpen(!typeOpen);
@@ -267,7 +272,7 @@ const Create: React.FC = () => {
                 {formData.requestType ? formData.requestType : <span></span>}
                 <IconDown />
               </div>
-              <div className={cn(ps['down-items'], { [ps['open-down']]: typeOpen })}>
+              <div className={cn(ps["down-items"], { [ps["open-down"]]: typeOpen })}>
                 <div>Select Type</div>
                 {requestTypes.map((ele) => (
                   <div key={ele.value} onClick={() => onChangeRequestType(ele)}>
@@ -279,24 +284,24 @@ const Create: React.FC = () => {
           </div>
           <div className={ps.url}>
             <div>URL</div>
-            <Input className={errorTag === 'url' ? ps['_error'] : ''} value={formData.requestURL} onChange={(e: any) => onInputChange(e, 'requestURL')} />
+            <Input className={errorTag === "url" ? ps["_error"] : ""} value={formData.requestURL} onChange={(e: any) => onInputChange(e, "requestURL")} />
           </div>
         </section>
 
         <section className={ps.params}>
           <div>Params（JSON）</div>
           <div>
-            <TextArea className={errorTag === 'params' ? ps['_error'] : ''} value={formData.requestParams} onChange={(e: any) => onInputChange(e, 'requestParams')} placeholder="" />
+            <TextArea className={errorTag === "params" ? ps["_error"] : ""} value={formData.requestParams} onChange={(e: any) => onInputChange(e, "requestParams")} placeholder="" />
           </div>
         </section>
 
-        <section className={ps['token-price']}>
+        <section className={ps["token-price"]}>
           <div>Price Setting</div>
           <div>Please select an API gear and enter a command to call it.</div>
           <div>
             <div>
               <div>Token</div>
-              <div className={ps['down-group']} ref={tokenRef}>
+              <div className={ps["down-group"]} ref={tokenRef}>
                 <div
                   onClick={() => {
                     setTokenOpen(!tokenOpen);
@@ -305,7 +310,7 @@ const Create: React.FC = () => {
                   {formData.denom ? formData.denom : <span></span>}
                   <IconDown />
                 </div>
-                <div className={cn(ps['down-items'], ps['down-tokens'], { [ps['open-down']]: tokenOpen })}>
+                <div className={cn(ps["down-items"], ps["down-tokens"], { [ps["open-down"]]: tokenOpen })}>
                   <div>Select Token</div>
                   {tokenList.map((ele) => (
                     <div key={ele.value} onClick={() => onChangeToken(ele)}>
@@ -324,14 +329,14 @@ const Create: React.FC = () => {
               <Input
                 value={formData.price}
                 onChange={(e: any) => {
-                  onInputChange($filterNumber(e), 'price');
+                  onInputChange($filterNumber(e), "price");
                 }}
               />
             </div>
           </div>
         </section>
 
-        <Button block className={ps['submit-btn']} disabled={!!btn_disable} loading={loading} onClick={submit}>
+        <Button block className={ps["submit-btn"]} disabled={!!btn_disable} loading={loading} onClick={submit}>
           Submit
         </Button>
       </div>

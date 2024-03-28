@@ -1,8 +1,8 @@
-import { Connection } from '@solana/web3.js';
-import { Provider, AnchorProvider } from '@coral-xyz/anchor';
-import { AnchorWallet, useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useMemo } from 'react';
-import { HelloWorld, Gear } from '@/programs'
+import { Connection } from "@solana/web3.js";
+import { Provider, AnchorProvider } from "@coral-xyz/anchor";
+import { AnchorWallet, useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useMemo } from "react";
+import { HelloWorld, Gear } from "@/programs";
 
 export interface Workspace {
   wallet: AnchorWallet;
@@ -11,8 +11,8 @@ export interface Workspace {
   program: any;
 }
 
-const preflightCommitment = 'confirmed';
-const commitment = 'confirmed';
+const preflightCommitment = "confirmed";
+const commitment = "confirmed";
 
 export function useWorkspaceHW() {
   const { connection } = useConnection();
@@ -86,7 +86,7 @@ export function useWorkspaceGear() {
         connection,
         wallet,
         provider,
-        program,
+        program
       };
     } else {
       return null;
