@@ -1,5 +1,5 @@
 import { FC, ReactElement } from "react";
-import Wallet from "@/views/wallet";
+import Wallet from "@/views/home";
 
 const WalletPage: FC = (): ReactElement => {
   return <Wallet />;
