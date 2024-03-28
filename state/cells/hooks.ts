@@ -1,18 +1,18 @@
-import { useSelector } from 'react-redux';
-import { useCallback, useState } from 'react';
-import { setTokensModal, setRequestTypeModal, setIsCreate, setList, updateList, setResultDialog } from './actions';
-import { AppState, useAppDispatch } from '../index';
-import Server from '@/service';
+import { useSelector } from "react-redux";
+import { useCallback, useState } from "react";
+import { setTokensModal, setRequestTypeModal, setIsCreate, setList, updateList, setResultDialog } from "./actions";
+import { AppState, useAppDispatch } from "../index";
+import Server from "@/service";
 // import { useTransactionMined } from '@/hooks';
-import { Cell, constants, getERC20, getRegistry } from '@/sdk';
-import { $shiftedByFixed } from '@/utils/met';
-import { TransactionState } from '@/typings';
-import { message, notification } from 'antd';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { Cell, constants, getERC20, getRegistry } from "@/sdk";
+import { $shiftedByFixed } from "@/utils/met";
+import { TransactionState } from "@/typings";
+import { message, notification } from "antd";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export function useIsCreate(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
-  const isCreate = useSelector<AppState, AppState['cells']['isCreate']>((state: AppState) => state.cells.isCreate);
+  const isCreate = useSelector<AppState, AppState["cells"]["isCreate"]>((state: AppState) => state.cells.isCreate);
   const handIsCreate = useCallback(
     (open: boolean) => {
       dispatch(setIsCreate(open));
@@ -25,7 +25,7 @@ export function useIsCreate(): [boolean, (open: boolean) => void] {
 
 export function useTokensModal(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
-  const showTokensModal = useSelector<AppState, AppState['cells']['showTokensModal']>((state: AppState) => state.cells.showTokensModal);
+  const showTokensModal = useSelector<AppState, AppState["cells"]["showTokensModal"]>((state: AppState) => state.cells.showTokensModal);
   const handTokensModal = useCallback(
     (open: boolean) => {
       dispatch(setTokensModal(open));
@@ -38,7 +38,7 @@ export function useTokensModal(): [boolean, (open: boolean) => void] {
 
 export function useRequestTypeModal(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
-  const showRequestTypeModal = useSelector<AppState, AppState['cells']['showRequestTypeModal']>((state: AppState) => state.cells.showRequestTypeModal);
+  const showRequestTypeModal = useSelector<AppState, AppState["cells"]["showRequestTypeModal"]>((state: AppState) => state.cells.showRequestTypeModal);
   const handRequestTypeModal = useCallback(
     (open: boolean) => {
       dispatch(setRequestTypeModal(open));
@@ -54,7 +54,7 @@ export function useCells(): [any[], () => void, (data: Record<string, any>) => P
   // const { wallet, account, chainId } = useWallet();
   const { wallet, publicKey } = useWallet();
   const [loading, setLoading] = useState(false);
-  const list = useSelector<AppState, AppState['cells']['list']>((state: AppState) => state.cells.list);
+  const list = useSelector<AppState, AppState["cells"]["list"]>((state: AppState) => state.cells.list);
   const fetchList = useCallback(async () => {
     try {
       // const Registry = constants.CHAIN_CONTRACTS[chainId].Registry;
@@ -86,7 +86,7 @@ export function useCells(): [any[], () => void, (data: Record<string, any>) => P
       // }
       // dispatch(setList(list));
     } catch (e: any) {
-      console.error('----', e.reason || e.message);
+      console.error("----", e.reason || e.message);
     } finally {
       setLoading(false);
     }
@@ -99,7 +99,7 @@ export function useCells(): [any[], () => void, (data: Record<string, any>) => P
         // const reward = await erc20.balanceOf(data.cellAddress);
         // dispatch(updateList({ cellAddress: data.cellAddress, reward: $shiftedByFixed(reward, -1 * data.tokeninfo.decimals, 4) }));
       } catch (e: any) {
-        console.error('----', e.reason || e.message);
+        console.error("----", e.reason || e.message);
       }
     },
     [dispatch, wallet]
@@ -137,7 +137,7 @@ export function useClaim(): [(data: Record<string, any>) => void, boolean] {
         //   throw new Error('Claim Fail');
         // }
       } catch (e: any) {
-        notification.error({ message: e.reason || e.message || 'Claim fail' });
+        notification.error({ message: e.reason || e.message || "Claim fail" });
       } finally {
         setLoading(false);
       }
@@ -150,7 +150,7 @@ export function useClaim(): [(data: Record<string, any>) => void, boolean] {
 
 export function useResultModal(): [{ [key: string]: any }, (info: { [key: string]: any }) => void] {
   const dispatch = useAppDispatch();
-  const resultInfo = useSelector<AppState, AppState['cells']['resultInfoByDialog']>((state: AppState) => state.cells.resultInfoByDialog);
+  const resultInfo = useSelector<AppState, AppState["cells"]["resultInfoByDialog"]>((state: AppState) => state.cells.resultInfoByDialog);
   const handResultModal = useCallback(
     (info: { [key: string]: any }) => {
       dispatch(setResultDialog(info));
