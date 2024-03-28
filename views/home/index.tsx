@@ -264,7 +264,7 @@ const Home: FC = (): ReactElement => {
     <>
       <div className={ps.full}>
         <div className={ps.container}>
-          <div className={ps.tit}>Call Cell</div>
+          <div className={ps.tit}>Call Gear</div>
           <Input className={ps.search} value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e: any) => hangSearch(e.target.value)} />
           <div className={ps.group}>
             {cellLoad ? (
