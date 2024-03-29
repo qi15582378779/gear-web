@@ -6,10 +6,8 @@ import { useRouter } from "next/router";
 import { FC, ReactElement, useEffect, useRef, useState } from "react";
 import { IconMetaMask, IconHistory1, IconOut, IconCopy, IconAdd } from "@/components/Icon";
 import { motion, AnimatePresence } from "framer-motion";
-import tokens from "@/utils/tokens.json";
 
 import styled from "styled-components";
-import { useIsCreate } from "@/state/cells/hooks";
 import { Dropdown, Popover } from "antd";
 import { useUserBalance } from "@/state/base/hooks";
 import type { MenuProps } from "antd";
@@ -19,11 +17,8 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
   const router = useRouter();
-  const [isCreate, setIsCreate] = useIsCreate();
-  // const { account, chainId, walletReady, switchNetwork } = useWallet();
-  const { wallet, publicKey, connected } = useWallet();
+  const { publicKey, connected } = useWallet();
   const [, connectWallet] = useConnectWallet();
-  const [, disconnectWallet] = useDisconnectWallet();
   const [balance, getUserBalance] = useUserBalance();
   const [open, setOpen] = useState(false);
 
@@ -39,24 +34,7 @@ const Header: FC<any> = (): ReactElement => {
     { name: "Create", path: "/create" }
   ];
 
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <ChainItems
-          onClick={() => {
-            // switchNetwork();
-          }}
-        >
-          <ChainImg src="/images/chain/BSC.svg" />
-          BNB Chain
-        </ChainItems>
-      )
-    }
-  ];
-
   const jump = (path: string) => {
-    setIsCreate(false);
     router.push(path);
   };
 
@@ -97,7 +75,7 @@ const Header: FC<any> = (): ReactElement => {
 
   return (
     <HeaderView>
-      <Section className={cn({ "menu-open": open })} ref={H5DropRef}>
+      <Section className={cn({ "menu-open": open })}>
         <Left>
           <Logo onClick={() => jump("/")} src="/images/logo/logo.svg" />
         </Left>
@@ -144,13 +122,12 @@ const Header: FC<any> = (): ReactElement => {
               <WalletDownIcon src="/images/other/3.svg" />
             </Wallet>
           ) : (
-            // <ConnectWallet onClick={() => connectWallet('m')}>Connect Wallet</ConnectWallet>
             <WalletMultiButton>Connect Wallet</WalletMultiButton>
           )}
 
           <H5Menu
+            ref={H5DropRef}
             onClick={() => {
-              console.log("test---->");
               setOpen(!open);
             }}
             className={cn({ active: open })}
@@ -205,13 +182,6 @@ const Header: FC<any> = (): ReactElement => {
               </Account>
 
               <AssetsContent>
-                {/* <Balance>
-                  <Symbol>
-                    <SymbolIcon src="/images/tokens/USDC.png" />
-                    USDC
-                  </Symbol>
-                  <b>{balance.usdt}</b>
-                </Balance> */}
                 <Balance>
                   <Symbol>
                     <SymbolIcon src="/images/tokens/SOL.png" />

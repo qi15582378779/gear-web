@@ -1,9 +1,8 @@
-import styled, { css, keyframes } from 'styled-components';
-import { SVGAttributes } from 'react';
+import styled, { css, keyframes } from "styled-components";
+import { SVGAttributes } from "react";
 
 export interface SvgProps extends SVGAttributes<HTMLOrSVGElement> {
   color?: string;
-  spin?: boolean;
 }
 
 const rotate = keyframes`
@@ -23,14 +22,12 @@ const Svg = styled.svg<SvgProps>`
   align-self: center; // Safari fix
   /* fill: ${({ color }) => color}; */
   flex-shrink: 0;
-  ${({ spin }) => spin && spinStyle}
 `;
 
 Svg.defaultProps = {
-  color: 'text',
-  width: '20px',
-  xmlns: 'http://www.w3.org/2000/svg',
-  spin: false
+  color: "text",
+  width: "20px",
+  xmlns: "http://www.w3.org/2000/svg"
 };
 
 export default Svg;

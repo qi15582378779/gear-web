@@ -1,8 +1,8 @@
-import { FC, ReactElement } from 'react';
-import Cells from '@/views/cells/index';
+import { FC, ReactElement } from "react";
+import Gears from "@/views/gears/index";
 
-const CellsPage: FC = (): ReactElement => {
-  return <Cells />;
+const GearsPage: FC = (): ReactElement => {
+  return <Gears />;
 };
 
-export default CellsPage;
+export default GearsPage;

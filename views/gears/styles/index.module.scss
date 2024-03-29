@@ -154,7 +154,9 @@
             font-size: 0.12rem;
             font-weight: 600;
             line-height: 150%;
-
+            span {
+              cursor: pointer;
+            }
             i {
               color: #fff;
               cursor: pointer;
@@ -245,8 +247,7 @@
       font-weight: 600;
     }
 
-    &:nth-of-type(1),
-    &:nth-of-type(2) {
+    &:nth-of-type(1) {
       & > div {
         & > img {
           display: block;
@@ -258,8 +259,8 @@
       }
     }
 
-    &:nth-of-type(3),
-    &:nth-of-type(4) {
+    &:nth-of-type(2),
+    &:nth-of-type(3) {
       & > div {
         color: #17fb9b;
         letter-spacing: 0.4px;
@@ -275,7 +276,20 @@
     }
   }
 }
-
+.see {
+  font-style: normal;
+  display: flex;
+  align-items: center;
+  width: 0.12rem;
+  height: 0.12rem;
+  color: #fff;
+  transition: all 0.2s;
+  margin-left: 0.04rem;
+  cursor: pointer;
+  &:hover {
+    color: #17fb9b !important;
+  }
+}
 .claim-btn {
   height: 0.4rem;
   border-radius: 0.24rem;
@@ -287,6 +301,10 @@
   &:disabled {
     color: #fff !important;
     background: rgba(133, 123, 139, 0.5) !important;
+    &:hover {
+      color: #fff !important;
+      background: rgba(133, 123, 139, 0.5) !important;
+    }
   }
 
   &:hover {

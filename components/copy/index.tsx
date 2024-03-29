@@ -1,6 +1,6 @@
-import { IconCopy, CopyAfterIcon } from '@/components/Icon';
-import { FC, ReactElement, useState } from 'react';
-import styled from 'styled-components';
+import { IconCopy, CopyAfterIcon } from "@/components/Icon";
+import { FC, ReactElement, useState } from "react";
+import styled from "styled-components";
 
 type IProps = {
   copy: () => any;
@@ -49,7 +49,7 @@ const IconCopyView = styled.i`
 
   &.copy {
     &:hover {
-      color: #fc72ff !important;
+      color: #17fb9b !important;
     }
   }
 `;
