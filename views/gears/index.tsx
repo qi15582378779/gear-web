@@ -10,14 +10,13 @@ import { Copy } from "@/components";
 import { $BigNumber, $copy, $hash, $shiftedByFixed } from "@/utils/met";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
-import { useScan, useWorkspaceGear } from "@/hooks";
+import { useWorkspaceGear } from "@/hooks";
 
 const Gears: React.FC = () => {
   const { wallet, connected } = useWallet();
   const [list, fetchGears, update, reset, loading] = useGears();
   const router = useRouter();
   const workspace = useWorkspaceGear();
-  const { openGreenfieldScan } = useScan();
 
   const [isExpanded, setIsExpanded] = useState<any[]>([]);
   const [claimLoading, setClaimLoading] = useState<any[]>([]);
