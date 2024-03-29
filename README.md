@@ -1,2 +1,3 @@
-# ai-cell-web
-AICell web project
+# gearai-web
+
+GearAI web project
