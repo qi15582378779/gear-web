@@ -46,7 +46,7 @@ const Create: React.FC = () => {
 
     // name: "translate 2",
     // description: "translate",
-    // requestURL: "https://api.aicell.world/v1/ai/text-to-en",
+    // requestURL: "https://api.gearai.xyz/v1/ai/text-to-en",
     // requestParams: '{"text":""}',
     // requestType: "POST",
     // price: "1",
@@ -55,7 +55,7 @@ const Create: React.FC = () => {
 
     // name: 'image-gen',
     // description: 'image gen',
-    // requestURL: 'https://api.aicell.world/v1/ai/image-gen-dev',
+    // requestURL: 'https://api.gearai.xyz/v1/ai/image-gen-dev',
     // requestParams: '{"text":""}',
     // requestType: 'POST',
     // price: '0.01',
