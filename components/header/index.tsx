@@ -1,5 +1,5 @@
 import { useWallet } from "@solana/wallet-adapter-react";
-import { $hash } from "@/utils/met";
+import { $copy, $hash } from "@/utils/met";
 import { useRouter } from "next/router";
 import { FC, ReactElement, useEffect, useRef, useState } from "react";
 import { IconHistory1, IconOut, IconCopy, IconAdd } from "@/components/Icon";
@@ -11,6 +11,7 @@ import { useUserBalance } from "@/state/base/hooks";
 import type { MenuProps } from "antd";
 import cn from "classnames";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Copy from "../copy";
 
 const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
@@ -171,7 +172,7 @@ const Header: FC<any> = (): ReactElement => {
               <Account>
                 <Avatar src="/images/avatar-metamask.png" />
                 {$hash(publicKey!.toBase58(), 4, 4)}
-                <IconCopy />
+                <Copy className={"copy"} copy={() => $copy(publicKey!.toBase58())} />
               </Account>
 
               <AssetsContent>
@@ -197,10 +198,10 @@ const Header: FC<any> = (): ReactElement => {
                       My Profile <IconOut onClick={() => disconnect()} />
                     </ModalTit>
 
-                    <Account>
+                    <Account onClick={() => $copy(publicKey!.toBase58())}>
                       <Avatar src="/images/avatar-metamask.png" />
                       {$hash(publicKey!.toBase58(), 4, 4)}
-                      <IconCopy />
+                      <Copy className={"copy"} copy={() => $copy(publicKey!.toBase58())} />
                     </Account>
 
                     <AssetsContent>
@@ -538,11 +539,12 @@ const Account = styled.div`
   filter: drop-shadow(0px 18.201px 0px #fff) inset;
   margin-bottom: 0.08rem;
 
-  & > svg {
+  svg {
     width: 0.14rem;
+    height: 0.14rem;
     cursor: pointer;
     transition: all 0.2s;
-
+    color: #ebebeb;
     &:hover {
       color: #17fb9b;
     }

@@ -10,13 +10,14 @@ import { Copy } from "@/components";
 import { $BigNumber, $copy, $hash, $shiftedByFixed } from "@/utils/met";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
-import { useWorkspaceGear } from "@/hooks";
+import { useScan, useWorkspaceGear } from "@/hooks";
 
 const Gears: React.FC = () => {
   const { wallet, connected } = useWallet();
   const [list, fetchGears, update, reset, loading] = useGears();
   const router = useRouter();
   const workspace = useWorkspaceGear();
+  const { openGreenfieldScan } = useScan();
 
   const [isExpanded, setIsExpanded] = useState<any[]>([]);
   const [claimLoading, setClaimLoading] = useState<any[]>([]);
@@ -214,7 +215,12 @@ const Gears: React.FC = () => {
 
                   <div>
                     gear nft
-                    <div>
+                    <div
+                      onClick={() => {
+                        if (typeof window === "undefined") return;
+                        window.open(ele.gear_nft);
+                      }}
+                    >
                       {$hash(ele.gear_nft)}
                       <IconSee className={ps["see"]} />
                     </div>
@@ -222,7 +228,12 @@ const Gears: React.FC = () => {
 
                   <div>
                     Arweave Storage
-                    <div>
+                    <div
+                      onClick={() => {
+                        if (typeof window === "undefined") return;
+                        window.open(ele.arweave_storage);
+                      }}
+                    >
                       {$hash(ele.arweave_storage)}
                       <IconSee className={ps["see"]} />
                       {/* <Copy
