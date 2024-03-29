@@ -44,7 +44,7 @@ const Header: FC<any> = (): ReactElement => {
       setInitial({ opacity: 0, x: 20 });
       setInitial({ opacity: 1, x: 0 });
     }
-    setOpen(true);
+    setOpen(!open);
   };
 
   useEffect(() => {
@@ -109,25 +109,22 @@ const Header: FC<any> = (): ReactElement => {
               <ChainImg src="/images/chain/SOL.svg" />
             )} */}
 
-            {connected && <ChainImg src="/images/chain/SOL.svg" />}
+            <ChainImg src="/images/chain/SOL.svg" />
           </Chain>
 
           {connected ? (
-            <Wallet ref={H5DropRef} onClick={() => handOpen()}>
+            <Wallet onClick={() => handOpen()}>
               <AvatarIcon src="/images/avatar.svg" />
               <WalletAddressTxt>{$hash(publicKey!.toBase58(), 6, 4)}</WalletAddressTxt>
               <WalletDownIcon src="/images/other/3.svg" />
             </Wallet>
           ) : (
-            <WalletMultiButton>Connect Wallet</WalletMultiButton>
+            <H5ConnectFull className="pc-full">
+              <WalletMultiButton>Connect Wallet</WalletMultiButton>
+            </H5ConnectFull>
           )}
 
-          <H5Menu
-            onClick={() => {
-              setOpen(!open);
-            }}
-            className={cn({ active: open })}
-          >
+          <H5Menu onClick={() => handOpen()} className={cn({ active: open })}>
             <IconAdd />
           </H5Menu>
         </AccountConter>
@@ -763,6 +760,13 @@ const H5ConnectFull = styled.div`
   justify-content: center;
   & > div {
     display: flex;
+  }
+
+  &.pc-full {
+    padding-top: 0;
+    @media screen and (max-width: 768px) {
+      display: none;
+    }
   }
 `;
 

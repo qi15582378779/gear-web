@@ -1,14 +1,14 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import call from "./call/reducer";
-import cells from "./cells/reducer";
+import gears from "./gears/reducer";
 import base from "./base/reducer";
 
 const store = configureStore({
   reducer: {
     base,
     call,
-    cells
+    gears
   },
   middleware: (getDefaultMiddleware: any) =>
     getDefaultMiddleware({

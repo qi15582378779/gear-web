@@ -1,17 +1,16 @@
-import '@solana/wallet-adapter-react-ui/styles.css';
-import 'styles/index.scss';
-import dynamic from 'next/dynamic';
+import "@solana/wallet-adapter-react-ui/styles.css";
+import "styles/index.scss";
+import dynamic from "next/dynamic";
 
-import { createGlobalStyle } from 'styled-components';
-import type { AppProps } from 'next/app';
+import { createGlobalStyle } from "styled-components";
+import type { AppProps } from "next/app";
 
-import Header from 'components/header';
-import Footer from 'components/footer';
-import Head from 'next/head';
-import { Provider } from 'react-redux';
-import store from '../state';
-import styled from 'styled-components';
-import { ReactNode } from 'react';
+import Header from "components/header";
+import Head from "next/head";
+import { Provider } from "react-redux";
+import store from "../state";
+import styled from "styled-components";
+import { ReactNode } from "react";
 // import { WalletProvider } from '../contexts/Wallet';
 // import ResultModal from '@/components/ResultModal';
 
@@ -29,7 +28,7 @@ const Main = styled.section`
   }
 `;
 
-const SolanaProvider = dynamic(() => import('../contexts/Solana/Provider').then(({ SolanaProvider }) => SolanaProvider), { ssr: false });
+const SolanaProvider = dynamic(() => import("../contexts/Solana/Provider").then(({ SolanaProvider }) => SolanaProvider), { ssr: false });
 
 function AppContext({ children }: { children: ReactNode }) {
   return (
@@ -70,7 +69,6 @@ function AiApp({ Component, pageProps }: AppProps) {
           <Main id="_main_app">
             <Component {...pageProps} />
           </Main>
-          <Footer />
         </AppContext>
       </Provider>
     </>

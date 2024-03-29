@@ -12,8 +12,8 @@ const initialState = {
   }
 };
 
-const CellsSlice = createSlice({
-  name: "cells",
+const GearsSlice = createSlice({
+  name: "gears",
   initialState,
   reducers: {
     setTokensModal(state, { payload: open }) {
@@ -38,4 +38,4 @@ const CellsSlice = createSlice({
     }
   }
 });
-export default CellsSlice.reducer;
+export default GearsSlice.reducer;

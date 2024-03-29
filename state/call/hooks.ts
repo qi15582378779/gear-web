@@ -1,15 +1,15 @@
-import { useSelector } from 'react-redux';
-import { useCallback, useEffect, useState } from 'react';
-import { setTokensModal, setHistory, setResultDialog, setHistoryModal, setHasNewHistory, setApproveResultDialog } from './actions';
-import { AppState, useAppDispatch } from '../index';
-import Server from '@/service';
+import { useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from "react";
+import { setTokensModal, setHistory, setResultDialog, setHistoryModal, setHasNewHistory, setApproveResultDialog } from "./actions";
+import { AppState, useAppDispatch } from "../index";
+import Server from "@/service";
 // import { useWallet } from '@/hooks';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { message, notification } from 'antd';
+import { useWallet } from "@solana/wallet-adapter-react";
+import { message, notification } from "antd";
 
 export function useTokensModal(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
-  const showTokensModal = useSelector<AppState, AppState['cells']['showTokensModal']>((state: AppState) => state.cells.showTokensModal);
+  const showTokensModal = useSelector<AppState, AppState["gears"]["showTokensModal"]>((state: AppState) => state.gears.showTokensModal);
   const handTokensModal = useCallback(
     (open: boolean) => {
       dispatch(setTokensModal(open));
@@ -24,7 +24,7 @@ export function useHistory(): [{ historyList: any[]; listLoad: boolean }, { fetc
   const dispatch = useAppDispatch();
   const { wallet, publicKey } = useWallet();
 
-  const historyList = useSelector<AppState, AppState['call']['history']>((state: AppState) => state.call.history);
+  const historyList = useSelector<AppState, AppState["call"]["history"]>((state: AppState) => state.call.history);
   const [listLoad, setListLoad] = useState<boolean>(false);
   const fetchHistory = useCallback(async () => {
     setListLoad(true);
@@ -35,7 +35,7 @@ export function useHistory(): [{ historyList: any[]; listLoad: boolean }, { fetc
       dispatch(setHistory(data));
     } catch (e: any) {
       notification.error({
-        message: e.message || 'error'
+        message: e.message || "error"
       });
     } finally {
       setListLoad(false);
@@ -54,7 +54,7 @@ export function useHistory(): [{ historyList: any[]; listLoad: boolean }, { fetc
 
 export function useHistoryDialog(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
-  const showHistoryModal = useSelector<AppState, AppState['call']['showHistoryModal']>((state: AppState) => state.call.showHistoryModal);
+  const showHistoryModal = useSelector<AppState, AppState["call"]["showHistoryModal"]>((state: AppState) => state.call.showHistoryModal);
   const handShowHistoryModal = useCallback(
     (open: boolean) => {
       dispatch(setHistoryModal(open));
@@ -67,7 +67,7 @@ export function useHistoryDialog(): [boolean, (open: boolean) => void] {
 
 export function useResultModal(): [{ [key: string]: any }, (info: { [key: string]: any }) => void] {
   const dispatch = useAppDispatch();
-  const resultInfo = useSelector<AppState, AppState['call']['resultInfoByDialog']>((state: AppState) => state.call.resultInfoByDialog);
+  const resultInfo = useSelector<AppState, AppState["call"]["resultInfoByDialog"]>((state: AppState) => state.call.resultInfoByDialog);
   const handResultModal = useCallback(
     (info: { [key: string]: any }) => {
       dispatch(setResultDialog(info));
@@ -79,7 +79,7 @@ export function useResultModal(): [{ [key: string]: any }, (info: { [key: string
 }
 export function useApproveDialog(): [{ [key: string]: any }, (info: { [key: string]: any }) => void] {
   const dispatch = useAppDispatch();
-  const approveResultDialog = useSelector<AppState, AppState['call']['approveResultDialog']>((state: AppState) => state.call.approveResultDialog);
+  const approveResultDialog = useSelector<AppState, AppState["call"]["approveResultDialog"]>((state: AppState) => state.call.approveResultDialog);
   const handResultModal = useCallback(
     (info: { [key: string]: any }) => {
       dispatch(setApproveResultDialog(info));
@@ -92,7 +92,7 @@ export function useApproveDialog(): [{ [key: string]: any }, (info: { [key: stri
 
 export function useHasNewHistory(): [boolean, (hasNew: boolean) => void] {
   const dispatch = useAppDispatch();
-  const hasNewHistory = useSelector<AppState, AppState['call']['hasNewHistory']>((state: AppState) => state.call.hasNewHistory);
+  const hasNewHistory = useSelector<AppState, AppState["call"]["hasNewHistory"]>((state: AppState) => state.call.hasNewHistory);
   const handHasNewHistory = useCallback(
     (hasNew: boolean) => {
       dispatch(setHasNewHistory(hasNew));

@@ -9,7 +9,7 @@ import { PublicKey } from "@solana/web3.js";
 
 export function useTokensModal(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
-  const showTokensModal = useSelector<AppState, AppState["cells"]["showTokensModal"]>((state: AppState) => state.cells.showTokensModal);
+  const showTokensModal = useSelector<AppState, AppState["gears"]["showTokensModal"]>((state: AppState) => state.gears.showTokensModal);
   const handTokensModal = useCallback(
     (open: boolean) => {
       dispatch(setTokensModal(open));
@@ -22,7 +22,7 @@ export function useTokensModal(): [boolean, (open: boolean) => void] {
 
 export function useRequestTypeModal(): [boolean, (open: boolean) => void] {
   const dispatch = useAppDispatch();
-  const showRequestTypeModal = useSelector<AppState, AppState["cells"]["showRequestTypeModal"]>((state: AppState) => state.cells.showRequestTypeModal);
+  const showRequestTypeModal = useSelector<AppState, AppState["gears"]["showRequestTypeModal"]>((state: AppState) => state.gears.showRequestTypeModal);
   const handRequestTypeModal = useCallback(
     (open: boolean) => {
       dispatch(setRequestTypeModal(open));
@@ -33,13 +33,13 @@ export function useRequestTypeModal(): [boolean, (open: boolean) => void] {
   return [showRequestTypeModal, handRequestTypeModal];
 }
 
-export function useCells(): [any[], () => void, (data: Record<string, any>) => Promise<any>, () => void, boolean] {
+export function useGears(): [any[], () => void, (data: Record<string, any>) => Promise<any>, () => void, boolean] {
   const dispatch = useAppDispatch();
   const workspace = useWorkspaceGear();
 
   const { wallet, publicKey } = useWallet();
   const [loading, setLoading] = useState(false);
-  const list = useSelector<AppState, AppState["cells"]["list"]>((state: AppState) => state.cells.list);
+  const list = useSelector<AppState, AppState["gears"]["list"]>((state: AppState) => state.gears.list);
   const fetchList = useCallback(async () => {
     try {
       setLoading(true);
@@ -85,7 +85,7 @@ export function useCells(): [any[], () => void, (data: Record<string, any>) => P
 }
 export function useResultModal(): [{ [key: string]: any }, (info: { [key: string]: any }) => void] {
   const dispatch = useAppDispatch();
-  const resultInfo = useSelector<AppState, AppState["cells"]["resultInfoByDialog"]>((state: AppState) => state.cells.resultInfoByDialog);
+  const resultInfo = useSelector<AppState, AppState["gears"]["resultInfoByDialog"]>((state: AppState) => state.gears.resultInfoByDialog);
   const handResultModal = useCallback(
     (info: { [key: string]: any }) => {
       dispatch(setResultDialog(info));

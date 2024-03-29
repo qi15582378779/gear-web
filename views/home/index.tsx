@@ -98,7 +98,6 @@ const Home: FC = (): ReactElement => {
         params: item.requestParams
       };
 
-      // console.log('callCells Data:', params);
       const { code, data, error } = await Server.callGears(params);
       console.log("data--->", data);
       if (code !== 0) throw new Error(error);

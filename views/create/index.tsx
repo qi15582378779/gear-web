@@ -6,7 +6,7 @@ import { IconDown } from "@/components/Icon";
 import { $BigNumber, $filterNumber } from "@/utils/met";
 import { useWallet } from "@solana/wallet-adapter-react";
 import tokens from "@/utils/tokens.json";
-import { useResultModal } from "@/state/cells/hooks";
+import { useResultModal } from "@/state/gears/hooks";
 import Server from "@/service";
 import { useWorkspaceGear } from "@/hooks/useWorkspace";
 import ResultModal from "./ResultModal";

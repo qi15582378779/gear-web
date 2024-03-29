@@ -6,7 +6,7 @@ import { IconClose } from "@/components/Icon";
 import { useScan } from "@/hooks";
 // import { useWallet } from '@solana/wallet-adapter-react';
 
-import { useResultModal } from "@/state/cells/hooks";
+import { useResultModal } from "@/state/gears/hooks";
 import { useRouter } from "next/router";
 
 const ResultModal: FC = (): ReactElement => {

@@ -1,6 +1,6 @@
 // import { useWallet } from '@/hooks';
 import ps from "./styles/index.module.scss";
-import { useCells } from "@/state/cells/hooks";
+import { useGears } from "@/state/gears/hooks";
 import { useEffect, useState } from "react";
 import { IconAdd, IconSee } from "@/components/Icon";
 import cn from "classnames";
@@ -12,9 +12,9 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import { useWorkspaceGear } from "@/hooks";
 
-const Cells: React.FC = () => {
+const Gears: React.FC = () => {
   const { wallet, connected } = useWallet();
-  const [list, fetchCells, update, reset, loading] = useCells();
+  const [list, fetchGears, update, reset, loading] = useGears();
   const router = useRouter();
   const workspace = useWorkspaceGear();
 
@@ -39,7 +39,7 @@ const Cells: React.FC = () => {
   };
 
   useEffect(() => {
-    if (connected) fetchCells();
+    if (connected) fetchGears();
     else reset();
   }, [connected, wallet]);
 
@@ -248,4 +248,4 @@ const Cells: React.FC = () => {
   );
 };
 
-export default Cells;
+export default Gears;
