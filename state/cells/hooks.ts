@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useCallback, useState } from "react";
-import { setTokensModal, setRequestTypeModal, setIsCreate, setList, updateList, setResultDialog } from "./actions";
+import { setTokensModal, setRequestTypeModal, setList, updateList, setResultDialog } from "./actions";
 import { AppState, useAppDispatch } from "../index";
 import Server from "@/service";
 import { useWallet } from "@solana/wallet-adapter-react";

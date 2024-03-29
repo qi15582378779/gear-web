@@ -116,6 +116,9 @@
     display: flex;
     align-items: center;
     transition: all 0.2s;
+    @media screen and (max-width: 768px) {
+      font-size: 0.12rem;
+    }
 
     &:hover {
       background: #c4cbd4 !important;

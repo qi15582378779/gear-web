@@ -71,13 +71,8 @@
   flex-direction: column;
   border-radius: 0.24rem;
   color: #fff;
-  // background: linear-gradient(237deg, #75deff -2.25%, rgba(0, 0, 0, 0) 17.44%), linear-gradient(300deg, #d976f6 3.22%, rgba(0, 0, 0, 0) 64.32%), linear-gradient(127deg, #9945ff -9.88%, rgba(51, 49, 54, 0) 100.66%);
-  padding: 1px;
   position: relative;
-  // background-image: url('/images/other/border-bg2.png');
-  // background-repeat: no-repeat;
-  // background-size: 100% 100%;
-  // background-position: center;
+  border: 1px solid rgba(80, 156, 211, 0.8);
 }
 
 .data-item {
@@ -93,6 +88,11 @@
 
   position: relative;
   background: rgba(219, 210, 224, 0.16);
+  // backdrop-filter: blur(27px);
+
+  &:hover {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%), rgba(219, 210, 224, 0.14);
+  }
   &::after {
     content: "";
     width: 100%;

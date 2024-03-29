@@ -35,23 +35,23 @@ const Create: React.FC = () => {
   const tokenList = [{ symbol: "SOL", decimals: 9, describe: "solana", value: "SOL" }];
 
   const [formData, setFormData] = useState<{ [key: string]: any }>({
-    // name: '',
-    // description: '',
-    // requestURL: '',
-    // requestParams: '',
-    // requestType: '',
-    // price: '',
-    // denom: '',
-    // logoFile: null
-
-    name: "translate 2",
-    description: "translate",
-    requestURL: "https://api.aicell.world/v1/ai/text-to-en",
-    requestParams: '{"text":""}',
-    requestType: "POST",
-    price: "1",
-    denom: "SOL",
+    name: "",
+    description: "",
+    requestURL: "",
+    requestParams: "",
+    requestType: "",
+    price: "",
+    denom: "",
     logoFile: null
+
+    // name: "translate 2",
+    // description: "translate",
+    // requestURL: "https://api.aicell.world/v1/ai/text-to-en",
+    // requestParams: '{"text":""}',
+    // requestType: "POST",
+    // price: "1",
+    // denom: "SOL",
+    // logoFile: null
 
     // name: 'image-gen',
     // description: 'image gen',

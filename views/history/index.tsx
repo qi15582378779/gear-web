@@ -189,7 +189,7 @@ const History: React.FC = () => {
                               Price
                               <div>
                                 <img src={`/images/tokens/${item.info?.symbol}.png`} alt="" />
-                                <span>${item.info?.price}</span>/Call
+                                <span>{item.info?.price}</span>/Call
                               </div>
                             </div>
 
@@ -197,7 +197,7 @@ const History: React.FC = () => {
                               Fee
                               <div>
                                 <img src={`/images/tokens/${item.info?.symbol}.png`} alt="" />
-                                <span>${item.info?.price}</span>
+                                <span>{item.info?.price}</span>
                               </div>
                             </div>
 
