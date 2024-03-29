@@ -1,4 +1,4 @@
-import { IconSearch } from "@/components/Icon";
+import { IconClose, IconSearch } from "@/components/Icon";
 import cn from "classnames";
 import { FC, ReactElement, useEffect, useRef, useState } from "react";
 
@@ -15,6 +15,7 @@ import TooltipLine from "@/components/TooltipLine";
 import { Copy } from "@/components";
 import { useDebounce, useScan, useWorkspaceGear } from "@/hooks";
 import Empty from "@/components/Empty";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const { TextArea } = Input;
 
@@ -138,7 +139,7 @@ const Home: FC = (): ReactElement => {
       <div className={ps.full}>
         <div className={ps.container}>
           <div className={ps.tit}>Call Gear</div>
-          <Input className={ps.search} value={search} prefix={<IconSearch />} placeholder="Search name or paste address" onChange={(e: any) => hangSearch(e.target.value)} />
+          <Input className={ps.search} value={search} prefix={<IconSearch />} placeholder="Search name or paste address" allowClear={{ clearIcon: <IconClose className={ps.clear} /> }} onChange={(e: any) => hangSearch(e.target.value)} />
           <div className={ps.group}>
             {cellLoad ? (
               <>
@@ -288,7 +289,8 @@ const Home: FC = (): ReactElement => {
                         ) : null}
 
                         {!connected ? (
-                          <Button className={ps["btn"]}>Connect Wallet</Button>
+                          // <Button className={ps["btn"]}>Connect Wallet</Button>
+                          <WalletMultiButton>Connect Wallet</WalletMultiButton>
                         ) : (
                           <>
                             {!$BigNumber(balance?.[item.symbol.toLowerCase()] || 0).gte(item.price) ? (

@@ -25,7 +25,11 @@ const useScan = (): IType => {
   const openGreenfieldScan = useCallback(
     (value: string, type: string = "tx") => {
       if (typeof window === "undefined") return;
-      window.open(`${greenfieldscanScan}${type}/${value}`);
+      if (type === "object") {
+        window.open(`${greenfieldscanScan}${value}`);
+      } else {
+        window.open(`${greenfieldscanScan}${type}/${value}`);
+      }
     },
     [greenfieldscanScan]
   );

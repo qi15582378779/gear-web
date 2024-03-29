@@ -260,6 +260,7 @@ const Create: React.FC = () => {
                   onClick={() => {
                     setTypeOpen(!typeOpen);
                   }}
+                  className={cn({ [ps["down-icon"]]: typeOpen })}
                 >
                   {formData.requestType ? formData.requestType : <span></span>}
                   <IconDown />
@@ -298,8 +299,17 @@ const Create: React.FC = () => {
                     onClick={() => {
                       setTokenOpen(!tokenOpen);
                     }}
+                    className={cn({ [ps["down-icon"]]: tokenOpen })}
                   >
-                    {formData.denom ? formData.denom : <span></span>}
+                    <div>
+                      {formData.denom && (
+                        <>
+                          <img src={`/images/tokens/${formData.denom}.png`} alt="" />
+                          {formData.denom}
+                        </>
+                      )}
+                    </div>
+
                     <IconDown />
                   </div>
                   <div className={cn(ps["down-items"], ps["down-tokens"], { [ps["open-down"]]: tokenOpen })}>

@@ -70,7 +70,7 @@
     &:focus-within,
     &:focus-visible {
       background-color: transparent;
-      border-color: #bc86ff;
+      border-color: #fff;
       box-shadow: none;
       outline: none;
     }
@@ -102,11 +102,27 @@
   & > div:nth-of-type(2) {
     height: 1.86rem;
     border-radius: 0.12rem;
-    border: 1px dashed #9945ff;
+    border: 1px dashed rgba(80, 156, 211, 0.8);
     background: #181b1c;
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    // padding: 1px;
+    flex: 1;
+
+    // &::before {
+    //   content: "";
+    //   position: absolute;
+    //   top: 0;
+    //   left: 0;
+    //   width: 100%;
+    //   height: 100%;
+    //   background-image: url("/images/other/6.svg");
+    //   background-size: 100% 1.86rem;
+    //   background-position: center;
+    //   background-repeat: no-repeat;
+    //   z-index: 2;
+    // }
 
     &::after {
       content: "";
@@ -262,6 +278,24 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
+    & > div {
+      display: flex;
+      align-items: center;
+      column-gap: 0.08rem;
+      & > img {
+        display: block;
+        width: 0.18rem;
+        height: 0.18rem;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+.down-icon {
+  svg {
+    transform: rotate(180deg);
   }
 }
 
@@ -273,12 +307,13 @@
   border-radius: 0.16rem;
   background: #191e23;
   backdrop-filter: blur(27px);
-  padding: 0.2rem;
   transition: opacity 267ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 178ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   transform-origin: 0 0;
   transform: scaleY(0);
   opacity: 0;
   z-index: 9;
+  overflow: hidden;
+  padding: 0.2rem 0;
 
   & > div {
     color: #fff;
@@ -289,6 +324,11 @@
     font-weight: 600;
     line-height: 150%;
     cursor: pointer;
+    transition: all 0.2s;
+    padding: 0 0.2rem;
+    &:hover {
+      background: #242b31;
+    }
 
     &:nth-of-type(1) {
       color: #fff;
@@ -298,6 +338,9 @@
       line-height: 112.5%;
       margin-bottom: 0.16rem;
       cursor: auto;
+      &:hover {
+        background: transparent;
+      }
     }
   }
 }
@@ -430,6 +473,7 @@
   color: #fff;
   background: linear-gradient(48deg, #9945ff 0.57%, #8a53f4 14.41%, #6377d6 42.09%, #24b0a7 78.67%, #00d18c 98.45%, #00d18c 99.43%);
   box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.22);
+  font-size: 0.2rem;
 
   &:disabled {
     color: #fff !important;

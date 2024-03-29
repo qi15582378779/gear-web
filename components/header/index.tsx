@@ -27,8 +27,8 @@ const Header: FC<any> = (): ReactElement => {
 
   const nav = [
     { name: "Call", path: "/" },
-    { name: "Gears", path: "/gears" },
-    { name: "Create", path: "/create" }
+    { name: "Gears", path: "/gears" }
+    // { name: "Create", path: "/create" }
   ];
 
   const jump = (path: string) => {
@@ -116,7 +116,7 @@ const Header: FC<any> = (): ReactElement => {
             <Wallet onClick={() => handOpen()}>
               <AvatarIcon src="/images/avatar.svg" />
               <WalletAddressTxt>{$hash(publicKey!.toBase58(), 6, 4)}</WalletAddressTxt>
-              <WalletDownIcon src="/images/other/3.svg" />
+              <WalletDownIcon src="/images/other/3.svg" className={cn({ "down-icon": open })} />
             </Wallet>
           ) : (
             <H5ConnectFull className="pc-full">
@@ -169,7 +169,7 @@ const Header: FC<any> = (): ReactElement => {
               className={cn({ "info-active": infoFlag })}
             >
               <Account>
-                <Avatar src="/images/avatar-metamask.png" />
+                <Avatar src="/images/avatar-wallet.svg" />
                 {$hash(publicKey!.toBase58(), 4, 4)}
                 <IconCopy />
               </Account>
@@ -188,46 +188,33 @@ const Header: FC<any> = (): ReactElement => {
         </H5MenuDrop>
 
         <AnimatePresence>
-          {open && (
+          {open && connected ? (
             <Modal ref={modalRef} initial={initial} animate={animate} exit={initial}>
               <ModalContent>
-                {connected ? (
-                  <>
-                    <ModalTit>
-                      My Profile <IconOut onClick={() => disconnect()} />
-                    </ModalTit>
+                <>
+                  <ModalTit>
+                    My Profile <IconOut onClick={() => disconnect()} />
+                  </ModalTit>
 
-                    <Account>
-                      <Avatar src="/images/avatar-metamask.png" />
-                      {$hash(publicKey!.toBase58(), 4, 4)}
-                      <IconCopy />
-                    </Account>
+                  <Account>
+                    <Avatar src="/images/avatar-wallet.svg" />
+                    {$hash(publicKey!.toBase58(), 4, 4)}
+                    <IconCopy />
+                  </Account>
 
-                    <AssetsContent>
-                      <Balance>
-                        <Symbol>
-                          <SymbolIcon src="/images/tokens/SOL.png" />
-                          SOL
-                        </Symbol>
-                        <b>{balance.sol}</b>
-                      </Balance>
-                    </AssetsContent>
-                  </>
-                ) : (
-                  <NoConnect>
-                    <Title>Connect a wallet</Title>
-                    <WalletMultiButton>Connect Wallet</WalletMultiButton>
-                    {/* <Content onClick={() => connectWallet("m")}>
-                      <MetaMask>
-                        <IconMetaMask />
-                      </MetaMask>
-                      MetaMask
-                    </Content> */}
-                  </NoConnect>
-                )}
+                  <AssetsContent>
+                    <Balance>
+                      <Symbol>
+                        <SymbolIcon src="/images/tokens/SOL.png" />
+                        SOL
+                      </Symbol>
+                      <b>{balance.sol}</b>
+                    </Balance>
+                  </AssetsContent>
+                </>
               </ModalContent>
             </Modal>
-          )}
+          ) : null}
         </AnimatePresence>
       </Section>
     </HeaderView>
@@ -398,6 +385,10 @@ const AvatarIcon = styled.img`
 `;
 
 const WalletDownIcon = styled(AvatarIcon)`
+  transition: all 0.2s;
+  &.down-icon {
+    transform: rotate(180deg);
+  }
   @media screen and (max-width: 768px) {
     display: none;
   }
