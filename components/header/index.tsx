@@ -4,7 +4,7 @@ import { useConnectWallet, useDisconnectWallet } from "@/state/chain/hooks";
 import { $hash } from "@/utils/met";
 import { useRouter } from "next/router";
 import { FC, ReactElement, useEffect, useRef, useState } from "react";
-import { IconMetaMask, IconHistory1, IconOut, IconCopy, IconAdd } from "@/components/Icon";
+import { IconHistory1, IconOut, IconCopy, IconAdd } from "@/components/Icon";
 import { motion, AnimatePresence } from "framer-motion";
 
 import styled from "styled-components";
@@ -17,7 +17,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
   const router = useRouter();
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, disconnect } = useWallet();
   const [, connectWallet] = useConnectWallet();
   const [balance, getUserBalance] = useUserBalance();
   const [open, setOpen] = useState(false);
@@ -162,7 +162,7 @@ const Header: FC<any> = (): ReactElement => {
             </H5WalletInfo>
           ) : (
             <H5ConnectFull>
-              <ConnectWallet onClick={() => connectWallet("m")}>Connect Wallet</ConnectWallet>
+              <WalletMultiButton>Connect Wallet</WalletMultiButton>
             </H5ConnectFull>
           )}
 
@@ -200,7 +200,7 @@ const Header: FC<any> = (): ReactElement => {
                 {connected ? (
                   <>
                     <ModalTit>
-                      My Profile <IconOut onClick={() => setOpen(false)} />
+                      My Profile <IconOut onClick={() => disconnect()} />
                     </ModalTit>
 
                     <Account>
@@ -222,12 +222,13 @@ const Header: FC<any> = (): ReactElement => {
                 ) : (
                   <NoConnect>
                     <Title>Connect a wallet</Title>
-                    <Content onClick={() => connectWallet("m")}>
+                    <WalletMultiButton>Connect Wallet</WalletMultiButton>
+                    {/* <Content onClick={() => connectWallet("m")}>
                       <MetaMask>
                         <IconMetaMask />
                       </MetaMask>
                       MetaMask
-                    </Content>
+                    </Content> */}
                   </NoConnect>
                 )}
               </ModalContent>
