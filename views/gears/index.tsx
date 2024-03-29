@@ -214,7 +214,12 @@ const Gears: React.FC = () => {
 
                   <div>
                     gear nft
-                    <div>
+                    <div
+                      onClick={() => {
+                        if (typeof window === "undefined") return;
+                        window.open(ele.gear_nft);
+                      }}
+                    >
                       {$hash(ele.gear_nft)}
                       <IconSee className={ps["see"]} />
                     </div>
@@ -222,7 +227,12 @@ const Gears: React.FC = () => {
 
                   <div>
                     Arweave Storage
-                    <div>
+                    <div
+                      onClick={() => {
+                        if (typeof window === "undefined") return;
+                        window.open(ele.arweave_storage);
+                      }}
+                    >
                       {$hash(ele.arweave_storage)}
                       <IconSee className={ps["see"]} />
                       {/* <Copy
