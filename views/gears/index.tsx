@@ -185,7 +185,7 @@ const Cells: React.FC = () => {
                   Reward
                   <div>
                     <img src="/images/tokens/SOL.png" alt="" />
-                    {$shiftedByFixed(ele.reward, 1, 4)} SOL
+                    {$shiftedByFixed(ele.reward, 0, 4)} SOL
                   </div>
                 </div>
 
