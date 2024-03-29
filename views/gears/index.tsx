@@ -220,7 +220,7 @@ const Gears: React.FC = () => {
                         window.open(ele.gear_nft);
                       }}
                     >
-                      {$hash(ele.gear_nft)}
+                      <span>{$hash(ele.gear_nft)}</span>
                       <IconSee className={ps["see"]} />
                     </div>
                   </div>
@@ -233,7 +233,7 @@ const Gears: React.FC = () => {
                         window.open(ele.arweave_storage);
                       }}
                     >
-                      {$hash(ele.arweave_storage)}
+                      <span>{$hash(ele.arweave_storage)}</span>
                       <IconSee className={ps["see"]} />
                       {/* <Copy
                         className="copy"

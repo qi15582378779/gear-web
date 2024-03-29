@@ -350,8 +350,10 @@
         span {
           cursor: pointer;
           transition: all 0.2s;
+          border-bottom: 1px solid transparent;
           &:hover {
             color: #17fb9b;
+            border-color: #17fb9b;
           }
         }
 

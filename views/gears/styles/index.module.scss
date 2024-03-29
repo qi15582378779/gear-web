@@ -53,10 +53,15 @@
   font-style: normal;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
 
   svg {
     width: 0.16rem;
     height: 0.16rem;
+  }
+
+  &:hover {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.06) 100%), linear-gradient(48deg, #9945ff 0.57%, #8a53f4 14.41%, #6377d6 42.09%, #24b0a7 78.67%, #00d18c 98.45%, #00d18c 99.43%);
   }
 }
 
@@ -156,6 +161,11 @@
             line-height: 150%;
             span {
               cursor: pointer;
+              transition: all 0.2s;
+              border-bottom: 1px solid transparent;
+              &:hover {
+                border-color: #17fb9b;
+              }
             }
             i {
               color: #fff;
@@ -264,6 +274,15 @@
       & > div {
         color: #17fb9b;
         letter-spacing: 0.4px;
+
+        span {
+          cursor: pointer;
+          transition: all 0.2s;
+          border-bottom: 1px solid transparent;
+          &:hover {
+            border-color: #17fb9b;
+          }
+        }
 
         & > i {
           color: #fff;

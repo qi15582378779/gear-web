@@ -318,6 +318,15 @@
         align-items: center;
         color: #17fb9b;
 
+        span {
+          cursor: pointer;
+          transition: all 0.2s;
+          border-bottom: 1px solid transparent;
+          &:hover {
+            border-color: #17fb9b;
+          }
+        }
+
         i {
           margin-left: 0.06rem;
         }

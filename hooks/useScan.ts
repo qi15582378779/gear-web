@@ -12,12 +12,17 @@ type IType = {
 };
 
 const useScan = (): IType => {
+  const env = process.env.APP_ENV;
   const scan = getConfig("scan");
   const greenfieldscanScan = getConfig("greenfieldscanScan");
   const openscan = useCallback(
     (value: string, type: string = "tx") => {
       if (typeof window === "undefined") return;
-      window.open(`${scan}${type}/${value}?cluster=devnet`);
+      if (env === "dev") {
+        window.open(`${scan}${type}/${value}?cluster=devnet`);
+      } else {
+        window.open(`${scan}${type}/${value}`);
+      }
     },
     [scan]
   );

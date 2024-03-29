@@ -44,12 +44,12 @@ const Create: React.FC = () => {
     denom: "",
     logoFile: null
 
-    // name: "translate 2",
+    // name: "translate 2---------",
     // description: "translate",
     // requestURL: "https://api.gearai.xyz/v1/ai/text-to-en",
     // requestParams: '{"text":""}',
     // requestType: "POST",
-    // price: "1",
+    // price: "0.01",
     // denom: "SOL",
     // logoFile: null
 
@@ -233,7 +233,6 @@ const Create: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <input type="file" className={ps.file} id="avatarFiles" accept="image/*" onChange={(e) => onUpload(e)} />
                     <img src="/images/create/1.svg" alt="" className={ps["upload-icon"]} />
                     <div className={ps["upload-tip"]}>
                       Drag & Drop or <span>Choose file</span> to upload <br />
@@ -241,6 +240,7 @@ const Create: React.FC = () => {
                     </div>
                   </>
                 )}
+                <input type="file" className={ps.file} id="avatarFiles" accept="image/*" onChange={(e) => onUpload(e)} />
               </div>
             </div>
 

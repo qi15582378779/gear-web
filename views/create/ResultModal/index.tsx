@@ -53,7 +53,7 @@ const ResultModal: FC = (): ReactElement => {
           </SeeScan>
           <SeeHistory onClick={seeHistory}>
             <HistoryIcon src="/images/dialog/history.svg" />
-            Back to “Your Cell”
+            Back to “Your Gear”
           </SeeHistory>
           <CloseBtn
             onClick={() => {

@@ -10,9 +10,11 @@ import moment from "moment";
 import { ConfigProvider, Skeleton, theme } from "antd";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Empty from "@/components/Empty";
+import { useScan } from "@/hooks";
 
 const History: React.FC = () => {
   const { connected } = useWallet();
+  const { openGreenfieldScan, openscan } = useScan();
   const [open, setOpen] = useState<boolean>(false);
   const [openIndex, setOpenIndex] = useState<number>(-1);
 
@@ -212,7 +214,13 @@ const History: React.FC = () => {
                             <div>
                               Call Txn
                               <div>
-                                {$hash(item.info?.txhash, 6, 8)}
+                                <span
+                                  onClick={() => {
+                                    openscan(item.info?.txhash);
+                                  }}
+                                >
+                                  {$hash(item.info?.txhash, 6, 8)}
+                                </span>
                                 <Copy
                                   className="copy"
                                   copy={() => {
@@ -225,11 +233,17 @@ const History: React.FC = () => {
                             <div>
                               Purchase Txn
                               <div>
-                                {$hash(item.txhash, 6, 8)}
+                                <span
+                                  onClick={() => {
+                                    openGreenfieldScan(item.logTxhash, "object");
+                                  }}
+                                >
+                                  {$hash(item.logTxhash, 6, 8)}
+                                </span>
                                 <Copy
                                   className="copy"
                                   copy={() => {
-                                    $copy(item.txhash);
+                                    $copy(item.logTxhash);
                                   }}
                                 />
                               </div>
