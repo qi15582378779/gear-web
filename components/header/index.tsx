@@ -1,29 +1,24 @@
 // import { useBalance, useWallet } from '@/hooks';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useConnectWallet, useDisconnectWallet } from '@/state/chain/hooks';
-import { $hash } from '@/utils/met';
-import { useRouter } from 'next/router';
-import { FC, ReactElement, useEffect, useRef, useState } from 'react';
-import { IconMetaMask, IconHistory1, IconOut, IconCopy, IconAdd } from '@/components/Icon';
-import { motion, AnimatePresence } from 'framer-motion';
-import tokens from '@/utils/tokens.json';
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnectWallet, useDisconnectWallet } from "@/state/chain/hooks";
+import { $hash } from "@/utils/met";
+import { useRouter } from "next/router";
+import { FC, ReactElement, useEffect, useRef, useState } from "react";
+import { IconMetaMask, IconHistory1, IconOut, IconCopy, IconAdd } from "@/components/Icon";
+import { motion, AnimatePresence } from "framer-motion";
 
-import styled from 'styled-components';
-import { useIsCreate } from '@/state/cells/hooks';
-import { Dropdown, Popover } from 'antd';
-import { useUserBalance } from '@/state/base/hooks';
-import type { MenuProps } from 'antd';
-import cn from 'classnames';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import styled from "styled-components";
+import { Dropdown, Popover } from "antd";
+import { useUserBalance } from "@/state/base/hooks";
+import type { MenuProps } from "antd";
+import cn from "classnames";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
   const router = useRouter();
-  const [isCreate, setIsCreate] = useIsCreate();
-  // const { account, chainId, walletReady, switchNetwork } = useWallet();
-  const { wallet, publicKey, connected } = useWallet();
+  const { publicKey, connected } = useWallet();
   const [, connectWallet] = useConnectWallet();
-  const [, disconnectWallet] = useDisconnectWallet();
   const [balance, getUserBalance] = useUserBalance();
   const [open, setOpen] = useState(false);
 
@@ -34,34 +29,17 @@ const Header: FC<any> = (): ReactElement => {
   const H5DropRef = useRef<HTMLDivElement | null>(null);
 
   const nav = [
-    { name: 'Call', path: '/' },
-    { name: 'Gears', path: '/gears' },
-    { name: 'Create', path: '/create' }
-  ];
-
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: (
-        <ChainItems
-          onClick={() => {
-            // switchNetwork();
-          }}
-        >
-          <ChainImg src="/images/chain/BSC.svg" />
-          BNB Chain
-        </ChainItems>
-      )
-    }
+    { name: "Call", path: "/" },
+    { name: "Gears", path: "/gears" },
+    { name: "Create", path: "/create" }
   ];
 
   const jump = (path: string) => {
-    setIsCreate(false);
     router.push(path);
   };
 
   const handOpen = () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     if (window.innerWidth < 768) {
       setInitial({ y: 20 });
       setInitial({ y: 0 });
@@ -89,21 +67,21 @@ const Header: FC<any> = (): ReactElement => {
   };
 
   useEffect(() => {
-    document.addEventListener('click', handleDocumentClick);
+    document.addEventListener("click", handleDocumentClick);
     return () => {
-      document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener("click", handleDocumentClick);
     };
   }, [open]);
 
   return (
     <HeaderView>
-      <Section className={cn({ 'menu-open': open })}>
+      <Section className={cn({ "menu-open": open })}>
         <Left>
-          <Logo onClick={() => jump('/')} src="/images/logo/logo.svg" />
+          <Logo onClick={() => jump("/")} src="/images/logo/logo.svg" />
         </Left>
         <Nav>
           {nav.map((ele) => (
-            <NavItem key={ele.path} onClick={() => jump(ele.path)} className={ele.path === router.pathname ? 'active' : ''}>
+            <NavItem key={ele.path} onClick={() => jump(ele.path)} className={ele.path === router.pathname ? "active" : ""}>
               {ele.name}
             </NavItem>
           ))}
@@ -112,9 +90,9 @@ const Header: FC<any> = (): ReactElement => {
         <AccountConter>
           <History
             onClick={() => {
-              router.push('/history');
+              router.push("/history");
             }}
-            className={'/history' === router.pathname ? 'active' : ''}
+            className={"/history" === router.pathname ? "active" : ""}
           >
             <IconHistory1 />
             History
@@ -144,7 +122,6 @@ const Header: FC<any> = (): ReactElement => {
               <WalletDownIcon src="/images/other/3.svg" />
             </Wallet>
           ) : (
-            // <ConnectWallet onClick={() => connectWallet('m')}>Connect Wallet</ConnectWallet>
             <WalletMultiButton>Connect Wallet</WalletMultiButton>
           )}
 
@@ -167,7 +144,7 @@ const Header: FC<any> = (): ReactElement => {
                 jump(ele.path);
                 setOpen(!open);
               }}
-              className={ele.path === router.pathname ? 'active' : ''}
+              className={ele.path === router.pathname ? "active" : ""}
             >
               {ele.name}
             </H5MenuItem>
@@ -186,7 +163,7 @@ const Header: FC<any> = (): ReactElement => {
             </H5WalletInfo>
           ) : (
             <H5ConnectFull>
-              <ConnectWallet onClick={() => connectWallet('m')}>Connect Wallet</ConnectWallet>
+              <ConnectWallet onClick={() => connectWallet("m")}>Connect Wallet</ConnectWallet>
             </H5ConnectFull>
           )}
 
@@ -196,7 +173,7 @@ const Header: FC<any> = (): ReactElement => {
                 e.stopPropagation();
                 e.nativeEvent.stopImmediatePropagation();
               }}
-              className={cn({ 'info-active': infoFlag })}
+              className={cn({ "info-active": infoFlag })}
             >
               <Account>
                 <Avatar src="/images/avatar-metamask.png" />
@@ -205,13 +182,6 @@ const Header: FC<any> = (): ReactElement => {
               </Account>
 
               <AssetsContent>
-                <Balance>
-                  <Symbol>
-                    <SymbolIcon src="/images/tokens/USDC.png" />
-                    USDC
-                  </Symbol>
-                  <b>{balance.usdt}</b>
-                </Balance>
                 <Balance>
                   <Symbol>
                     <SymbolIcon src="/images/tokens/SOL.png" />
@@ -253,7 +223,7 @@ const Header: FC<any> = (): ReactElement => {
                 ) : (
                   <NoConnect>
                     <Title>Connect a wallet</Title>
-                    <Content onClick={() => connectWallet('m')}>
+                    <Content onClick={() => connectWallet("m")}>
                       <MetaMask>
                         <IconMetaMask />
                       </MetaMask>
@@ -386,7 +356,7 @@ const Chain = styled.div`
   align-items: center;
   height: 0.4rem;
   color: #222;
-  font-feature-settings: 'clig' off, 'liga' off;
+  font-feature-settings: "clig" off, "liga" off;
   font-size: 0.14rem;
   border-radius: 0.12rem;
 `;
@@ -516,7 +486,7 @@ const ModalTit = styled.div`
 const NoConnect = styled.div``;
 const Title = styled.div`
   color: #222;
-  font-family: 'Source Sans 3';
+  font-family: "Source Sans 3";
   font-size: 0.16rem;
   font-style: normal;
   font-weight: 600;
@@ -532,8 +502,8 @@ const Content = styled.div`
   display: flex;
   align-items: center;
   color: #170f49;
-  font-feature-settings: 'clig' off, 'liga' off;
-  font-family: 'Source Sans 3';
+  font-feature-settings: "clig" off, "liga" off;
+  font-family: "Source Sans 3";
   font-size: 0.16rem;
   font-weight: 600;
   padding: 0 0.19rem;

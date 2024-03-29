@@ -301,6 +301,10 @@
   &:disabled {
     color: #fff !important;
     background: rgba(133, 123, 139, 0.5) !important;
+    &:hover {
+      color: #fff !important;
+      background: rgba(133, 123, 139, 0.5) !important;
+    }
   }
 
   &:hover {

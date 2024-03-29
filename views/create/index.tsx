@@ -3,23 +3,20 @@ import ps from "./styles/index.module.scss";
 import { Button, Dropdown, Input, notification } from "antd";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconDown } from "@/components/Icon";
-import { $BigNumber, $filterNumber, $shiftedBy } from "@/utils/met";
+import { $BigNumber, $filterNumber } from "@/utils/met";
 import { useWallet } from "@solana/wallet-adapter-react";
 import tokens from "@/utils/tokens.json";
 import { useResultModal } from "@/state/cells/hooks";
 import Server from "@/service";
-import { BigNumber } from "ethers";
 import { useWorkspaceGear } from "@/hooks/useWorkspace";
 import ResultModal from "./ResultModal";
-import { useRouter } from "next/router";
 
 const { TextArea } = Input;
 let form = new FormData();
 const Create: React.FC = () => {
-  const { wallet, publicKey, connected } = useWallet();
+  const { publicKey, connected } = useWallet();
   const [, handResultModal] = useResultModal();
   const workspace = useWorkspaceGear();
-  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState<string>("");
@@ -127,7 +124,6 @@ const Create: React.FC = () => {
       // console.log('(tokens as any)[chainId]', (tokens as any)[chainId], chainId, formData.denom);
 
       const tokeninfo = (tokens as any)["devnet"][formData.denom];
-      // const price = $shiftedBy(formData.price, tokeninfo.decimals);
 
       form.append("owner", publicKey!.toBase58());
       form.append("requestURL", formData.requestURL);

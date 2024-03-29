@@ -6,13 +6,12 @@ import { IconClose } from "@/components/Icon";
 import { useScan } from "@/hooks";
 // import { useWallet } from '@solana/wallet-adapter-react';
 
-import { useIsCreate, useResultModal } from "@/state/cells/hooks";
+import { useResultModal } from "@/state/cells/hooks";
 import { useRouter } from "next/router";
 
 const ResultModal: FC = (): ReactElement => {
   const { getScanAddress } = useScan();
   const [resultInfo, handResultModal] = useResultModal();
-  const [, setIsCreate] = useIsCreate();
   const router = useRouter();
 
   const seeHistory = () => {
