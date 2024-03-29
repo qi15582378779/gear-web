@@ -48,7 +48,7 @@ const Gears: React.FC = () => {
       <div className={ps.container}>
         <div className={ps.tit}>
           <div>
-            Interface gear <span>({list.length})</span>
+            Your gear <span>({list.length})</span>
           </div>
 
           {!loading && list.length > 0 && (
@@ -134,8 +134,8 @@ const Gears: React.FC = () => {
           )}
 
           {list.map((ele, index) => (
-            <section key={ele.gearId} className={cn(ps.item, { [ps["item-flipped"]]: isExpanded.includes(index) })}>
-              <div
+            <section key={ele.gearId} className={cn(ps.item, ps["item-no-border"], { [ps["item-flipped"]]: isExpanded.includes(index) })}>
+              {/* <div
                 className={ps["flipped-icon"]}
                 onClick={() => {
                   setIsExpanded((prevState) => {
@@ -148,9 +148,23 @@ const Gears: React.FC = () => {
                 }}
               >
                 <img src="/images/other/5.svg" alt="" />
-              </div>
+              </div> */}
 
               <div className={ps["item-front"]}>
+                <div
+                  className={ps["flipped-icon"]}
+                  onClick={() => {
+                    setIsExpanded((prevState) => {
+                      if (prevState.includes(index)) {
+                        return prevState.filter((i) => i !== index);
+                      } else {
+                        return [...prevState, index];
+                      }
+                    });
+                  }}
+                >
+                  <img src="/images/other/5.svg" alt="" />
+                </div>
                 <div className={ps["item-name"]}>
                   <div>
                     <img src={ele.image} alt="" />
@@ -195,6 +209,20 @@ const Gears: React.FC = () => {
               </div>
 
               <div className={ps["item-back"]}>
+                <div
+                  className={ps["flipped-icon"]}
+                  onClick={() => {
+                    setIsExpanded((prevState) => {
+                      if (prevState.includes(index)) {
+                        return prevState.filter((i) => i !== index);
+                      } else {
+                        return [...prevState, index];
+                      }
+                    });
+                  }}
+                >
+                  <img src="/images/other/5.svg" alt="" />
+                </div>
                 <div className={ps.info}>
                   <div>
                     Fee

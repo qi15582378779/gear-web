@@ -21,6 +21,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 0.4rem;
 
   & > div {
     display: flex;
@@ -30,7 +31,6 @@
       font-weight: 700;
       line-height: 168.75%;
       color: #fff;
-      margin-bottom: 0.4rem;
 
       span {
         font-size: 0.24rem;
@@ -84,6 +84,8 @@
     padding: 0.16rem !important;
     width: 100%;
     height: 100%;
+    position: relative;
+    z-index: 4;
 
     & > div {
       display: flex;
@@ -103,14 +105,26 @@
 
 .item {
   // width: 3.44rem;
-  border-radius: 24px;
-  border: 2px solid rgba(80, 156, 211, 0.8);
+  border-radius: 0.24rem;
+  // border: 2px solid rgba(80, 156, 211, 0.8);
   min-height: 2.82rem;
   color: #fff;
   position: relative;
   overflow: hidden;
-  background: rgba(219, 210, 224, 0.16);
-  backdrop-filter: blur(33px);
+  background: linear-gradient(237deg, #69a9c7 -2.25%, rgba(0, 0, 0, 0) 17.44%), linear-gradient(300deg, #d876f5 3.22%, rgba(0, 0, 0, 0) 64.32%), linear-gradient(127deg, #9a5de4 -9.88%, rgba(51, 49, 54, 0) 100.66%);
+
+  &::before {
+    content: "";
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2d2f3f;
+    z-index: 1;
+    border-radius: 0.24rem;
+  }
 
   &::after {
     content: "";
@@ -121,8 +135,9 @@
     left: 50%;
     transform: translateX(-50%);
     border-radius: 4.17rem;
-    background: linear-gradient(117deg, rgba(200, 243, 132, 0.8) 16.95%, rgba(30, 80, 255, 0.8) 94.94%);
+    background: linear-gradient(114deg, rgba(200, 243, 132, 0.54) 6.6%, rgba(89, 30, 255, 0.54) 92.59%);
     filter: blur(50px);
+    z-index: 2;
   }
 }
 
@@ -130,6 +145,8 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.18rem;
+  position: relative;
+  z-index: 4;
   & > div {
     &:nth-of-type(1) {
       display: flex;
@@ -202,17 +219,20 @@
   line-height: 166.667%;
   margin-bottom: 0.24rem;
   min-height: 0.48rem;
+  position: relative;
+  z-index: 4;
 }
 
 .reward {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   color: rgba(235, 235, 235, 0.8);
   font-size: 12px;
   font-weight: 400;
   margin-bottom: 0.32rem;
+  position: relative;
+  z-index: 4;
 
   & > div {
     display: flex;
@@ -239,6 +259,8 @@
   display: flex;
   flex-direction: column;
   row-gap: 0.1rem;
+  position: relative;
+  z-index: 4;
 
   & > div {
     display: flex;
@@ -305,6 +327,8 @@
   transition: all 0.2s;
   margin-left: 0.04rem;
   cursor: pointer;
+  position: relative;
+  z-index: 4;
   &:hover {
     color: #17fb9b !important;
   }
@@ -316,6 +340,8 @@
   color: #fff;
   background: linear-gradient(48deg, #9945ff 0.57%, #8a53f4 14.41%, #6377d6 42.09%, #24b0a7 78.67%, #00d18c 98.45%, #00d18c 99.43%);
   box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.22);
+  position: relative;
+  z-index: 4;
 
   &:disabled {
     color: #fff !important;
@@ -332,9 +358,18 @@
   }
 }
 
+.item-no-border {
+  background: transparent;
+  overflow: auto;
+  &::after,
+  &::before {
+    content: none;
+  }
+}
+
 .flipped-icon {
   position: absolute;
-  z-index: 3;
+  z-index: 5;
   top: 0.2rem;
   right: 0.16rem;
   cursor: pointer;
@@ -351,10 +386,40 @@
   width: 100%;
   height: 100%;
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   backface-visibility: hidden;
   transition: transform 0.4s ease 0s;
   padding: 0.16rem 0.16rem 0.24rem;
+  background: linear-gradient(237deg, #69a9c7 -2.25%, rgba(0, 0, 0, 0) 17.44%), linear-gradient(300deg, #d876f5 3.22%, rgba(0, 0, 0, 0) 64.32%), linear-gradient(127deg, #9a5de4 -9.88%, rgba(51, 49, 54, 0) 100.66%);
+  overflow: hidden;
+  border-radius: 0.24rem;
+
+  &::before {
+    content: "";
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2d2f3f;
+    z-index: 1;
+    border-radius: 0.24rem;
+  }
+
+  &::after {
+    content: "";
+    width: 4.17rem;
+    height: 2.51rem;
+    position: absolute;
+    bottom: -1.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 4.17rem;
+    background: linear-gradient(114deg, rgba(200, 243, 132, 0.54) 6.6%, rgba(89, 30, 255, 0.54) 92.59%);
+    filter: blur(50px);
+    z-index: 2;
+  }
 }
 
 .item-back {
@@ -374,6 +439,8 @@
     width: 100%;
     height: 100%;
     padding: 0.16rem;
+    position: relative;
+    z-index: 4;
     & > div {
       &:nth-of-type(1) {
         display: flex;
@@ -454,8 +521,12 @@
     padding: 1.28rem 0.16rem 0.48rem;
   }
   .tit {
-    font-size: 0.24rem;
-    line-height: 1px;
+    & > div {
+      &:nth-of-type(1) {
+        font-size: 0.24rem;
+        margin-bottom: 0;
+      }
+    }
   }
   .group {
     grid-template-columns: repeat(1, 1fr);
