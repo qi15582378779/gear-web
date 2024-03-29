@@ -1,19 +1,12 @@
 import { IconSearch } from "@/components/Icon";
 import cn from "classnames";
-import { FC, ReactElement, useEffect, useMemo, useRef, useState } from "react";
+import { FC, ReactElement, useEffect, useRef, useState } from "react";
 
 import { Button, ConfigProvider, Input, Skeleton, notification, theme } from "antd";
-import HistoryModal from "./components/history-modal";
-// import { useApproveByToken, useTransactionMined, useWallet } from '@/hooks';
-import { useConnectWallet } from "@/state/chain/hooks";
-import { $BigNumber, $copy, $hash, $shiftedBy, $shiftedByFixed, $sleep } from "@/utils/met";
-import { getCell, ERC20 } from "@/sdk";
-
+import { $BigNumber, $copy, $hash } from "@/utils/met";
 import Server from "@/service";
-import { ApprovalState, TransactionState } from "@/typings";
-import { useApproveDialog, useHasNewHistory, useHistory, useHistoryDialog, useResultModal } from "@/state/call/hooks";
+import { useResultModal } from "@/state/call/hooks";
 import ResultModal from "./ResultModal";
-import ApproveModal from "./ApproveModal";
 import { useUserBalance } from "@/state/base/hooks";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -29,25 +22,11 @@ const Home: FC = (): ReactElement => {
   const workspace = useWorkspaceGear();
   const [debounce] = useDebounce(1000);
 
-  const [, connectWallet] = useConnectWallet();
-  const [history, { fetchHistory, reset }] = useHistory();
-  const { wallet, publicKey, connected } = useWallet();
+  const { publicKey, connected } = useWallet();
   const { openGreenfieldScan } = useScan();
-  // const { account, wallet, walletReady, switchNetwork, openGreenfieldScan } = useWallet();
   const [balance, getUserBalance] = useUserBalance();
 
-  // const [{ approvalState, transactionState }, { approve, getAllowance }, approveLoading] = useApproveByToken();
-  // const [, { awaitTransactionMined }] = useTransactionMined();
-  const [showHistoryModal, handShowHistoryModal] = useHistoryDialog();
-  const [approveResultDialog, handApproveResultModal] = useApproveDialog();
-
   const [, handResultModal] = useResultModal();
-  const [hasNewHistory, handHasNewHistory] = useHasNewHistory();
-
-  const [detailData, setDetailData] = useState<any>(null);
-  const [cellModalFlag, setCellModalFlag] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-
   const [search, setSearch] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState<any[]>([]);
 
@@ -225,7 +204,7 @@ const Home: FC = (): ReactElement => {
                           <img src={`/images/tokens/${item.symbol}.png`} alt="" />
 
                           <div>
-                            <span>${item.price}</span>/Call
+                            <span>{item.price}</span>/Call
                           </div>
 
                           <div
@@ -318,17 +297,9 @@ const Home: FC = (): ReactElement => {
                                 Insufficient balance
                               </Button>
                             ) : (
-                              <>
-                                {/* {approvalState !== ApprovalState.APPROVED ? (
-                                  <Button className={ps['btn']} loading={approveLoading || loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handApprove()}>
-                                    Approve and Call
-                                  </Button>
-                                ) : ( */}
-                                <Button className={ps["btn"]} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall(item, index)}>
-                                  Call
-                                </Button>
-                                {/* )} */}
-                              </>
+                              <Button className={ps["btn"]} loading={loadingStates[index]} disabled={Object.values(cellList[index].requestParams).findIndex((ele: any) => ele.length === 0) !== -1} onClick={() => handleCall(item, index)}>
+                                Call
+                              </Button>
                             )}
                           </>
                         )}
@@ -343,12 +314,6 @@ const Home: FC = (): ReactElement => {
         </div>
       </div>
 
-      <HistoryModal
-        isOpen={showHistoryModal}
-        handleCancelModal={(update) => {
-          handShowHistoryModal(false);
-        }}
-      />
       <ResultModal />
     </>
   );

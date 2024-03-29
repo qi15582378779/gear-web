@@ -1,6 +1,4 @@
-// import { useBalance, useWallet } from '@/hooks';
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useConnectWallet, useDisconnectWallet } from "@/state/chain/hooks";
 import { $hash } from "@/utils/met";
 import { useRouter } from "next/router";
 import { FC, ReactElement, useEffect, useRef, useState } from "react";
@@ -18,7 +16,6 @@ const Header: FC<any> = (): ReactElement => {
   const modalRef = useRef(null);
   const router = useRouter();
   const { publicKey, connected, disconnect } = useWallet();
-  const [, connectWallet] = useConnectWallet();
   const [balance, getUserBalance] = useUserBalance();
   const [open, setOpen] = useState(false);
 

@@ -1,14 +1,12 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import { useDispatch } from 'react-redux';
-import chain from './chain/reducer';
-import call from './call/reducer';
-import cells from './cells/reducer';
-import base from './base/reducer';
+import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
+import call from "./call/reducer";
+import cells from "./cells/reducer";
+import base from "./base/reducer";
 
 const store = configureStore({
   reducer: {
     base,
-    chain,
     call,
     cells
   },
@@ -18,7 +16,7 @@ const store = configureStore({
 
       thunk: true
     }),
-  devTools: process.env.NODE_ENV === 'development'
+  devTools: process.env.NODE_ENV === "development"
 });
 
 export default store;
