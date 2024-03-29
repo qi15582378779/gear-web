@@ -75,7 +75,7 @@ const Header: FC<any> = (): ReactElement => {
 
   return (
     <HeaderView>
-      <Section className={cn({ "menu-open": open })}>
+      <Section className={cn({ "menu-open": open })} ref={H5DropRef}>
         <Left>
           <Logo onClick={() => jump("/")} src="/images/logo/logo.svg" />
         </Left>
@@ -126,7 +126,6 @@ const Header: FC<any> = (): ReactElement => {
           )}
 
           <H5Menu
-            ref={H5DropRef}
             onClick={() => {
               setOpen(!open);
             }}
