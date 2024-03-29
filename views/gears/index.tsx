@@ -41,6 +41,9 @@ const Gears: React.FC = () => {
   useEffect(() => {
     if (connected) fetchGears();
     else reset();
+    return () => {
+      reset();
+    };
   }, [connected, wallet]);
 
   return (
