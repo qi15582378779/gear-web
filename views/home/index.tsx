@@ -39,6 +39,8 @@ const Home: FC = (): ReactElement => {
     text: ""
   });
 
+  const textareaRefs = useRef<any>([]);
+
   const hangSearch = (value: string) => {
     setSearch(value);
     params.current.text = value;
@@ -72,6 +74,12 @@ const Home: FC = (): ReactElement => {
     };
 
     setCellList(updatedData);
+  };
+
+  const handleFocusClick = (index: number, item: any) => {
+    if (textareaRefs.current) {
+      textareaRefs.current[index + item.gearId]?.focus();
+    }
   };
 
   const handleCall = async (item: any, index: number) => {
@@ -260,10 +268,12 @@ const Home: FC = (): ReactElement => {
                         <>
                           {Object.keys(item.requestParams).length > 0 && (
                             <>
-                              {Object.entries(item.requestParams).map(([key, value]) => (
-                                <div className={ps["more-list"]} key={key}>
-                                  <div className={ps["list-lab"]}>{key}</div>
-                                  <TextArea className={ps["list-input"]} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(index, key, e.target.value)} />
+                              {Object.entries(item.requestParams).map(([key, value], i) => (
+                                <div className={ps["more-list"]} key={key} onClick={() => handleFocusClick(i, item)}>
+                                  <div className={ps["list-lab"]}>
+                                    {key} === {i}
+                                  </div>
+                                  <TextArea ref={(ref) => (textareaRefs.current[i + item.gearId] = ref)} className={ps["list-input"]} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(index, key, e.target.value)} />
                                 </div>
                               ))}
                             </>

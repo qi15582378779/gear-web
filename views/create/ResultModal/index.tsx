@@ -98,6 +98,7 @@ const Modals = styled(Modal)`
       padding: 0.14rem 0.2rem 0;
       min-height: 1.5rem;
       border-radius: 0.24rem;
+      font-family: "IBM Plex Mono", sans-serif;
     }
   }
 `;
@@ -106,7 +107,7 @@ const Header = styled.header`
   align-items: center;
   justify-content: space-between;
   color: #fff;
-  font-feature-settings: "clig" off, "liga" off;
+  font-family: "IBM Plex Mono", sans-serif;
   font-size: 0.16rem;
   font-style: normal;
   font-weight: 500;
@@ -141,6 +142,7 @@ const Title = styled.h5`
   font-size: 0.16rem;
   font-weight: 500;
   line-height: 0.24rem; /* 150% */
+  font-family: "IBM Plex Mono", sans-serif;
 `;
 
 const Interface = styled.div`
@@ -178,6 +180,7 @@ const Notic = styled.div`
   font-style: normal;
   font-weight: 400;
   line-height: 133.333%;
+  font-family: "IBM Plex Mono", sans-serif;
 `;
 const WainIcon = styled.img`
   width: 0.14rem;
@@ -194,6 +197,7 @@ const Tip = styled.p`
   font-style: normal;
   font-weight: 400;
   line-height: 0.24rem; /* 171.429% */
+  font-family: "IBM Plex Mono", sans-serif;
 `;
 
 const Success = styled.section`
@@ -216,6 +220,7 @@ const Status = styled.h4`
   font-weight: 600;
   line-height: 0.24rem; /* 120% */
   margin-top: 0.15rem;
+  font-family: "IBM Plex Mono", sans-serif;
 `;
 const SeeScan = styled.a`
   color: #17fb9b;
@@ -227,6 +232,8 @@ const SeeScan = styled.a`
   line-height: 0.2rem;
   text-decoration-line: underline;
   margin-top: 0.12rem;
+  font-family: "IBM Plex Mono", sans-serif;
+
   &:hover {
     color: #17fb9b;
   }
@@ -241,11 +248,12 @@ const SeeHistory = styled.div`
   border-radius: 0.08rem;
   background: #283039;
   cursor: pointer;
-
   color: #fff;
   font-feature-settings: "clig" off, "liga" off;
   font-size: 0.14rem;
   font-weight: 500;
+  font-family: "IBM Plex Mono", sans-serif;
+
   &.fail {
     background: none;
   }
@@ -266,5 +274,6 @@ const CloseBtn = styled.div`
   font-size: 0.14rem;
   font-weight: 500;
   cursor: pointer;
+  font-family: "IBM Plex Mono", sans-serif;
 `;
 export default ResultModal;
