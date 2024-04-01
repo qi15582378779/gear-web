@@ -10,11 +10,14 @@ import { useResultModal } from "@/state/gears/hooks";
 import Server from "@/service";
 import { useWorkspaceGear } from "@/hooks/useWorkspace";
 import ResultModal from "./ResultModal";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useUserBalance } from "@/state/base/hooks";
 
 const { TextArea } = Input;
 let form = new FormData();
 const Create: React.FC = () => {
   const { publicKey, connected } = useWallet();
+  const [balance] = useUserBalance();
   const [, handResultModal] = useResultModal();
   const workspace = useWorkspaceGear();
 
@@ -338,9 +341,23 @@ const Create: React.FC = () => {
             </div>
           </section>
 
-          <Button block className={ps["submit-btn"]} disabled={!!btn_disable} loading={loading} onClick={submit}>
-            Submit
-          </Button>
+          {!connected ? (
+            <div className={ps["no-connect"]}>
+              <WalletMultiButton>Connect Wallet</WalletMultiButton>
+            </div>
+          ) : (
+            <>
+              {$BigNumber(balance?.["sol"] || 0).isZero() ? (
+                <Button className={ps["btn"]} disabled>
+                  Insufficient balance
+                </Button>
+              ) : (
+                <Button block className={ps["submit-btn"]} disabled={!!btn_disable} loading={loading} onClick={submit}>
+                  Submit
+                </Button>
+              )}
+            </>
+          )}
         </div>
       </div>
       <ResultModal />

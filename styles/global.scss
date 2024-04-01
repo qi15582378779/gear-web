@@ -103,29 +103,33 @@
   }
 }
 
-///
-.wallet-adapter-dropdown {
-  .wallet-adapter-button {
-    border-radius: 0.32rem;
-    height: 0.4rem;
-    padding: 0 0.16rem;
-    color: #07071c;
-    font-size: 0.14rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: all 0.2s;
-    @media screen and (max-width: 768px) {
-      font-size: 0.12rem;
-    }
+//
+.wallet-full {
+  .wallet-adapter-dropdown {
+    .wallet-adapter-button {
+      border-radius: 0.32rem;
+      height: 0.4rem;
+      padding: 0 0.16rem;
+      color: #07071c;
+      font-size: 0.14rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+      font-family: "IBM Plex Mono";
 
-    &:hover {
-      background: #c4cbd4 !important;
-    }
+      @media screen and (max-width: 768px) {
+        font-size: 0.12rem;
+      }
 
-    &.wallet-adapter-button-trigger {
-      background: #fbfbfb;
+      &:hover {
+        background: #c4cbd4 !important;
+      }
+
+      &.wallet-adapter-button-trigger {
+        background: #fbfbfb;
+      }
     }
   }
 }

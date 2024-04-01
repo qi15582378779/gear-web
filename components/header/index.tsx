@@ -120,7 +120,7 @@ const Header: FC<any> = (): ReactElement => {
               <WalletDownIcon src="/images/other/3.svg" className={cn({ "down-icon": open })} />
             </Wallet>
           ) : (
-            <H5ConnectFull className="pc-full">
+            <H5ConnectFull className="pc-full wallet-full">
               <WalletMultiButton>Connect Wallet</WalletMultiButton>
             </H5ConnectFull>
           )}
@@ -156,7 +156,7 @@ const Header: FC<any> = (): ReactElement => {
               Profile <WalletDownIcon src="/images/other/3.svg" />
             </H5WalletInfo>
           ) : (
-            <H5ConnectFull>
+            <H5ConnectFull className="wallet-full">
               <WalletMultiButton>Connect Wallet</WalletMultiButton>
             </H5ConnectFull>
           )}
