@@ -50,7 +50,13 @@ export function useGears(): [any[], () => void, (data: Record<string, any>) => P
       for (i; i < data.length; i++) {
         try {
           const reward = await workspace?.program.getClaimableAmount(new PublicKey(data[i].gearAddress));
-          list.push({ ...data[i], reward, gear_nft: `https://solscan.io/token/${data[i].gearAddress}?cluster=devnet#metadata`, arweave_storage: `https://arweave.net/${data[i].metadataObjectId}` });
+          list.push({
+            ...data[i],
+            reward,
+            // gear_nft: `https://solscan.io/token/${data[i].gearAddress}?cluster=devnet#metadata`, //
+            gear_nft: `https://explorer.solana.com/address/${data[i].gearAddress}?cluster=devnet`,
+            arweave_storage: `https://arweave.net/${data[i].metadataObjectId}`
+          });
         } catch (e) {}
       }
       dispatch(setList(list));

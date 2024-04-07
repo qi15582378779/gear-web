@@ -270,9 +270,7 @@ const Home: FC = (): ReactElement => {
                             <>
                               {Object.entries(item.requestParams).map(([key, value], i) => (
                                 <div className={ps["more-list"]} key={key} onClick={() => handleFocusClick(i, item)}>
-                                  <div className={ps["list-lab"]}>
-                                    {key} === {i}
-                                  </div>
+                                  <div className={ps["list-lab"]}>{key}</div>
                                   <TextArea ref={(ref) => (textareaRefs.current[i + item.gearId] = ref)} className={ps["list-input"]} value={value as string} autoSize={{ minRows: 1, maxRows: 3 }} onChange={(e) => handleInputChange(index, key, e.target.value)} />
                                 </div>
                               ))}
